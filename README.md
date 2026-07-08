@@ -1,5 +1,8 @@
 # PlanningPoker
 
+>This README file contains *general information* about the idea and purpose of the project. 
+>See [/docs](docs/README.md) for detailed *technic documentation*.
+
 ## Introduction 
 
 Planning Poker is a **collaborative estimation technique** used by software development teams to **estimate the complexity and effort of tasks**. Team members independently evaluate a task, discuss different opinions, and reach a shared understanding of the required effort.  
@@ -56,6 +59,7 @@ A typical workflow:
 | Session        | A collaborative workspace where users estimate tasks             |     |
 | Task           | An item that requires estimation by participants                 |     |
 | Vote           | An individual estimation value submitted by a participant        |     |
+More terms are available in [glossary](glossary.md).
 
 ## Resources
 
@@ -64,6 +68,18 @@ The project is developed using:
 - Frontend: Basic web technologies | [Tailwind](https://tailwindcss.com/)
 - Version Control: [GitHub](https://github.com/danylo-dorofeiev/planning-poker) | [Bitbucket](https://bitbucket.org/)
 - Documentation: [Obsidian](https://obsidian.md/) | [LaTex](https://www.latex-project.org/) | [Overleaf](https://www.overleaf.com/)
+
+## Documentation
+
+Project documentation is stored in the [/docs](docs/README.md) directory.
+It contains:
+- System Requirements Specification (SRS)
+- Functional and Non-functional Requirements
+- Use Cases
+- System Design
+- Architecture Documentation
+- Implementation Details
+- Testing Documentation
 
 ## Reference
 
