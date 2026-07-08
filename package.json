@@ -5,6 +5,7 @@
         "@symfony/webpack-encore": "^7.1.0",
         "babel-plugin-polyfill-corejs3": "^1.0.0",
         "core-js": "^3.49.0",
+        "postcss-loader": "^8.2.1",
         "regenerator-runtime": "^0.13.9",
         "webpack": "^5.82",
         "webpack-cli": "^7.0.0"
