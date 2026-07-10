@@ -11,10 +11,8 @@ class RoomService
         private EntityManagerInterface $entityManager
     ) {
     }
-    public function createRoom(): Room
+    public function createRoom(Room $room): Room
     {
-        $room = new Room();
-
         $this->entityManager->persist($room);
         $this->entityManager->flush();
 
