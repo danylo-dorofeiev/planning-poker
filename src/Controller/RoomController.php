@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Room;
+use App\Service\RoomService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,18 +15,12 @@ use Symfony\Component\Mercure\Update;
 final class RoomController extends AbstractController
 {
     #[Route('/room/create', name: 'room_create')]
-    public function create(EntityManagerInterface $entityManager): Response
+    public function create(RoomService $roomService): Response
     {
-        $room = new Room();
+        $room = $roomService->createRoom();
 
-        $entityManager->persist($room);
-        $entityManager->flush();
-
-        return $this->redirectToRoute(
-            'room_show',
-            [
+        return $this->redirectToRoute('room_show', [
                 'uuid'=>$room->getUuid(),
-                'room'=>$room,
             ]
         );
     }
@@ -36,6 +31,7 @@ final class RoomController extends AbstractController
         return $this->render('room/show.html.twig',
             [
                 'room'=>$room,
+                'uuid'=>$room->getUuid(),
             ]
         );
     }
