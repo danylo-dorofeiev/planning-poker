@@ -1,0 +1,12 @@
+{{ form_start(ticketForm, {
+    action: path('ticket_create', {uuid: room.uuid}),
+    method: 'POST'
+}) }}
+
+    {{ form_widget(ticketForm) }}
+
+<button type="submit">
+    Create Ticket
+</button>
+
+{{ form_end(ticketForm) }}

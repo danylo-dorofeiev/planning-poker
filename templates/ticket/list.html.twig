@@ -1,29 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Room{% endblock %}
+{% block title %}Ticket List{% endblock %}
 
 {% block body %}
 
-    <h1>Room</h1>
-
-    <h2>Room Settings</h2>
-    <ul>
-        <li>Uuid: {{ room.uuid }}</li>
-        <li>Name: {{ room.name }}</li>
-        <li>Description: {{ room.description }}</li>
-        <li>Max Users: {{ room.maxUsers }}</li>
-        <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
-    </ul>
-
-    <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
-
-    <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
-        <button type="submit">Delete</button>
-    </form>
-
-    <hr>
-
-    <h2>Tickets</h2>
+    <h1>Ticket List</h1>
 
     <style>
         table, th, td {
@@ -41,10 +22,11 @@
             <th>Status</th>
             <th>Created at</th>
             <th>Updated at</th>
+            <th>Room</th>
         </tr>
         </thead>
         <tbody>
-        {% for ticket in room.tickets %}
+        {% for ticket in tickets %}
             <tr>
                 <td>{{ ticket.key }}</td>
                 <td>{{ ticket.title }}</td>
@@ -52,12 +34,9 @@
                 <td>{{ ticket.status.value }}</td>
                 <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
                 <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
+                <td>{{ ticket.getRoomUuid() }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <br>
-
-    {{ include('ticket/_create_form.html.twig') }}
 {% endblock %}

@@ -14,7 +14,7 @@ class Ticket
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 20, unique: true)]
+    #[ORM\Column(name: 'ticket_key', length: 20, nullable: true)]
     private ?string $key = null;
 
     #[ORM\Column(length: 255)]
@@ -53,7 +53,7 @@ class Ticket
         return $this->key;
     }
 
-    public function setKey(string $key): static
+    public function setKey(?string $key): static
     {
         $this->key = $key;
         return $this;
@@ -97,6 +97,11 @@ class Ticket
         return $this->room;
     }
 
+    public function getRoomUuid(): string
+    {
+        return $this->room->getUuid();
+    }
+
     public function setRoom(?Room $room): static
     {
         $this->room = $room;
@@ -117,10 +122,5 @@ class Ticket
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
-    }
-
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
     }
 }

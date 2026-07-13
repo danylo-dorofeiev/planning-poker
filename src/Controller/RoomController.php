@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Room;
+use App\Entity\Ticket;
 use App\Form\RoomType;
+use App\Form\TicketType;
 use App\Repository\RoomRepository;
 use App\Service\RoomService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,14 +51,15 @@ final class RoomController extends AbstractController
     #[Route('/room/{uuid}', name: 'room_show')]
     public function show(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room): Response {
+        $ticket = new Ticket();
+        $ticket->setRoom($room);
+
+        $form = $this->createForm(TicketType::class, $ticket);
+
         return $this->render('room/show.html.twig',
             [
                 'room'=>$room,
-                'room.uuid'=>$room->getUuid(),
-                'room.name'=>$room->getName(),
-                'room.description'=>$room->getDescription(),
-                'room.maxUsers'=>$room->getMaxUsers(),
-                'room.createdAt'=>$room->getCreatedAt(),
+                'ticketForm'=>$form,
             ]
         );
     }
