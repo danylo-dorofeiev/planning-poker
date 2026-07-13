@@ -72,6 +72,11 @@ class Room
         return $this;
     }
 
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
     public function getMaxUsers(): int
     {
         return $this->maxUsers;

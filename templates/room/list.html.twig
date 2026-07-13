@@ -6,6 +6,13 @@
 
     <h1>Room List</h1>
 
+    <style>
+        table, th, td {
+            border: 1px black solid;
+            border-collapse: collapse;
+        }
+    </style>
+
     <table>
         <thead>
             <tr>
@@ -13,7 +20,8 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Max Users</th>
-                <th>Created At</th>
+                <th>Created at</th>
+                <th></th>
                 <th></th>
                 <th></th>
             </tr>
@@ -26,8 +34,13 @@
                 <td>{{ room.description }}</td>
                 <td>{{ room.maxUsers }}</td>
                 <td>{{ room.createdAt|date('d.m.Y H:i') }}</td>
-                <td><a href="/room/{{ room.uuid }}/edit"><button>Edit</button></a></td>
-                <td><a href="/room/{{ room.uuid }}/delete"><button>Delete</button></a></td>
+                <td><a href="{{ path('room_show', {uuid:room.uuid}) }}"><button>Open</button></a></td>
+                <td><a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a></td>
+                <td>
+                    <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
