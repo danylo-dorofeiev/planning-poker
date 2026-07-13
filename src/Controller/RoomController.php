@@ -94,4 +94,12 @@ final class RoomController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/room/{uuid}/delete', name: 'room_delete')]
+    public function delete(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService): Response {
+        $roomService->deleteRoom($room);
+
+        return $this->redirectToRoute('room_list');
+    }
 }
