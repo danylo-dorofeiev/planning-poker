@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use App\Form\RoomType;
 use App\Repository\RoomRepository;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,6 +24,9 @@ class Room
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
+
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
+    private Collection $tickets;
 
     #[ORM\Column]
     private int $maxUsers = 10;
