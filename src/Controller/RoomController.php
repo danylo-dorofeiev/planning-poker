@@ -70,8 +70,28 @@ final class RoomController extends AbstractController
                 'message' => 'New player joined the room',
             ])
         );
+
         $hub->publish($update);
 
         return new Response('Joined');
+    }
+
+    #[Route('/room/{uuid}/edit', name: 'room_edit')]
+    public function edit(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService): Response {
+        $form = $this->createForm(RoomType::class, $room);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $roomService->updateRoom($room);
+
+            return $this->redirectToRoute('room_show', [
+                'uuid' => $room->getUuid(),
+            ]);
+        }
+
+        return $this->render('room/edit.html.twig', [
+            'form' => $form,
+        ]);
     }
 }
