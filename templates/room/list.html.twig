@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Room List{% endblock %}
+
+{% block body %}
+
+    <h1>Room List</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Uuid</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Max Users</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for room in rooms %}
+            <tr>
+                <td>{{ room.uuid }}</td>
+                <td>{{ room.name }}</td>
+                <td>{{ room.description }}</td>
+                <td>{{ room.maxUsers }}</td>
+                <td>{{ room.createdAt|date('d.m.Y H:i') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
