@@ -1,5 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% endblock %}
+{% block title %}Homepage{% endblock %}
 
-{% block body %}{% endblock %}
+{% block body %}
+
+<h1>PlanningPoker</h1>
+<p>
+    Schätzen Sie Aufgaben gemeinsam im Team, erkennen Sie Risiken frühzeitig und schaffen Sie ein
+    gemeinsames Verständnis für die Anforderungen, bevor die Entwicklung beginnt.
+</p>
+<a href="{{ path('room_create') }}"><button>Create a Room</button></a>
+
+{% endblock %}

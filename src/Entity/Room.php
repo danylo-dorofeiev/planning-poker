@@ -17,6 +17,15 @@ class Room
     #[ORM\Column(type: 'uuid', unique: true)]
     private Uuid $uuid;
 
+    #[ORM\Column(length: 255)]
+    private string $name;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column]
+    private int $maxUsers = 10;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -34,6 +43,39 @@ class Room
     public function getUuid(): Uuid
     {
         return $this->uuid;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getMaxUsers(): int
+    {
+        return $this->maxUsers;
+    }
+
+    public function setMaxUsers(int $maxUsers): static
+    {
+        $this->maxUsers = $maxUsers;
+        return $this;
     }
 
     public function getCreatedAt(): \DateTimeImmutable

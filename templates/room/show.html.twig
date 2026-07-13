@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Room{% endblock %}
+
+{% block body %}
+
+    <h1>Room</h1>
+
+    <strong>Settings:</strong>
+    <ul>
+        <li>Uuid: {{ room.uuid }}</li>
+        <li>Name: {{ room.name }}</li>
+        <li>Description: {{ room.description }}</li>
+        <li>Max Users: {{ room.maxUsers }}</li>
+        <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
+    </ul>
+
+    <td><a href="/room/{{ room.uuid }}/edit"><button>Edit</button></a></td>
+    <td><a href="/room/{{ room.uuid }}/delete"><button>Delete</button></a></td>
+{% endblock %}
