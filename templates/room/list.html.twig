@@ -14,6 +14,8 @@
                 <th>Description</th>
                 <th>Max Users</th>
                 <th>Created At</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -24,8 +26,12 @@
                 <td>{{ room.description }}</td>
                 <td>{{ room.maxUsers }}</td>
                 <td>{{ room.createdAt|date('d.m.Y H:i') }}</td>
+                <td><a href="/room/{{ room.uuid }}/edit"><button>Edit</button></a></td>
+                <td><a href="/room/{{ room.uuid }}/delete"><button>Delete</button></a></td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <a href="{{ path('room_create') }}"><button>Create a Room</button></a>
 {% endblock %}
