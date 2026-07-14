@@ -4,6 +4,8 @@
 
 {% block body %}
 
+<div data-controller="edit-ticket-form">
+
     <h1>Ticket List</h1>
 
     <style>
@@ -23,6 +25,7 @@
             <th>Created at</th>
             <th>Updated at</th>
             <th>Room</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -35,8 +38,18 @@
                 <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
                 <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
                 <td>{{ ticket.getRoomUuid() }}</td>
+                <td>
+                    <button
+                        type="button"
+                        data-action="click->edit-ticket-form#open"
+                        data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}"
+                    >Edit</button>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <div data-edit-ticket-form-target="form" style="display: none"></div>
+</div>
 {% endblock %}

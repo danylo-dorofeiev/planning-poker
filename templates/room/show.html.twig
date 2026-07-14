@@ -23,41 +23,55 @@
 
     <hr>
 
-    <h2>Tickets</h2>
+    <div data-controller="edit-ticket-form">
 
-    <style>
-        table, th, td {
-            border: 1px black solid;
-            border-collapse: collapse;
-        }
-    </style>
+        <h2>Tickets</h2>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Key</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Created at</th>
-            <th>Updated at</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for ticket in room.tickets %}
+        <style>
+            table, th, td {
+                border: 1px black solid;
+                border-collapse: collapse;
+            }
+        </style>
+
+        <table>
+            <thead>
             <tr>
-                <td>{{ ticket.key }}</td>
-                <td>{{ ticket.title }}</td>
-                <td>{{ ticket.description }}</td>
-                <td>{{ ticket.status.value }}</td>
-                <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
-                <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
+                <th>Key</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Created at</th>
+                <th>Updated at</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for ticket in room.tickets %}
+                <tr>
+                    <td>{{ ticket.key }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td>{{ ticket.description }}</td>
+                    <td>{{ ticket.status.value }}</td>
+                    <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
+                    <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
+                    <td>
+                        <button
+                            type="button"
+                            data-action="click->edit-ticket-form#open"
+                            data-url="{{ path('ticket_edit', {uuid: room.uuid, id: ticket.id}) }}"
+                        >Edit</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <br>
+        <br>
 
-    {{ include('ticket/_create_form.html.twig') }}
+        <div data-edit-ticket-form-target="form" style="display: none"></div>
+
+        <br>
+
+        {{ include('ticket/_create_form.html.twig') }}
+    </div>
 {% endblock %}

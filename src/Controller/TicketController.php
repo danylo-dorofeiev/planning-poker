@@ -23,7 +23,7 @@ class TicketController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{uuid}/ticket', name: 'ticket_create', methods: ['POST'])]
+    #[Route('/room/{uuid}/ticket/create', name: 'ticket_create', methods: ['POST'])]
     public function create(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, EntityManagerInterface $entityManager): Response {
         $ticket = new Ticket();
@@ -43,19 +43,24 @@ class TicketController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{uuid}/ticket/{id}/edit', name: 'ticket_edit', methods: ['POST'])]
+    #[Route('/room/{uuid}/ticket/{id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, Request $request, EntityManagerInterface $entityManager): Response {
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $ticket->setUpdatedAt();
             $entityManager->flush();
+
+            return $this->redirectToRoute('room_show', [
+                'uuid' => $room->getUuid(),
+            ]);
         }
 
-        return $this->redirectToRoute('room_show', [
-            'uuid' => $room->getUuid(),
+        return $this->render('ticket/_edit_form.html.twig', [
+            'room' => $room,
+            'ticket' => $ticket,
+            'form' => $form,
         ]);
     }
 }

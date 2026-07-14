@@ -59,7 +59,7 @@ final class RoomController extends AbstractController
         return $this->render('room/show.html.twig',
             [
                 'room'=>$room,
-                'ticketForm'=>$form,
+                'form'=>$form,
             ]
         );
     }
