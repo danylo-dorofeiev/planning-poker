@@ -63,4 +63,15 @@ class TicketController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/room/{uuid}/ticket/{id}/delete', name: 'ticket_delete')]
+    public function delete(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, EntityManagerInterface $entityManager): Response {
+        $entityManager->remove($ticket);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('room_show', [
+            'uuid' => $room->getUuid(),
+        ]);
+    }
 }

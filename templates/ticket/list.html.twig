@@ -26,6 +26,7 @@
             <th>Updated at</th>
             <th>Room</th>
             <th></th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -44,6 +45,11 @@
                         data-action="click->edit-ticket-form#open"
                         data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}"
                     >Edit</button>
+                </td>
+                <td>
+                    <form method="post" action="{{ path('ticket_delete', {uuid: ticket.getRoomUuid(), id:ticket.id}) }}">
+                        <button type="submit">Delete</button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
