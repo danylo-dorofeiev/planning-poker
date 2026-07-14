@@ -21,8 +21,4 @@ export default class extends Controller {
         this.formTarget.innerHTML = html;
         this.formTarget.style.display = "block";
     }
-    delete() {
-        this.formTarget.innerHTML = '';
-        this.formTarget.style.display = "none"
-    }
 }

@@ -6,6 +6,7 @@ use App\Repository\DeckRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DeckRepository::class)]
 class Deck
@@ -15,20 +16,33 @@ class Deck
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private Uuid $uuid;
+
     #[ORM\Column(length: 255)]
     private string $name;
 
     #[ORM\OneToMany(targetEntity: Card::class, mappedBy: 'deck', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $cards;
 
+    #[ORM\Column]
+    private \DateTimeImmutable $createdAt;
+
     public function __construct()
     {
         $this->cards = new ArrayCollection();
+        $this->uuid = Uuid::v4();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): Uuid
+    {
+        return $this->uuid;
     }
 
     public function getName(): ?string
@@ -42,7 +56,7 @@ class Deck
         return $this;
     }
 
-    public function getCards()
+    public function getCards(): Collection
     {
         return $this->cards;
     }
@@ -55,6 +69,7 @@ class Deck
         }
         return $this;
     }
+
     public function removeCard(Card $card): static
     {
         if ($this->cards->removeElement($card)) {
@@ -63,5 +78,10 @@ class Deck
             }
         }
         return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }

@@ -1,0 +1,42 @@
+<button
+    type="button"
+    data-action="click->form#close"
+>
+    Close
+</button>
+{{ form_start(form, {
+    action: path('deck_edit', {uuid: deck.uuid}),
+    method: 'POST'
+}) }}
+{{ form_row(form.name) }}
+<div
+    data-controller="collection"
+    data-collection-index-value="{{ form.cards|length }}"
+    data-collection-prototype-value="{{ form_widget(form.cards.vars.prototype)|e('html_attr') }}"
+>
+    <div data-collection-target="items">
+        {% for cardForm in form.cards %}
+            <div class="card-item">
+                {{ form_row(cardForm.value) }}
+                <button
+                    type="button"
+                    data-action="collection#remove"
+                >
+                    Delete
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button
+        type="button"
+        data-action="collection#add"
+    >
+        Add card
+    </button>
+</div>
+
+<button type="submit">
+    Save
+</button>
+{{ form_end(form) }}

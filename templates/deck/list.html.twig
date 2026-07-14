@@ -3,59 +3,61 @@
 {% block title %}Deck List{% endblock %}
 
 {% block body %}
-<h1>Deck List</h1>
 
-<style>
-    table, th, td {
-        border: 1px black solid;
-        border-collapse: collapse;
-    }
-</style>
+<div data-controller="form">
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for deck in decks %}
+    <h1>Deck List</h1>
+
+    <style>
+        table, th, td {
+            border: 1px black solid;
+            border-collapse: collapse;
+        }
+    </style>
+
+    <table>
+        <thead>
         <tr>
-            <td>{{ deck.id }}</td>
-            <td>{{ deck.name }}</td>
+            <th>UUID</th>
+            <th>Name</th>
+            <th>Cards</th>
+            <th>Created at</th>
+            <th></th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for deck in decks %}
+            <tr>
+                <td>{{ deck.uuid }}</td>
+                <td>{{ deck.name }}</td>
+                <td>
+                    {% for card in deck.cards %}
+                        {{ card.value }}
+                    {% endfor %}
+                </td>
+                <td>{{ deck.createdAt|date('d.m.Y H:i') }}</td>
+                <td>
+                    <button
+                        type="button"
+                        data-action="click->form#fetch"
+                        data-url="{{ path('deck_edit', {uuid: deck.uuid}) }}"
+                    >Edit</button>
+                </td>
+                <td>
+                    <form method="post" action="{{ path('deck_delete', {uuid:deck.uuid}) }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div data-form-target="form" style="display: none"></div>
+</div>
 
 <br>
 
-<div data-controller="form">
-    <button
-        type="button"
-        data-action="click->form#open"
-        data-form-target="target"
-    >Create Deck</button>
+{{ include('deck/_create_form.html.twig') }}
 
-    <div data-form-target="form" style="display: none">
-        <button
-            type="button"
-            data-action="click->form#close"
-        >Close</button>
-
-        {{ form_start(form, {
-            action: path('deck_create'),
-            method: 'POST'
-        }) }}
-
-        {{ form_widget(form) }}
-
-        <button type="submit">
-            Create
-        </button>
-
-        {{ form_end(form) }}
-    </div>
-</div>
 {% endblock %}
