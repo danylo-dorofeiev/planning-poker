@@ -42,7 +42,7 @@
                 <td>
                     <button
                         type="button"
-                        data-action="click->edit-ticket-form#open"
+                        data-action="click->form#open"
                         data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}"
                     >Edit</button>
                 </td>
@@ -56,6 +56,6 @@
         </tbody>
     </table>
 
-    <div data-edit-ticket-form-target="form" style="display: none"></div>
+    <div data-form-target="form" style="display: none"></div>
 </div>
 {% endblock %}

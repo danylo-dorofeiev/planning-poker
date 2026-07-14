@@ -30,4 +30,38 @@ class Deck
     {
         return $this->id;
     }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getCards()
+    {
+        return $this->cards;
+    }
+
+    public function addCard(Card $card): static
+    {
+        if (!$this->cards->contains($card)) {
+            $this->cards->add($card);
+            $card->setDeck($this);
+        }
+        return $this;
+    }
+    public function removeCard(Card $card): static
+    {
+        if ($this->cards->removeElement($card)) {
+            if ($card->getDeck() === $this) {
+                $card->setDeck(null);
+            }
+        }
+        return $this;
+    }
 }

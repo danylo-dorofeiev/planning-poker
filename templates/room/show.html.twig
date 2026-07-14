@@ -23,7 +23,7 @@
 
     <hr>
 
-    <div data-controller="edit-ticket-form">
+    <div data-controller="form">
 
         <h2>Tickets</h2>
 
@@ -59,7 +59,7 @@
                     <td>
                         <button
                             type="button"
-                            data-action="click->edit-ticket-form#open"
+                            data-action="click->form#fetch"
                             data-url="{{ path('ticket_edit', {uuid: room.uuid, id: ticket.id}) }}"
                         >Edit</button>
                     </td>
@@ -75,7 +75,7 @@
 
         <br>
 
-        <div data-edit-ticket-form-target="form" style="display: none"></div>
+        <div data-form-target="form" style="display: none"></div>
 
         <br>
 

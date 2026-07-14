@@ -35,4 +35,15 @@ class Card
         $this->value = $value;
         return $this;
     }
+
+    public function getDeck(): ?Deck
+    {
+        return $this->deck;
+    }
+
+    public function setDeck(?Deck $deck): static
+    {
+        $this->deck = $deck;
+        return $this;
+    }
 }

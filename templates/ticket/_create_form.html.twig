@@ -1,19 +1,19 @@
-<div data-controller="create-ticket-form">
+<div data-controller="form">
     <button
         type="button"
-        data-action="click->create-ticket-form#open"
-        data-create-ticket-form-target="createFormButton"
+        data-action="click->form#open"
+        data-form-target="target"
     >
         Create Ticket
     </button>
 
     <div
-        data-create-ticket-form-target="form"
+        data-form-target="form"
         style="display: none"
     >
         <button
             type="button"
-            data-action="click->create-ticket-form#close"
+            data-action="click->form#close"
         >
             Close
         </button>

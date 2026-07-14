@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Form\RoomType;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
