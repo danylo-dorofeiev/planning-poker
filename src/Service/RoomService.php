@@ -3,13 +3,20 @@
 namespace App\Service;
 
 use App\Entity\Room;
+use App\Repository\RoomRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class RoomService
+readonly class RoomService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private RoomRepository          $roomRepository,
+        private EntityManagerInterface  $entityManager,
     ) {
+    }
+
+    public function findAll(): array
+    {
+        return $this->roomRepository->findAll();
     }
 
     public function createRoom(Room $room): Room

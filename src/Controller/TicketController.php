@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Room;
 use App\Entity\Ticket;
 use App\Form\TicketType;
-use App\Repository\RoomRepository;
 use App\Repository\TicketRepository;
+use App\Service\TicketService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,25 +17,23 @@ use Symfony\Component\Routing\Attribute\Route;
 class TicketController extends AbstractController
 {
     #[Route('/ticket/list', name: 'ticket_list')]
-    public function list(TicketRepository $ticketRepository): Response {
+    public function list(TicketService $ticketService): Response {
         return $this->render('ticket/list.html.twig', [
-            'tickets'=>$ticketRepository->findAll(),
+            'tickets'=>$ticketService->findAll(),
         ]);
     }
 
     #[Route('/room/{uuid}/ticket/create', name: 'ticket_create', methods: ['POST'])]
     public function create(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, EntityManagerInterface $entityManager): Response {
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, TicketService $ticketService): Response {
         $ticket = new Ticket();
-
         $ticket->setRoom($room);
 
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($ticket);
-            $entityManager->flush();
+            $ticketService->createTicket($ticket);
         }
 
         return $this->redirectToRoute('room_show', [
@@ -45,12 +43,12 @@ class TicketController extends AbstractController
 
     #[Route('/room/{uuid}/ticket/{id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
     public function edit(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, Request $request, EntityManagerInterface $entityManager): Response {
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, Request $request, TicketService $ticketService): Response {
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $ticketService->updateTicket($ticket);
 
             return $this->redirectToRoute('room_show', [
                 'uuid' => $room->getUuid(),
@@ -64,11 +62,10 @@ class TicketController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{uuid}/ticket/{id}/delete', name: 'ticket_delete')]
+    #[Route('/room/{uuid}/ticket/{id}/delete', name: 'ticket_delete', methods: ['POST'])]
     public function delete(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, EntityManagerInterface $entityManager): Response {
-        $entityManager->remove($ticket);
-        $entityManager->flush();
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, TicketService $ticketService): Response {
+        $ticketService->deleteTicket($ticket);
 
         return $this->redirectToRoute('room_show', [
             'uuid' => $room->getUuid(),
