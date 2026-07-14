@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket List{% endblock %}
+
+{% block body %}
+
+<div data-controller="edit-ticket-form">
+
+    <h1>Ticket List</h1>
+
+    <style>
+        table, th, td {
+            border: 1px black solid;
+            border-collapse: collapse;
+        }
+    </style>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Key</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Created at</th>
+            <th>Updated at</th>
+            <th>Room</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.key }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.description }}</td>
+                <td>{{ ticket.status.value }}</td>
+                <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
+                <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
+                <td>{{ ticket.getRoomUuid() }}</td>
+                <td>
+                    <button
+                        type="button"
+                        data-action="click->edit-ticket-form#open"
+                        data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}"
+                    >Edit</button>
+                </td>
+                <td>
+                    <form method="post" action="{{ path('ticket_delete', {uuid: ticket.getRoomUuid(), id:ticket.id}) }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div data-edit-ticket-form-target="form" style="display: none"></div>
+</div>
+{% endblock %}

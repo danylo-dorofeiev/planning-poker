@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Room;
+use App\Entity\Ticket;
 use App\Form\RoomType;
-use App\Repository\RoomRepository;
+use App\Form\TicketType;
 use App\Service\RoomService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,14 +17,14 @@ use Symfony\Component\Mercure\Update;
 
 final class RoomController extends AbstractController
 {
-    #[Route('/room/list', name: 'room_list')]
-    public function list(RoomRepository $roomRepository): Response {
+    #[Route('/room/list', name: 'room_list', methods: ['GET'])]
+    public function list(RoomService $roomService): Response {
         return $this->render('room/list.html.twig', [
-            'rooms'=>$roomRepository->findAll(),
+            'rooms'=>$roomService->findAll(),
         ]);
     }
 
-    #[Route('/room/create', name: 'room_create')]
+    #[Route('/room/create', name: 'room_create', methods: ['GET', 'POST'])]
     public function create(Request $request, RoomService $roomService): Response
     {
         $room = new Room();
@@ -33,7 +33,6 @@ final class RoomController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $roomService->createRoom($room);
 
             return $this->redirectToRoute('room_show', [
@@ -46,22 +45,23 @@ final class RoomController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{uuid}', name: 'room_show')]
+    #[Route('/room/{uuid}', name: 'room_show', methods: ['GET'])]
     public function show(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room): Response {
+        $ticket = new Ticket();
+        $ticket->setRoom($room);
+
+        $form = $this->createForm(TicketType::class, $ticket);
+
         return $this->render('room/show.html.twig',
             [
                 'room'=>$room,
-                'room.uuid'=>$room->getUuid(),
-                'room.name'=>$room->getName(),
-                'room.description'=>$room->getDescription(),
-                'room.maxUsers'=>$room->getMaxUsers(),
-                'room.createdAt'=>$room->getCreatedAt(),
+                'form'=>$form,
             ]
         );
     }
 
-    #[Route('/room/{uuid}/join', name: 'room_join')]
+    #[Route('/room/{uuid}/join', name: 'room_join', methods: ['GET'])]
     public function join(Room $room, HubInterface $hub): Response {
         $update = new Update(
             $room->getMercureTopic(),
@@ -76,7 +76,7 @@ final class RoomController extends AbstractController
         return new Response('Joined');
     }
 
-    #[Route('/room/{uuid}/edit', name: 'room_edit')]
+    #[Route('/room/{uuid}/edit', name: 'room_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService): Response {
         $form = $this->createForm(RoomType::class, $room);
@@ -95,7 +95,7 @@ final class RoomController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{uuid}/delete', name: 'room_delete')]
+    #[Route('/room/{uuid}/delete', name: 'room_delete', methods: ['POST'])]
     public function delete(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService): Response {
         $roomService->deleteRoom($room);
