@@ -61,21 +61,6 @@ final class RoomController extends AbstractController
         );
     }
 
-    #[Route('/room/{uuid}/join', name: 'room_join', methods: ['GET'])]
-    public function join(Room $room, HubInterface $hub): Response {
-        $update = new Update(
-            $room->getMercureTopic(),
-            json_encode([
-                'type' => 'join',
-                'message' => 'New player joined the room',
-            ])
-        );
-
-        $hub->publish($update);
-
-        return new Response('Joined');
-    }
-
     #[Route('/room/{uuid}/edit', name: 'room_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService): Response {

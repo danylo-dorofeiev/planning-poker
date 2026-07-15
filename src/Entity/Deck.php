@@ -30,6 +30,9 @@ class Deck
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
+    #[ORM\Column]
+    private bool $system = false;
+
     public function __construct()
     {
         $this->cards = new ArrayCollection();
@@ -85,5 +88,16 @@ class Deck
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function isSystem(): bool
+    {
+       return $this->system;
+    }
+
+    public function setSystem(bool $system): static
+    {
+        $this->system = $system;
+        return $this;
     }
 }

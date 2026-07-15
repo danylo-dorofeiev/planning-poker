@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Deck;
 use App\Form\DeckType;
 use App\Service\DeckService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,6 +50,10 @@ final class DeckController extends AbstractController
     #[Route('/deck/{uuid}/edit', name: 'deck_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Deck $deck, DeckService $deckService, Request $request): Response {
+        if ($deck->isSystem()) {
+            throw new \LogicException('This deck cannot be edited because it is used as a default deck.');
+        }
+
         $form = $this->createForm(DeckType::class, $deck);
         $form->handleRequest($request);
 
@@ -69,6 +72,10 @@ final class DeckController extends AbstractController
     #[Route('/deck/{uuid}/delete', name: 'deck_delete', methods: ['POST'])]
     public function delete(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Deck $deck, DeckService $deckService): Response {
+        if ($deck->isSystem()) {
+            throw new \LogicException('This deck cannot be deleted because it is used as a default deck.');
+        }
+
         $deckService->deleteDeck($deck);
 
         return $this->redirectToRoute('deck_list');

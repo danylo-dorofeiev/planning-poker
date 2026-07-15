@@ -27,6 +27,10 @@ class Room
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
     private Collection $tickets;
 
+    #[ORM\ManyToOne(inversedBy: 'rooms')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Deck $deck = null;
+
     #[ORM\Column]
     private int $maxUsers = 10;
 
@@ -76,6 +80,17 @@ class Room
         return $this->tickets;
     }
 
+    public function getDeck(): ?Deck
+    {
+        return $this->deck;
+    }
+
+    public function setDeck(?Deck $deck): static
+    {
+        $this->deck = $deck;
+        return $this;
+    }
+
     public function getMaxUsers(): int
     {
         return $this->maxUsers;
@@ -90,10 +105,5 @@ class Room
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function getMercureTopic(): string
-    {
-        return 'room/'.$this->uuid;
     }
 }
