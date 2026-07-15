@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^2.18",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6",
+        "hwi/oauth-bundle": "*",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2",
@@ -77,6 +78,13 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "symfony/maker-bundle": "^1.67"
+    },
+    "repositories": {
+        "quantumfrog-auth-bundle": {
+            "type": "vcs",
+            "url": "git@bitbucket.org:qfrog/authbundle.git"
+        }
     }
 }
