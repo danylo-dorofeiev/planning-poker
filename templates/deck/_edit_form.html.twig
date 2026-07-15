@@ -4,11 +4,20 @@
 >
     Close
 </button>
+
 {{ form_start(form, {
     action: path('deck_edit', {uuid: deck.uuid}),
-    method: 'POST'
+    method: 'POST',
+    attr: {
+        'data-controller': 'form',
+        'data-action': 'submit->form#validate',
+    }
 }) }}
+
 {{ form_row(form.name) }}
+
+{{ form_errors(form.cards) }}
+
 <div
     data-controller="collection"
     data-collection-index-value="{{ form.cards|length }}"
