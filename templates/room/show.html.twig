@@ -16,12 +16,15 @@
         <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
     </ul>
 
-    <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
+    {% if is_granted('ROOM_EDIT', room) %}
+        <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
+    {% endif %}
 
-    <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
-        <button type="submit">Delete</button>
-    </form>
-
+    {% if is_granted('ROOM_DELETE', room) %}
+        <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
+            <button type="submit">Delete</button>
+        </form>
+    {% endif %}
     <hr>
 
     <div data-controller="form">

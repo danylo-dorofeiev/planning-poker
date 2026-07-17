@@ -6,21 +6,25 @@ use App\Entity\Room;
 use App\Entity\Ticket;
 use App\Form\RoomType;
 use App\Form\TicketType;
+use App\Security\Voter\RoomVoter;
 use App\Service\RoomService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 final class RoomController extends AbstractController
 {
     #[Route('/room/list', name: 'room_list', methods: ['GET'])]
-    public function list(RoomService $roomService): Response {
+    public function list(RoomService $roomService, Security $security): Response {
         return $this->render('room/list.html.twig', [
-            'rooms'=>$roomService->findAll(),
+            'rooms'=>$roomService->findAllByOwner($security->getUser()),
         ]);
     }
 
@@ -28,6 +32,7 @@ final class RoomController extends AbstractController
     public function create(Request $request, RoomService $roomService): Response
     {
         $room = new Room();
+        $room->setOwner($this->getUser());
 
         $form = $this->createForm(RoomType::class, $room);
         $form->handleRequest($request);
@@ -64,6 +69,8 @@ final class RoomController extends AbstractController
     #[Route('/room/{uuid}/edit', name: 'room_edit', methods: ['GET', 'POST'])]
     public function edit(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService): Response {
+        $this->denyAccessUnlessGranted(RoomVoter::EDIT, $room);
+
         $form = $this->createForm(RoomType::class, $room);
         $form->handleRequest($request);
 
@@ -83,6 +90,8 @@ final class RoomController extends AbstractController
     #[Route('/room/{uuid}/delete', name: 'room_delete', methods: ['POST'])]
     public function delete(
         #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService): Response {
+        $this->denyAccessUnlessGranted(RoomVoter::DELETE, $room);
+
         $roomService->deleteRoom($room);
 
         return $this->redirectToRoute('room_list');

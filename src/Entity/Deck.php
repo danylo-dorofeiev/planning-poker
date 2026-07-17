@@ -20,6 +20,10 @@ class Deck
     #[ORM\Column(type: 'uuid', unique: true)]
     private Uuid $uuid;
 
+    #[ORM\ManyToOne(inversedBy: 'decks')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $owner = null;
+
     #[ORM\Column(length: 255)]
     private string $name;
 
@@ -48,6 +52,17 @@ class Deck
     public function getUuid(): Uuid
     {
         return $this->uuid;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+        return $this;
     }
 
     public function getName(): ?string

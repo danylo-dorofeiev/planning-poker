@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Deck;
+use App\Entity\User;
 use App\Repository\DeckRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -14,9 +15,11 @@ readonly class DeckService
     ) {
     }
 
-    public function findAll(): array
+    public function findAllByOwner(User $user): array
     {
-        return $this->deckRepository->findAll();
+        return $this->deckRepository->findBy([
+            'owner' => $user
+        ]);
     }
 
     public function createDeck(Deck $deck): Deck

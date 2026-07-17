@@ -4,6 +4,11 @@
 
 {% block body %}
 
+{% if not app.user %}
+    <a href="{{ path('app_register') }}"><button>Sign up</button></a>
+    <a href="{{ path('app_login') }}"><button>Login</button></a>
+{% endif %}
+
 <h1>PlanningPoker</h1>
 <p>
     Schätzen Sie Aufgaben gemeinsam im Team, erkennen Sie Risiken frühzeitig und schaffen Sie ein

@@ -8,16 +8,19 @@ use App\Form\TicketType;
 use App\Service\TicketService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 class TicketController extends AbstractController
 {
-    #[Route('/ticket/list', name: 'ticket_list')]
-    public function list(TicketService $ticketService): Response {
+    #[Route('/ticket/list', name: 'ticket_list', methods: ['GET'])]
+    public function list(TicketService $ticketService, Security $security): Response {
         return $this->render('ticket/list.html.twig', [
-            'tickets'=>$ticketService->findAll(),
+            'tickets'=>$ticketService->findAllByOwner($security->getUser()),
         ]);
     }
 
