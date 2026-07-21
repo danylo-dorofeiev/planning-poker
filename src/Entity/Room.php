@@ -36,9 +36,6 @@ class Room
     private ?Deck $deck = null;
 
     #[ORM\Column]
-    private int $maxUsers = 10;
-
-    #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
     public function __construct()
@@ -106,16 +103,6 @@ class Room
         return $this;
     }
 
-    public function getMaxUsers(): int
-    {
-        return $this->maxUsers;
-    }
-
-    public function setMaxUsers(int $maxUsers): static
-    {
-        $this->maxUsers = $maxUsers;
-        return $this;
-    }
 
     public function getCreatedAt(): \DateTimeImmutable
     {

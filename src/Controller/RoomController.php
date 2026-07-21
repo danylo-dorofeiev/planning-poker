@@ -7,6 +7,7 @@ use App\Entity\Ticket;
 use App\Form\RoomType;
 use App\Form\TicketType;
 use App\Security\Voter\RoomVoter;
+use App\Service\DeckService;
 use App\Service\RoomService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,12 +30,16 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/room/create', name: 'room_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, RoomService $roomService): Response
+    public function create(Request $request, RoomService $roomService, DeckService $deckService): Response
     {
-        $room = new Room();
-        $room->setOwner($this->getUser());
+        $user = $this->getUser();
 
-        $form = $this->createForm(RoomType::class, $room);
+        $room = new Room();
+        $room->setOwner($user);
+
+        $form = $this->createForm(RoomType::class, $room, [
+            'decks' => $deckService->findAllByOwner($user)
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

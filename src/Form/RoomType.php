@@ -19,8 +19,8 @@ class RoomType extends AbstractType
             ->add('deck', EntityType::class, [
                 'class' => Deck::class,
                 'choice_label' => 'name',
+                'choices' => $options['decks'],
             ])
-            ->add('maxUsers')
         ;
     }
 
@@ -28,6 +28,7 @@ class RoomType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Room::class,
+            'decks' => [],
         ]);
     }
 }

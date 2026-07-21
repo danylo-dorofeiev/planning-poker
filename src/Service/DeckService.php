@@ -17,9 +17,7 @@ readonly class DeckService
 
     public function findAllByOwner(User $user): array
     {
-        return $this->deckRepository->findBy([
-            'owner' => $user
-        ]);
+        return $this->deckRepository->findAllByOwner($user);
     }
 
     public function createDeck(Deck $deck): Deck

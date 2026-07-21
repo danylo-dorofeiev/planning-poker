@@ -34,7 +34,6 @@
                 <td>{{ room.uuid }}</td>
                 <td>{{ room.name }}</td>
                 <td>{{ room.description }}</td>
-                <td>{{ room.maxUsers }}</td>
                 <td>{{ room.createdAt|date('d.m.Y H:i') }}</td>
                 <td>
                     {% for ticket in room.tickets %}
