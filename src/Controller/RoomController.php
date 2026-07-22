@@ -15,8 +15,6 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -30,9 +28,8 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/room/create', name: 'room_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, RoomService $roomService, DeckService $deckService): Response
-    {
-        $user = $this->getUser();
+    public function create(Request $request, RoomService $roomService, DeckService $deckService, Security $security): Response {
+        $user = $security->getUser();
 
         $room = new Room();
         $room->setOwner($user);
@@ -55,28 +52,28 @@ final class RoomController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{uuid}', name: 'room_show', methods: ['GET'])]
-    public function show(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room): Response {
+    #[Route('/room/{uuid}', name: 'room_show', methods: ['GET', 'POST'])]
+    public function show(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room): Response {
         $ticket = new Ticket();
         $ticket->setRoom($room);
 
         $form = $this->createForm(TicketType::class, $ticket);
 
-        return $this->render('room/show.html.twig',
-            [
-                'room'=>$room,
-                'form'=>$form,
-            ]
-        );
+        return $this->render('room/show.html.twig', [
+            'room'=>$room,
+            'form'=>$form,
+        ]);
     }
 
     #[Route('/room/{uuid}/edit', name: 'room_edit', methods: ['GET', 'POST'])]
-    public function edit(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService): Response {
+    public function edit(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, DeckService $deckService, Security $security): Response {
         $this->denyAccessUnlessGranted(RoomVoter::EDIT, $room);
 
-        $form = $this->createForm(RoomType::class, $room);
+        $user = $security->getUser();
+
+        $form = $this->createForm(RoomType::class, $room, [
+            'decks' => $deckService->findAllByOwner($user)
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -93,8 +90,7 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/room/{uuid}/delete', name: 'room_delete', methods: ['POST'])]
-    public function delete(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService): Response {
+    public function delete(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService): Response {
         $this->denyAccessUnlessGranted(RoomVoter::DELETE, $room);
 
         $roomService->deleteRoom($room);

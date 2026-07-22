@@ -40,11 +40,7 @@
                 <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
                 <td><a href="{{ path('room_show', {uuid:ticket.getRoomUuid()}) }}">{{ ticket.getRoomUuid() }}</a></td>
                 <td>
-                    <button
-                        type="button"
-                        data-action="click->form#fetch"
-                        data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}"
-                    >Edit</button>
+                    <button type="button" data-action="click->form#fetch" data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}">Edit</button>
                 </td>
                 <td>
                     <form method="post" action="{{ path('ticket_delete', {uuid: ticket.getRoomUuid(), id:ticket.id}) }}">

@@ -31,7 +31,7 @@ readonly class TicketService
 
     public function updateTicket(Ticket $ticket): Ticket
     {
-        $ticket->setUpdatedAt(new \DateTimeImmutable);
+        $ticket->setUpdatedAt();
         $this->entityManager->flush();
 
         return $ticket;

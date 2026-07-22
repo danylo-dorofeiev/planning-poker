@@ -19,21 +19,25 @@ final class DeckController extends AbstractController
 {
     #[Route('/deck/list', name: 'deck_list', methods: ['GET'])]
     public function list(DeckService $deckService, Security $security): Response {
+        $user = $security->getUser();
+
         $deck = new Deck();
-        $deck->setOwner($this->getUser());
+        $deck->setOwner($user);
 
         $form = $this->createForm(DeckType::class, $deck);
 
         return $this->render('deck/list.html.twig', [
-            'decks'=>$deckService->findAllByOwner($security->getUser()),
+            'decks'=>$deckService->findAllByOwner($user),
             'form' => $form,
         ]);
     }
 
-    #[Route('/deck/create', name: 'deck_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, DeckService $deckService): Response {
+    #[Route('/deck/create', name: 'deck_create', methods: ['POST'])]
+    public function create(Request $request, DeckService $deckService, Security $security): Response {
+        $user = $security->getUser();
+
         $deck = new Deck();
-        $deck->setOwner($this->getUser());
+        $deck->setOwner($user);
 
         $form = $this->createForm(DeckType::class, $deck);
         $form->handleRequest($request);
@@ -48,9 +52,7 @@ final class DeckController extends AbstractController
             return $this->redirectToRoute('deck_list');
         }
 
-        return $this->render('deck/create.html.twig', [
-            'form' => $form,
-        ]);
+        return new Response('', 302);
     }
 
     #[Route('/deck/{uuid}/edit', name: 'deck_edit', methods: ['GET', 'POST'])]
@@ -71,7 +73,7 @@ final class DeckController extends AbstractController
             return $this->redirectToRoute('deck_list');
         }
 
-        return $this->render('deck/_edit_form.html.twig', [
+        return $this->render('deck/form/edit_form.html.twig', [
             'deck'=>$deck,
             'form' => $form,
         ]);
