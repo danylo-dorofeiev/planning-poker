@@ -9,7 +9,8 @@ services:
 ###> symfony/mercure-bundle ###
   mercure:
     ports:
-      - "80"
+      - "3000:80"
+      - "3443:443"
 ###< symfony/mercure-bundle ###
 
 ###> symfony/mailer ###
