@@ -6,14 +6,7 @@
 
     <h1>Room</h1>
 
-    <h2>Room Settings</h2>
-    <ul>
-        <li>Uuid: {{ room.uuid }}</li>
-        <li>Name: {{ room.name }}</li>
-        <li>Description: {{ room.description }}</li>
-        <li>Deck: {{ room.deck.name }}</li>
-        <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
-    </ul>
+    {% include('room/elements/_settings.html.twig') %}
 
     {% if is_granted('ROOM_EDIT', room) %}
         <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
@@ -24,6 +17,7 @@
             <button type="submit">Delete</button>
         </form>
     {% endif %}
+
     <hr>
 
     <div data-controller="form">
@@ -63,9 +57,9 @@
 
         <br>
 
-        <turbo-frame id="ticket_create">{% include('ticket/form/create_form.html.twig') %}</turbo-frame>
+        {% include('ticket/form/create_form.html.twig') %}
 
-        <!-- mercure stream -->
-        <turbo-stream-source src="{{ mercure(room.uuid) }}"></turbo-stream-source>
+        <!-- mercure stream source -->
+        {% include('mercure/stream-source.html.twig') %}
     </div>
 {% endblock %}

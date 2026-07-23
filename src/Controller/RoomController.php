@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\Ticket;
+use App\Event\RoomEditedEvent;
 use App\Form\RoomType;
 use App\Form\TicketType;
 use App\Security\Voter\RoomVoter;
@@ -12,6 +13,7 @@ use App\Service\RoomService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -66,7 +68,7 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/room/{uuid}/edit', name: 'room_edit', methods: ['GET', 'POST'])]
-    public function edit(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, DeckService $deckService, Security $security): Response {
+    public function edit(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, DeckService $deckService, Security $security, EventDispatcherInterface $eventDispatcher): Response {
         $this->denyAccessUnlessGranted(RoomVoter::EDIT, $room);
 
         $user = $security->getUser();
@@ -78,6 +80,10 @@ final class RoomController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $roomService->updateRoom($room);
+
+            $eventDispatcher->dispatch(
+                new RoomEditedEvent($room),
+            );
 
             return $this->redirectToRoute('room_show', [
                 'uuid' => $room->getUuid(),

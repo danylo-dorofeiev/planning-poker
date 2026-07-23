@@ -1,16 +1,17 @@
-<div data-controller="form">
-    <button type="button" data-action="click->form#open" data-form-target="target">Create Ticket</button>
+<turbo-frame id="ticket_create_form">
+    <div data-controller="form">
+        <button type="button" data-action="click->form#open" data-form-target="target">Create Ticket</button>
 
-    <div data-form-target="form" style="display: none">
-        <button type="button" data-action="click->form#close">Close</button>
+        <div data-form-target="form" style="display: none">
+            <button type="button" data-action="click->form#close">Close</button>
 
-        {{ form_start(form, { action: path('ticket_create', {uuid: room.uuid}), method: 'POST' }) }}
+            {{ form_start(form, { action: path('ticket_create', {uuid: room.uuid}), method: 'POST' }) }}
 
-        {{ form_widget(form) }}
+            {{ form_widget(form) }}
 
-        <button type="submit">Create</button>
+            <button type="submit">Create</button>
 
-        {{ form_end(form) }}
+            {{ form_end(form) }}
+        </div>
     </div>
-</div>
-
+</turbo-frame>

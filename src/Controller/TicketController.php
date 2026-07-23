@@ -43,7 +43,13 @@ class TicketController extends AbstractController
                 new TicketCreatedEvent($ticket),
             );
 
-            return new Response('', 204);
+            $ticket = new Ticket();
+            $ticket->setRoom($room);
+
+            return $this->render('ticket/form/create_form.html.twig', [
+                'form' => $this->createForm(TicketType::class, $ticket)->createView(),
+                'room' => $room,
+            ]);
         }
 
         return new Response('', 302);

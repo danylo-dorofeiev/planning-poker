@@ -1,0 +1,11 @@
+<div id="room_settings">
+
+    <h2>Room Settings</h2>
+    <ul>
+        <li>Uuid: {{ room.uuid }}</li>
+        <li>Name: {{ room.name }}</li>
+        <li>Description: {{ room.description }}</li>
+        <li>Deck: {{ room.deck.name }}</li>
+        <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
+    </ul>
+</div>
