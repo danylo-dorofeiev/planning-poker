@@ -2,7 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\Room;
 use App\Entity\Ticket;
+use App\Entity\User;
 use App\Repository\TicketRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -14,9 +16,9 @@ readonly class TicketService
     ) {
     }
 
-    public function findAll(): array
+    public function findAllByOwner(User $user): array
     {
-        return $this->ticketRepository->findAll();
+        return $this->ticketRepository->findAllByRoomOwner($user);
     }
 
     public function createTicket(Ticket $ticket): Ticket
@@ -29,6 +31,7 @@ readonly class TicketService
 
     public function updateTicket(Ticket $ticket): Ticket
     {
+        $ticket->setUpdatedAt();
         $this->entityManager->flush();
 
         return $ticket;

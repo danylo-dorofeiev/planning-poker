@@ -1,0 +1,9 @@
+<button type="button" data-action="click->form#close">Close</button>
+
+{{ form_start(form, { action: path('ticket_edit', { uuid: room.uuid, id:ticket.id }), method: 'POST' }) }}
+
+{{ form_widget(form) }}
+
+<button type="submit">Save</button>
+
+{{ form_end(form) }}

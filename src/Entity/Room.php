@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Form\RoomType;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
@@ -19,6 +18,10 @@ class Room
     #[ORM\Column(type: 'uuid', unique: true)]
     private Uuid $uuid;
 
+    #[ORM\ManyToOne(inversedBy: 'rooms')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
+
     #[ORM\Column(length: 255)]
     private string $name;
 
@@ -28,8 +31,9 @@ class Room
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
     private Collection $tickets;
 
-    #[ORM\Column]
-    private int $maxUsers = 10;
+    #[ORM\ManyToOne(inversedBy: 'rooms')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Deck $deck = null;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
@@ -48,6 +52,17 @@ class Room
     public function getUuid(): Uuid
     {
         return $this->uuid;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+        return $this;
     }
 
     public function getName(): string
@@ -77,24 +92,20 @@ class Room
         return $this->tickets;
     }
 
-    public function getMaxUsers(): int
+    public function getDeck(): ?Deck
     {
-        return $this->maxUsers;
+        return $this->deck;
     }
 
-    public function setMaxUsers(int $maxUsers): static
+    public function setDeck(?Deck $deck): static
     {
-        $this->maxUsers = $maxUsers;
+        $this->deck = $deck;
         return $this;
     }
+
 
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function getMercureTopic(): string
-    {
-        return 'room/'.$this->uuid;
     }
 }

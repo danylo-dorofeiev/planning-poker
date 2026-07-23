@@ -9,5 +9,15 @@ services:
 ###> symfony/mercure-bundle ###
   mercure:
     ports:
-      - "80"
+      - "3443:443"
 ###< symfony/mercure-bundle ###
+
+###> symfony/mailer ###
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "2525:2525"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+###< symfony/mailer ###

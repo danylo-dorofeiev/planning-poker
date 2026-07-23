@@ -113,14 +113,14 @@ class Ticket
         return $this->createdAt;
     }
 
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
     public function setUpdatedAt(): static
     {
         $this->updatedAt = new \DateTimeImmutable();
         return $this;
-    }
-
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
 }

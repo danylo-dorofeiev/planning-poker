@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Deck List{% endblock %}
+
+{% block body %}
+
+<div data-controller="form">
+
+    <h1>Deck List</h1>
+
+    <style>
+        table, th, td {
+            border: 1px black solid;
+            border-collapse: collapse;
+        }
+    </style>
+
+    <table>
+        <thead>
+        <tr>
+            <th>UUID</th>
+            <th>Name</th>
+            <th>Cards</th>
+            <th>Created at</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for deck in decks %}
+            <tr>
+                <td>{{ deck.uuid }}</td>
+                <td>{{ deck.name }}</td>
+                <td>
+                    {% for card in deck.cards %}
+                        {{ card.value }}
+                    {% endfor %}
+                </td>
+                <td>{{ deck.createdAt|date('d.m.Y H:i') }}</td>
+                <td>
+                    {% if not deck.system %}
+                    <button
+                        type="button"
+                        data-action="click->form#fetch"
+                        data-url="{{ path('deck_edit', {uuid: deck.uuid}) }}"
+                    >Edit</button>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not deck.system %}
+                    <form method="post" action="{{ path('deck_delete', {uuid:deck.uuid}) }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- deck edit form -->
+    <div data-form-target="form" style="display: none"></div>
+    <!-- deck edit form -->
+</div>
+
+<br>
+
+{{ include('deck/form/create_form.html.twig') }}
+
+{% endblock %}

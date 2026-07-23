@@ -1,0 +1,16 @@
+<tr id="ticket-{{ ticket.id }}">
+    <td>{{ ticket.key }}</td>
+    <td>{{ ticket.title }}</td>
+    <td>{{ ticket.description }}</td>
+    <td>{{ ticket.status.value }}</td>
+    <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
+    <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
+    <td>
+        <button type="button" data-action="click->form#fetch" data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}">Edit</button>
+    </td>
+    <td>
+        <form method="post" action="{{ path('ticket_delete', {uuid: ticket.room.uuid, id:ticket.id}) }}">
+            <button type="submit">Delete</button>
+        </form>
+    </td>
+</tr>

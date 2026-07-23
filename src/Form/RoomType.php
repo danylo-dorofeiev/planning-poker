@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Deck;
 use App\Entity\Room;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,7 +16,11 @@ class RoomType extends AbstractType
         $builder
             ->add('name')
             ->add('description')
-            ->add('maxUsers')
+            ->add('deck', EntityType::class, [
+                'class' => Deck::class,
+                'choice_label' => 'name',
+                'choices' => $options['decks'],
+            ])
         ;
     }
 
@@ -22,6 +28,7 @@ class RoomType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Room::class,
+            'decks' => [],
         ]);
     }
 }

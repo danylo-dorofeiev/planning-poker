@@ -21,6 +21,8 @@
                 <th>Description</th>
                 <th>Max Users</th>
                 <th>Created at</th>
+                <th>Tickets</th>
+                <th>Deck</th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -32,8 +34,13 @@
                 <td>{{ room.uuid }}</td>
                 <td>{{ room.name }}</td>
                 <td>{{ room.description }}</td>
-                <td>{{ room.maxUsers }}</td>
                 <td>{{ room.createdAt|date('d.m.Y H:i') }}</td>
+                <td>
+                    {% for ticket in room.tickets %}
+                        {{ ticket.title }}
+                    {% endfor %}
+                </td>
+                <td>{{ room.deck.name }}</td>
                 <td><a href="{{ path('room_show', {uuid:room.uuid}) }}"><button>Open</button></a></td>
                 <td><a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a></td>
                 <td>

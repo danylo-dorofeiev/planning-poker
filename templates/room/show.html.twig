@@ -6,24 +6,21 @@
 
     <h1>Room</h1>
 
-    <h2>Room Settings</h2>
-    <ul>
-        <li>Uuid: {{ room.uuid }}</li>
-        <li>Name: {{ room.name }}</li>
-        <li>Description: {{ room.description }}</li>
-        <li>Max Users: {{ room.maxUsers }}</li>
-        <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
-    </ul>
+    {% include('room/elements/_settings.html.twig') %}
 
-    <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
+    {% if is_granted('ROOM_EDIT', room) %}
+        <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
+    {% endif %}
 
-    <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
-        <button type="submit">Delete</button>
-    </form>
+    {% if is_granted('ROOM_DELETE', room) %}
+        <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
+            <button type="submit">Delete</button>
+        </form>
+    {% endif %}
 
     <hr>
 
-    <div data-controller="edit-ticket-form">
+    <div data-controller="form">
 
         <h2>Tickets</h2>
 
@@ -47,38 +44,22 @@
                 <th></th>
             </tr>
             </thead>
-            <tbody>
-            {% for ticket in room.tickets %}
-                <tr>
-                    <td>{{ ticket.key }}</td>
-                    <td>{{ ticket.title }}</td>
-                    <td>{{ ticket.description }}</td>
-                    <td>{{ ticket.status.value }}</td>
-                    <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
-                    <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
-                    <td>
-                        <button
-                            type="button"
-                            data-action="click->edit-ticket-form#open"
-                            data-url="{{ path('ticket_edit', {uuid: room.uuid, id: ticket.id}) }}"
-                        >Edit</button>
-                    </td>
-                    <td>
-                        <form method="post" action="{{ path('ticket_delete', {uuid: room.uuid, id:ticket.id}) }}">
-                            <button type="submit">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
+            <tbody id="tickets">
+                {% for ticket in room.tickets %}
+                    {% include('ticket/elements/_card.html.twig') %}
+                {% endfor %}
             </tbody>
         </table>
 
         <br>
 
-        <div data-edit-ticket-form-target="form" style="display: none"></div>
+        <div data-form-target="form" style="display: none"></div>
 
         <br>
 
-        {{ include('ticket/_create_form.html.twig') }}
+        {% include('ticket/form/create_form.html.twig') %}
+
+        <!-- mercure stream source -->
+        {% include('mercure/stream-source.html.twig') %}
     </div>
 {% endblock %}
