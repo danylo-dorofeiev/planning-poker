@@ -81,6 +81,9 @@ final class RoomController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $roomService->updateRoom($room);
 
+            $room->setUpdatedAt();
+            $roomService->updateRoom($room);
+
             $eventDispatcher->dispatch(
                 new RoomEditedEvent($room),
             );

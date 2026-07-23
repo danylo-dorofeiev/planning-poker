@@ -38,7 +38,7 @@ class Ticket
 
     public function __construct()
     {
-        $this->status = TicketStatus::OPEN;
+        $this->status = TicketStatus::PENDING;
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }

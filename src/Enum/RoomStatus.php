@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum TicketStatus: string
+enum RoomStatus: string
 {
     case PENDING = 'pending';
     case VOTING = 'voting';

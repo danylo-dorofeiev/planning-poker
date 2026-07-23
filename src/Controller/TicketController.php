@@ -8,6 +8,7 @@ use App\Event\TicketCreatedEvent;
 use App\Event\TicketDeletedEvent;
 use App\Event\TicketEditedEvent;
 use App\Form\TicketType;
+use App\Service\RoomService;
 use App\Service\TicketService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +30,7 @@ class TicketController extends AbstractController
     }
 
     #[Route('/room/{uuid}/ticket/create', name: 'ticket_create', methods: ['POST'])]
-    public function create(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
+    public function create(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
         $ticket = new Ticket();
         $ticket->setRoom($room);
 
@@ -38,6 +39,9 @@ class TicketController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $ticketService->createTicket($ticket);
+
+            $room->setUpdatedAt();
+            $roomService->updateRoom($room);
 
             $eventDispatcher->dispatch(
                 new TicketCreatedEvent($ticket),
@@ -57,12 +61,15 @@ class TicketController extends AbstractController
 
     #[Route('/room/{uuid}/ticket/{id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
     public function edit(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher,): Response {
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $ticketService->updateTicket($ticket);
+
+            $room->setUpdatedAt();
+            $roomService->updateRoom($room);
 
             $eventDispatcher->dispatch(
                 new TicketEditedEvent($ticket),
@@ -82,12 +89,15 @@ class TicketController extends AbstractController
 
     #[Route('/room/{uuid}/ticket/{id}/delete', name: 'ticket_delete', methods: ['POST'])]
     public function delete(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
         $eventDispatcher->dispatch(
             new TicketDeletedEvent($ticket),
         );
 
         $ticketService->deleteTicket($ticket);
+
+        $room->setUpdatedAt();
+        $roomService->updateRoom($room);
 
         return $this->redirectToRoute('room_show', [
             'uuid' => $room->getUuid(),

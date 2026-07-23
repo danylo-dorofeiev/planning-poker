@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\RoomStatus;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
@@ -28,6 +29,9 @@ class Room
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(enumType: RoomStatus::class)]
+    private RoomStatus $status;
+
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
     private Collection $tickets;
 
@@ -38,10 +42,15 @@ class Room
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
+    #[ORM\Column]
+    private \DateTimeImmutable $updatedAt;
+
     public function __construct()
     {
         $this->uuid = Uuid::v4();
+        $this->status = RoomStatus::PENDING;
         $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -87,6 +96,17 @@ class Room
         return $this;
     }
 
+    public function getStatus(): RoomStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(RoomStatus $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
     public function getTickets(): Collection
     {
         return $this->tickets;
@@ -103,9 +123,19 @@ class Room
         return $this;
     }
 
-
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(): static
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+        return $this;
     }
 }

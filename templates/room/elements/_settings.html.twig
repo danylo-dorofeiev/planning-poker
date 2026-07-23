@@ -5,7 +5,9 @@
         <li>Uuid: {{ room.uuid }}</li>
         <li>Name: {{ room.name }}</li>
         <li>Description: {{ room.description }}</li>
+        <li>Status: {{ room.status.value }}</li>
         <li>Deck: {{ room.deck.name }}</li>
         <li>Created at: {{ room.createdAt|date('d.m.Y H:i') }}</li>
+        <li>Updated at: {{ room.updatedAt|date('d.m.Y H:i') }}</li>
     </ul>
 </div>
