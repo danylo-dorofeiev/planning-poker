@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Room;
 use App\Entity\Ticket;
 use App\Event\RoomEditedEvent;
+use App\Event\RoundStartedEvent;
 use App\Form\RoomType;
 use App\Form\TicketType;
+use App\Repository\RoundRepository;
 use App\Security\Voter\RoomVoter;
 use App\Service\DeckService;
 use App\Service\RoomService;
@@ -55,15 +57,18 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/room/{uuid}', name: 'room_show', methods: ['GET', 'POST'])]
-    public function show(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room): Response {
+    public function show(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoundRepository $roundRepository, EventDispatcherInterface $eventDispatcher): Response {
         $ticket = new Ticket();
         $ticket->setRoom($room);
 
         $form = $this->createForm(TicketType::class, $ticket);
 
+        $activeRound = $roundRepository->findActiveRoundByRoom($room);
+
         return $this->render('room/show.html.twig', [
             'room'=>$room,
             'form'=>$form,
+            'activeRound'=>$activeRound,
         ]);
     }
 

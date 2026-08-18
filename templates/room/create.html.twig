@@ -3,12 +3,15 @@
 {% block title %}Room Creation Form{% endblock %}
 
 {% block body %}
+    <a href="{{ path('room_list') }}">All Rooms</a>
 
     <h1>Room Creation Form</h1>
 
     {{  form_start(form) }}
 
     {{ form_widget(form) }}
+
+    <br>
 
     <button type="submit">
         Create

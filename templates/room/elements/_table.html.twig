@@ -1,0 +1,32 @@
+<div id="poker_table">
+    {% if activeRound %}
+        <h2>Round {{ activeRound.number }} - id: {{ activeRound.id }}</h2>
+        <span>Status: {{ activeRound.status.value }}</span>
+
+        <h3>{{ activeRound.ticket.title }}</h3>
+
+        {% if activeRound.ticket.description %}
+            <p>{{ activeRound.ticket.description }}</p>
+        {% endif %}
+
+        {% if activeRound.status.value == 'active' %}
+
+            <div data-controller="voting" data-voting-vote-url-value="{{ path('round_vote', {uuid: activeRound.ticket.room.uuid, id: activeRound.ticket.id}) }}">
+                {% for card in activeRound.cards %}
+                    <button type="button" data-card-id="{{ card.id }}" data-action="click->voting#vote">{{ card.value }}</button>
+                {% endfor %}
+            </div>
+
+            {% if is_granted('ROUND_REVEAL', activeRound.ticket.room) %}
+                <form method="post" action="{{ path('round_reveal', {uuid: activeRound.ticket.room.uuid, id: activeRound.ticket.id}) }}">
+                    <button type="submit">Reveal</button>
+                </form>
+            {% endif %}
+
+        {% else %}
+            {% for vote in activeRound.votes %}
+                <p>{{ vote.user.email }} -> {{ vote.value }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+</div>

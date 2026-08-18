@@ -61,7 +61,7 @@ class TicketController extends AbstractController
 
     #[Route('/room/{uuid}/ticket/{id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
     public function edit(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher,): Response {
+        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\TicketStatus;
 use App\Repository\TicketRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
@@ -29,6 +30,10 @@ class Ticket
     #[ORM\ManyToOne(inversedBy: 'tickets')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Room $room = null;
+
+    #[ORM\OneToMany(targetEntity: Round::class, mappedBy: 'ticket', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['number' => 'ASC'])]
+    private Collection $rounds;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
@@ -105,6 +110,32 @@ class Ticket
     public function setRoom(?Room $room): static
     {
         $this->room = $room;
+        return $this;
+    }
+
+    public function getRounds(): Collection
+    {
+        return $this->rounds;
+    }
+
+    public function addRound(Round $round): static
+    {
+        if (!$this->rounds->contains($round)) {
+            $this->rounds->add($round);
+            $round->setTicket($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRound(Round $round): static
+    {
+        if ($this->rounds->removeElement($round)) {
+            if ($round->getTicket() === $this) {
+                $round->setTicket(null);
+            }
+        }
+
         return $this;
     }
 

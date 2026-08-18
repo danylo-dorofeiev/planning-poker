@@ -42,6 +42,7 @@
                 <th>Updated at</th>
                 <th></th>
                 <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody id="tickets">
@@ -55,9 +56,10 @@
 
         <div data-form-target="form" style="display: none"></div>
 
-        <br>
-
         {% include('ticket/form/create_form.html.twig') %}
+
+        <hr>
+        {% include('room/elements/_table.html.twig') %}
 
         <!-- mercure stream source -->
         {% include('mercure/stream_source.html.twig') %}

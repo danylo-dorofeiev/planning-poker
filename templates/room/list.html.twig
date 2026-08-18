@@ -19,7 +19,6 @@
                 <th>Uuid</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Max Users</th>
                 <th>Created at</th>
                 <th>Tickets</th>
                 <th>Deck</th>
@@ -52,6 +51,8 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <br>
 
     <a href="{{ path('room_create') }}"><button>Create a Room</button></a>
 {% endblock %}

@@ -13,7 +13,7 @@
         {% endblock %}
     </head>
     <body>
-        {% if app.user %}<span>{{ app.user.email }} - <a href="{{ path('app_logout') }}">Logout</a></span><br><br>{% endif %}
+        {% if app.user %}<span>{{ app.user.email }} - <a href="{{ path('app_logout') }}" data-turbo="false">Logout</a></span><br><br>{% endif %}
         {% block body %}{% endblock %}
     </body>
 </html>

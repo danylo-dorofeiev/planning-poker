@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Room;
 use App\Entity\Ticket;
 use App\Entity\User;
+use App\Enum\TicketStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,5 +26,17 @@ class TicketRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function findVotingTicket(Room $room): ?Ticket
+    {
+        return $this->createQueryBuilder('ticket')
+            ->andwhere('ticket.room = :room')
+            ->andWhere('ticket.status = :status')
+            ->setParameter('room', $room)
+            ->setParameter('status', TicketStatus::VOTING)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }
