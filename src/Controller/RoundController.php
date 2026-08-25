@@ -28,12 +28,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-final class VotingController extends AbstractController
+#[IsGranted('ROLE_USER')]
+final class RoundController extends AbstractController
 {
-    #[Route('/room/{uuid}/ticket/{id}/round/start', name: 'round_start')]
-    public function start(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, TicketRepository $ticketRepository, RoomService $roomService, TicketService $ticketService, RoundService $roundService, EventDispatcherInterface $eventDispatcher): Response {
+    #[Route('/room/{room_id}/ticket/{ticket_id}/round/start', name: 'round_start')]
+    public function start(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+
+        TicketRepository $ticketRepository,
+        RoomService $roomService,
+        TicketService $ticketService,
+        RoundService $roundService,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
+
         $this->denyAccessUnlessGranted(RoomVoter::START, $room);
 
         $votingTicket = $ticketRepository->findVotingTicket($room);
@@ -77,24 +89,25 @@ final class VotingController extends AbstractController
         return new Response(status: 204);
     }
 
-    #[Route('/room/{uuid}/ticket/{id}/round/vote', name: 'round_vote')]
-    public function vote(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, Round $round, RoundRepository $roundRepository, CardRepository $cardRepository, VoteRepository $voteRepository, Request $request, EntityManagerInterface $entityManager): Response {
-        $round = $roundRepository->findOneBy([
-            'ticket' => $ticket,
-            'status' => RoundStatus::ACTIVE,
-        ]);
+    #[Route('/room/{room_id}/ticket/{ticket_id}/round/{round_id}/vote', name: 'round_vote', methods: ['POST'])]
+    public function vote(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+        #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
+
+        RoundRepository $roundRepository,
+        VoteRepository $voteRepository,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
 
         if ($round->getStatus() !== RoundStatus::ACTIVE) {
             throw $this->createAccessDeniedException();
         }
 
-        $card = $cardRepository->find($request->request->get('card'));
-
-        if(!$card || !$round->getCards()->contains($card)) {
-            throw $this->createAccessDeniedException();
-        }
-
         $user = $this->getUser();
+        $value = $request->request->get('value');
 
         $vote = $voteRepository->findOneBy([
             'round' => $round,
@@ -103,22 +116,40 @@ final class VotingController extends AbstractController
 
         if(!$vote) {
             $vote = new Vote();
-
             $vote->setRound($round);
             $vote->setUser($user);
 
             $entityManager->persist($vote);
-
         }
 
-        $vote->setValue($card->getValue());
+        $vote->setValue($value);
         $entityManager->flush();
+
+        $room->setUpdatedAt();
+        $eventDispatcher->dispatch(
+            new RoomEditedEvent($room),
+        );
+
+        $ticket->setUpdatedAt();
+        $eventDispatcher->dispatch(
+            new TicketEditedEvent($ticket),
+        );
 
         return new Response(status: 204);
     }
 
-    #[Route('/room/{uuid}/ticket/{id}/round/reveal', name: 'round_reveal', methods: ['POST'])]
-    public function reveal(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Ticket $ticket, RoundRepository $roundRepository, TicketService $ticketService, RoundService $roundService, EntityManagerInterface $entityManager, HubInterface $hub, EventDispatcherInterface $eventDispatcher,): Response {
+    #[Route('/room/{room_id}/ticket/{ticket_id}/round/{round_id}/reveal', name: 'round_reveal', methods: ['POST'])]
+    public function reveal(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+        #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
+
+        RoundRepository $roundRepository,
+        TicketService $ticketService,
+        RoundService $roundService,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
+
         $this->denyAccessUnlessGranted(RoomVoter::REVEAL, $room);
 
         $round = $roundRepository->findOneBy([
@@ -127,7 +158,7 @@ final class VotingController extends AbstractController
         ]);
 
         if (!$round) {
-            return new Response('No active round', 400);
+            return new Response(status: 400);
         }
 
         $round->setStatus(RoundStatus::REVEALED);

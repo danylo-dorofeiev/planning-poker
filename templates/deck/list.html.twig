@@ -41,13 +41,13 @@
                     <button
                         type="button"
                         data-action="click->form#fetch"
-                        data-url="{{ path('deck_edit', {uuid: deck.uuid}) }}"
+                        data-url="{{ path('deck_edit', {deck_id:deck.uuid}) }}"
                     >Edit</button>
                     {% endif %}
                 </td>
                 <td>
                     {% if not deck.system %}
-                    <form method="post" action="{{ path('deck_delete', {uuid:deck.uuid}) }}">
+                    <form method="post" action="{{ path('deck_delete', {deck_id:deck.uuid}) }}">
                         <button type="submit">Delete</button>
                     </form>
                     {% endif %}
@@ -64,6 +64,6 @@
 
 <br>
 
-{{ include('deck/form/create_form.html.twig') }}
+{{ include('deck/form/create.html.twig') }}
 
 {% endblock %}

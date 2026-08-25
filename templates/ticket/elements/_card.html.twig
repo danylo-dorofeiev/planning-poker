@@ -5,19 +5,40 @@
     <td>{{ ticket.status.value }}</td>
     <td>{{ ticket.createdAt|date('d.m.Y H:i') }}</td>
     <td>{{ ticket.updatedAt|date('d.m.Y H:i') }}</td>
-    <td>
-        {% if is_granted('ROUND_START', ticket.room) %}
-            <form method="post" action="{{ path('round_start', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}">
+    {% if is_granted('ROUND_START', ticket.room) %}
+        <td>
+            <form
+                method="post"
+                action="{{ path('round_start', {
+                    room_id: ticket.room.uuid,
+                    ticket_id: ticket.uuid
+                }) }}"
+            >
                 <button type="submit">Start Voting</button>
             </form>
-        {% endif %}
-    </td>
-    <td>
-        <button type="button" data-action="click->form#fetch" data-url="{{ path('ticket_edit', {uuid: ticket.getRoomUuid(), id: ticket.id}) }}">Edit</button>
-    </td>
-    <td>
-        <form method="post" action="{{ path('ticket_delete', {uuid: ticket.room.uuid, id:ticket.id}) }}">
-            <button type="submit">Delete</button>
-        </form>
+        </td>
+    {% endif %}
+    <td
+        data-controller="ticket-popup"
+        data-ticket-popup-show-url-value="{{ path('ticket_show', {
+            room_id: ticket.room.uuid,
+            ticket_id: ticket.uuid
+        }) }}"
+    >
+        <button
+            type="button"
+            data-action="click->ticket-popup#open"
+        >
+            Open
+        </button>
+        <div
+            data-ticket-popup-target="modal"
+            style="display: none"
+            data-action="click->ticket-popup#closeOnOverlay"
+        >
+            <div>
+                <div data-ticket-popup-target="content"></div>
+            </div>
+        </div>
     </td>
 </tr>

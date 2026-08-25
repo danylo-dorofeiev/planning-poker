@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\RoomStatus;
 use App\Repository\RoomRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
@@ -32,6 +33,9 @@ class Room
     #[ORM\Column(enumType: RoomStatus::class)]
     private RoomStatus $status;
 
+    #[ORM\OneToMany(mappedBy: 'room', targetEntity: RoomMember::class, orphanRemoval: true)]
+    private Collection $members;
+
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
     private Collection $tickets;
 
@@ -48,6 +52,7 @@ class Room
     public function __construct()
     {
         $this->uuid = Uuid::v4();
+        $this->members = new ArrayCollection();
         $this->status = RoomStatus::PENDING;
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
@@ -105,6 +110,11 @@ class Room
     {
         $this->status = $status;
         return $this;
+    }
+
+    public function getMembers(): Collection
+    {
+        return $this->members;
     }
 
     public function getTickets(): Collection

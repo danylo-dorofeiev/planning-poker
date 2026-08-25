@@ -18,27 +18,34 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class DeckController extends AbstractController
 {
     #[Route('/deck/list', name: 'deck_list', methods: ['GET'])]
-    public function list(DeckService $deckService, Security $security): Response {
+    public function list(
+        Security $security,
+        DeckService $deckService
+    ): Response {
         $user = $security->getUser();
 
         $deck = new Deck();
         $deck->setOwner($user);
-
         $form = $this->createForm(DeckType::class, $deck);
 
+        $decks = $deckService->findAllByOwner($user);
+
         return $this->render('deck/list.html.twig', [
-            'decks'=>$deckService->findAllByOwner($user),
+            'decks' => $decks,
             'form' => $form,
         ]);
     }
 
     #[Route('/deck/create', name: 'deck_create', methods: ['POST'])]
-    public function create(Request $request, DeckService $deckService, Security $security): Response {
+    public function create(
+        Security $security,
+        Request $request,
+        DeckService $deckService
+    ): Response {
         $user = $security->getUser();
 
         $deck = new Deck();
         $deck->setOwner($user);
-
         $form = $this->createForm(DeckType::class, $deck);
         $form->handleRequest($request);
 
@@ -55,9 +62,13 @@ final class DeckController extends AbstractController
         return new Response('', 302);
     }
 
-    #[Route('/deck/{uuid}/edit', name: 'deck_edit', methods: ['GET', 'POST'])]
+    #[Route('/deck/{deck_id}/edit', name: 'deck_edit', methods: ['GET', 'POST'])]
     public function edit(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Deck $deck, DeckService $deckService, Request $request): Response {
+        #[MapEntity(mapping: ['deck_id' => 'uuid'])]
+        Deck $deck,
+        DeckService $deckService,
+        Request $request
+    ): Response {
         if ($deck->isSystem()) {
             throw new \LogicException('This deck cannot be edited because it is used as a default deck.');
         }
@@ -73,15 +84,18 @@ final class DeckController extends AbstractController
             return $this->redirectToRoute('deck_list');
         }
 
-        return $this->render('deck/form/edit_form.html.twig', [
-            'deck'=>$deck,
+        return $this->render('deck/form/edit.html.twig', [
+            'deck' => $deck,
             'form' => $form,
         ]);
     }
 
-    #[Route('/deck/{uuid}/delete', name: 'deck_delete', methods: ['POST'])]
+    #[Route('/deck/{deck_id}/delete', name: 'deck_delete', methods: ['POST'])]
     public function delete(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Deck $deck, DeckService $deckService): Response {
+        #[MapEntity(mapping: ['deck_id' => 'uuid'])]
+        Deck $deck,
+        DeckService $deckService
+    ): Response {
         if ($deck->isSystem()) {
             throw new \LogicException('This deck cannot be deleted because it is used as a default deck.');
         }

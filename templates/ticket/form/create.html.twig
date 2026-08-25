@@ -5,7 +5,7 @@
         <div data-form-target="form" style="display: none">
             <button type="button" data-action="click->form#close">Close</button>
 
-            {{ form_start(form, { action: path('ticket_create', {uuid: room.uuid}), method: 'POST' }) }}
+            {{ form_start(form, { action: path('ticket_create', {room_id:room.uuid}), method: 'POST' }) }}
 
             {{ form_widget(form) }}
 

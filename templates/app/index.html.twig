@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Homepage{% endblock %}
+{% block title %}PlanningPoker{% endblock %}
 
 {% block body %}
 
@@ -10,10 +10,19 @@
 {% endif %}
 
 <h1>PlanningPoker</h1>
+
 <p>
     Schätzen Sie Aufgaben gemeinsam im Team, erkennen Sie Risiken frühzeitig und schaffen Sie ein
     gemeinsames Verständnis für die Anforderungen, bevor die Entwicklung beginnt.
 </p>
-<a href="{{ path('room_create') }}"><button>Start a Session</button></a>
+
+<a href="{{ path('room_create') }}"><button>Room erstellen</button></a>
+<a href="{{ path('room_join') }}"><button>Room beitreten</button></a>
+
+
+{% if app.user %}
+    <a href="{{ path('room_list') }}"><button>Room List</button></a>
+    <a href="{{ path('deck_list') }}"><button>Deck List</button></a>
+{% endif %}
 
 {% endblock %}

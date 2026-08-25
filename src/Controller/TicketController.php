@@ -23,17 +23,30 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class TicketController extends AbstractController
 {
     #[Route('/ticket/list', name: 'ticket_list', methods: ['GET'])]
-    public function list(TicketService $ticketService, Security $security): Response {
+    public function list(
+        Security $security,
+        TicketService $ticketService
+    ): Response {
+        $user = $security->getUser();
+        $tickets = $ticketService->findAllByOwner($user);
+
         return $this->render('ticket/list.html.twig', [
-            'tickets'=>$ticketService->findAllByOwner($security->getUser()),
+            'tickets' => $tickets,
         ]);
     }
 
-    #[Route('/room/{uuid}/ticket/create', name: 'ticket_create', methods: ['POST'])]
-    public function create(#[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
+    #[Route('/room/{room_id}/ticket/create', name: 'ticket_create', methods: ['POST'])]
+    public function create(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+
+        Request $request,
+        RoomService $roomService,
+        TicketService $ticketService,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
+
         $ticket = new Ticket();
         $ticket->setRoom($room);
-
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
@@ -50,7 +63,7 @@ class TicketController extends AbstractController
             $ticket = new Ticket();
             $ticket->setRoom($room);
 
-            return $this->render('ticket/form/create_form.html.twig', [
+            return $this->render('ticket/form/create.html.twig', [
                 'form' => $this->createForm(TicketType::class, $ticket)->createView(),
                 'room' => $room,
             ]);
@@ -59,9 +72,28 @@ class TicketController extends AbstractController
         return new Response('', 302);
     }
 
-    #[Route('/room/{uuid}/ticket/{id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
+    #[Route('/room/{room_id}/ticket/{ticket_id}', name: 'ticket_show', methods: ['GET'])]
+    public function show(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+    ): Response {
+
+        return $this->render('ticket/elements/_show.html.twig', [
+           'ticket' => $ticket,
+        ]);
+    }
+
+    #[Route('/room/{room_id}/ticket/{ticket_id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
     public function edit(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, Request $request, RoomService $roomService, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+
+        RoomService $roomService,
+        TicketService $ticketService,
+        Request $request,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
+
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
 
@@ -76,20 +108,25 @@ class TicketController extends AbstractController
             );
 
             return $this->redirectToRoute('room_show', [
-                'uuid' => $room->getUuid(),
+                'room_id' => $room->getUuid(),
             ]);
         }
 
-        return $this->render('ticket/form/edit_form.html.twig', [
+        return $this->render('ticket/form/edit.html.twig', [
             'room' => $room,
             'ticket' => $ticket,
             'form' => $form,
         ]);
     }
 
-    #[Route('/room/{uuid}/ticket/{id}/delete', name: 'ticket_delete', methods: ['POST'])]
+    #[Route('/room/{room_id}/ticket/{ticket_id}/delete', name: 'ticket_delete', methods: ['POST'])]
     public function delete(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])] Room $room, RoomService $roomService, Ticket $ticket, TicketService $ticketService, EventDispatcherInterface $eventDispatcher): Response {
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+        RoomService $roomService,
+        TicketService $ticketService,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
         $eventDispatcher->dispatch(
             new TicketDeletedEvent($ticket),
         );
@@ -100,7 +137,7 @@ class TicketController extends AbstractController
         $roomService->updateRoom($room);
 
         return $this->redirectToRoute('room_show', [
-            'uuid' => $room->getUuid(),
+            'room_id' => $room->getUuid(),
         ]);
     }
 }

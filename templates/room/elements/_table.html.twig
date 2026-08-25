@@ -11,21 +11,30 @@
 
         {% if activeRound.status.value == 'active' %}
 
-            <div data-controller="voting" data-voting-vote-url-value="{{ path('round_vote', {uuid: activeRound.ticket.room.uuid, id: activeRound.ticket.id}) }}">
+            <div data-controller="vote"
+                 data-vote-vote-url-value="{{ path('round_vote', {
+                     room_id:activeRound.ticket.room.uuid,
+                     ticket_id:activeRound.ticket.uuid,
+                     round_id:activeRound.id
+                 }) }}"
+            >
                 {% for card in activeRound.cards %}
-                    <button type="button" data-card-id="{{ card.id }}" data-action="click->voting#vote">{{ card.value }}</button>
+                    <button type="button"
+                            data-value="{{ card.value }}"
+                            data-action="click->vote#submit"
+                    >{{ card.value }}</button>
                 {% endfor %}
             </div>
 
             {% if is_granted('ROUND_REVEAL', activeRound.ticket.room) %}
-                <form method="post" action="{{ path('round_reveal', {uuid: activeRound.ticket.room.uuid, id: activeRound.ticket.id}) }}">
+                <form method="post" action="{{ path('round_reveal', {room_id:activeRound.ticket.room.uuid, ticket_id:activeRound.ticket.uuid, round_id:activeRound.id}) }}">
                     <button type="submit">Reveal</button>
                 </form>
             {% endif %}
 
         {% else %}
             {% for vote in activeRound.votes %}
-                <p>{{ vote.user.email }} -> {{ vote.value }}</p>
+                <p>{{ vote.user.email }} - {{ vote.value }}</p>
             {% endfor %}
         {% endif %}
     {% endif %}

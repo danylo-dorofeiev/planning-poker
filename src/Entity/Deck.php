@@ -20,6 +20,9 @@ class Deck
     #[ORM\Column(type: 'uuid', unique: true)]
     private Uuid $uuid;
 
+    #[ORM\OneToMany(mappedBy: 'deck', targetEntity: Room::class)]
+    private Collection $rooms;
+
     #[ORM\ManyToOne(inversedBy: 'decks')]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $owner = null;
@@ -39,8 +42,9 @@ class Deck
 
     public function __construct()
     {
-        $this->cards = new ArrayCollection();
         $this->uuid = Uuid::v4();
+        $this->rooms = new ArrayCollection();
+        $this->cards = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -63,6 +67,11 @@ class Deck
     {
         $this->owner = $owner;
         return $this;
+    }
+
+    public function getRooms(): Collection
+    {
+        return $this->rooms;
     }
 
     public function getName(): ?string

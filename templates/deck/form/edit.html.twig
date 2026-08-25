@@ -6,7 +6,7 @@
 </button>
 
 {{ form_start(form, {
-    action: path('deck_edit', {uuid: deck.uuid}),
+    action: path('deck_edit', {deck_id: deck.uuid}),
     method: 'POST',
     attr: {
         'data-controller': 'form',

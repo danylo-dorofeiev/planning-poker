@@ -6,14 +6,28 @@
 
     <h1>Room</h1>
 
+    <div
+        data-controller="room-presence"
+        data-room-presence-heartbeat-url-value="{{ path('room_heartbeat', {
+            room_id: room.uuid
+        }) }}"
+        data-room-presence-members-url-value="{{ path('room_members', {
+            room_id: room.uuid
+        }) }}"
+    >
+        <div data-room-presence-target="members">
+            Loading...
+        </div>
+    </div>
+
     {% include('room/elements/_settings.html.twig') %}
 
     {% if is_granted('ROOM_EDIT', room) %}
-        <a href="{{ path('room_edit', {uuid:room.uuid}) }}"><button>Edit</button></a>
+        <a href="{{ path('room_edit', {room_id:room.uuid}) }}"><button>Edit</button></a>
     {% endif %}
 
     {% if is_granted('ROOM_DELETE', room) %}
-        <form method="post" action="{{ path('room_delete', {uuid: room.uuid}) }}">
+        <form method="post" action="{{ path('room_delete', {room_id: room.uuid}) }}">
             <button type="submit">Delete</button>
         </form>
     {% endif %}
@@ -40,9 +54,6 @@
                 <th>Status</th>
                 <th>Created at</th>
                 <th>Updated at</th>
-                <th></th>
-                <th></th>
-                <th></th>
             </tr>
             </thead>
             <tbody id="tickets">
@@ -54,9 +65,7 @@
 
         <br>
 
-        <div data-form-target="form" style="display: none"></div>
-
-        {% include('ticket/form/create_form.html.twig') %}
+        {% include('ticket/form/create.html.twig') %}
 
         <hr>
         {% include('room/elements/_table.html.twig') %}

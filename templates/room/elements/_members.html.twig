@@ -1,0 +1,17 @@
+<div>
+    <h3>Participants</h3>
+
+    {% for member in members %}
+        <div style="display: flex; align-items: center; gap: 2rem;">
+            <span>{{ member.user.email }}</span>
+
+            {% if member.user.id in votedUserIds %}
+                <span>✓</span>
+            {% else %}
+                <span>…</span>
+            {% endif %}
+        </div>
+    {% else %}
+        <div>No participants</div>
+    {% endfor %}
+</div>

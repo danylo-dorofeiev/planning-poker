@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Room beitreten{% endblock %}
+
+{% block body %}
+
+    <h1>Room beitreten</h1>
+
+    {{  form_start(form) }}
+
+    {{ form_widget(form) }}
+
+    <button type="submit">
+        Join
+    </button>
+
+    {{ form_end(form) }}
+
+{% endblock %}

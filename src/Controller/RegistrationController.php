@@ -52,7 +52,7 @@ class RegistrationController extends AbstractController
                     ->from(new Address($this->emailFromAddress, $this->emailFromName))
                     ->to((string) $user->getEmail())
                     ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                    ->htmlTemplate('auth/confirmation_email.html.twig')
             );
 
             $this->addFlash(
@@ -63,7 +63,7 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render('auth/register.html.twig', [
             'registrationForm' => $form,
         ]);
     }

@@ -6,6 +6,7 @@ use App\Enum\TicketStatus;
 use App\Repository\TicketRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 class Ticket
@@ -14,6 +15,9 @@ class Ticket
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private Uuid $uuid;
 
     #[ORM\Column(name: 'ticket_key', length: 20, nullable: true)]
     private ?string $key = null;
@@ -43,6 +47,7 @@ class Ticket
 
     public function __construct()
     {
+        $this->uuid = Uuid::v4();
         $this->status = TicketStatus::PENDING;
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
@@ -51,6 +56,11 @@ class Ticket
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): Uuid
+    {
+        return $this->uuid;
     }
 
     public function getKey(): ?string
@@ -100,11 +110,6 @@ class Ticket
     public function getRoom(): ?Room
     {
         return $this->room;
-    }
-
-    public function getRoomUuid(): string
-    {
-        return $this->room->getUuid();
     }
 
     public function setRoom(?Room $room): static

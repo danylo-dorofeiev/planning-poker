@@ -1,0 +1,27 @@
+<div style="position: absolute; z-index: 5; background-color: white; border: 1px solid black; width: 40%; height: 40%; top: 50%; left: 50%; transform: translateX(-50%) translateY(-50%);">
+    <button
+        type="button"
+        data-action="click->ticket-popup#close"
+    >Close
+    </button>
+
+    <h2>{{ ticket.title }}</h2>
+
+    <span>{{ ticket.key }}</span>
+
+    <p>{{ ticket.description }}</p>
+
+    <button type="button" data-action="click->form#fetch" data-url="{{ path('ticket_edit', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">Edit</button>
+
+    <form
+        method="post"
+        action="{{ path('ticket_delete', {
+            room_id: ticket.room.uuid,
+            ticket_id: ticket.uuid
+        }) }}"
+    >
+        <button type="submit">Delete</button>
+    </form>
+
+    <div data-form-target="form" style="display: none"></div>
+</div>
