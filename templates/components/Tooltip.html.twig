@@ -1,0 +1,24 @@
+<div style="--delay: {{ delay }}ms" class="pointer-events-{{ pointer }} invisible opacity-0 group-hover:visible group-hover:opacity-100 group-hover:delay-(--delay) transition-opacity duration-150 ease-in absolute items-center z-10 {{ css }}
+        {% if position=="bottom center" %} top-full left-1/2 -translate-x-1/2 pt-1
+        {% elseif position=="bottom left" %} top-full right-0 pt-1
+        {% elseif position=="bottom right" %} top-full left-0 pt-1
+
+        {% elseif position=="top center" %} bottom-full left-1/2 -translate-x-1/2 pb-1
+        {% elseif position=="top left" %} bottom-full right-0 pb-1
+        {% elseif position=="top right" %} bottom-full left-0 pb-1
+
+        {% elseif position=="left" %} top-1/2 right-full -translate-y-1/2 pr-1
+
+        {% elseif position=="right" %} top-1/2 left-full -translate-y-1/2 pl-1
+        {% endif %}
+">
+    {% if type == "text" %}
+        <span class="leading-none! text-xs! font-light! bg-secondary-gray-700 px-2 py-1.5 rounded-sm text-nowrap brightness-110">
+            {{ block('content') }}
+        </span>
+    {% elseif type == "description" %}
+        <div class="w-90 bg-primary-black border border-secondary-gray-700 rounded-lg p-3">
+            {{ block('content') }}
+        </div>
+    {% endif %}
+</div>

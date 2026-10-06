@@ -1,0 +1,56 @@
+{{ form_start(deckCreateForm) }}
+
+<div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-1">
+        {{ form_label(deckCreateForm.name) }}
+        {{ form_widget(deckCreateForm.name) }}
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <span class="text-base!">
+            Cards
+        </span>
+
+        <div data-controller="collection" data-collection-index-value="{{ deckCreateForm.cards|length }}" class="flex gap-2 flex-wrap">
+            <div data-collection-target="items" class="flex gap-2 flex-wrap">
+                {% for card in deckCreateForm.cards %}
+                    <div data-collection-target="item" class="relative flex gap-2">
+                        {{ form_widget(card.value, {
+                            attr: {
+                                class: 'w-10! h-14!'
+                            }
+                        }) }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <template data-collection-target="prototype">
+                <div data-collection-target="item" class="relative flex gap-2">
+                    {{ form_widget(deckCreateForm.cards.vars.prototype.value, {
+                        attr: {
+                            class: 'w-10! h-14!'
+                        }
+                    }) }}
+
+                    <button data-action="collection#remove" class="absolute right-0.5 top-1">
+                        {{ icon('trash', 'w-3 h-3 stroke-red-500') }}
+                    </button>
+                </div>
+            </template>
+
+            <button type="button" data-action="collection#add" data-collection-target='addButton' class="card hover:bg-secondary-gray-800!">
+                {{ icon('plus', 'w-4 h-4 stroke-secondary-gray') }}
+            </button>
+        </div>
+    </div>
+
+    <span class="text-secondary-gray! text-xs!">
+        Der Kartenwert darf aus maximal <b>4 Zeichen</b> oder einem <b>einzelnen Emoji</b> bestehen.
+    </span>
+
+    <twig:Button func="submit" type="primary" size="small" css="ml-auto mt-2">
+        Create
+    </twig:Button>
+</div>
+
+{{ form_end(deckCreateForm) }}

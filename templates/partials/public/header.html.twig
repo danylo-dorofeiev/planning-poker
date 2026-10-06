@@ -1,0 +1,31 @@
+<header class="sticky top-0 bg-primary-black border-b border-secondary-gray-700 px-4 py-1 z-90">
+    <div class="flex justify-between items-center">
+        <div class="flex items-center gap-20">
+            <twig:Logo />
+
+            <nav class="flex gap-2 mt-0.5 items-center">
+                <twig:Button link="{{ path('app_about') }}" type="ghost" size="small" css="text-primary-white! hover:underline">
+                    About
+                </twig:Button>
+
+                <twig:Button link="{{ path('app_version') }}" type="ghost" size="small" css="text-primary-white! hover:underline">
+                    Versionen
+                </twig:Button>
+            </nav>
+        </div>
+
+        <nav>
+            {% if not app.user %}
+                <div class="flex gap-2 items-center">
+                    <twig:Button link="{{ path('app_login') }}" type="secondary" size="smaller">
+                        Sign in
+                    </twig:Button>
+
+                    <twig:Button link="{{ path('app_register') }}" type="primary" size="smaller">
+                        Sign up
+                    </twig:Button>
+                </div>
+            {% endif %}
+        </nav>
+    </div>
+</header>

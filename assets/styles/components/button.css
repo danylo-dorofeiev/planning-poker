@@ -1,0 +1,53 @@
+.btn-smallest {
+    @apply px-1 py-1 text-sm;
+}
+
+.btn-smaller {
+    @apply px-1.5 py-1.5 text-sm;
+}
+
+.btn-small {
+    @apply px-2 py-1.5 text-sm;
+}
+
+.btn-medium {
+    @apply px-2.5 py-2 text-sm;
+}
+
+.btn-large {
+    @apply px-3.5 py-2.5 text-base;
+}
+
+.btn-primary {
+    @apply flex gap-1.5 items-center justify-center rounded-md bg-accent-700 border border-accent-500 font-normal text-primary-white hover:bg-accent-600;
+}
+
+.btn-secondary {
+    @apply flex gap-1.5 items-center justify-center rounded-md bg-secondary-gray-800 border border-secondary-gray-700 font-normal hover:bg-secondary-gray-700;
+}
+
+.btn-smooth {
+    @apply flex gap-1.5 items-center justify-center rounded-md bg-transparent border border-secondary-gray-700 font-normal text-secondary-gray hover:bg-secondary-gray-800;
+}
+
+.btn-danger {
+    @apply flex gap-1.5 items-center justify-center rounded-md bg-red-950 border border-red-500 font-normal text-red-500 hover:brightness-110;
+}
+
+.btn-ghost {
+    @apply flex gap-1.5 items-center justify-center rounded-md bg-transparent border border-transparent font-normal hover:bg-secondary-gray-800;
+}
+
+.btn-glow {
+    @apply transition-all duration-200 ease-in;
+}
+
+.btn-glow:hover {
+    @apply text-primary-white *:stroke-primary-white;
+
+    box-shadow:
+        0 0 5px var(--color-accent),
+        0 0 20px var(--color-accent),
+        0 0 50px var(--color-accent),
+        0 0 100px var(--color-accent);
+}

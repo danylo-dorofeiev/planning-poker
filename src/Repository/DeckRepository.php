@@ -17,11 +17,21 @@ class DeckRepository extends ServiceEntityRepository
     public function findAllByOwner(User $user): array
     {
         return $this->createQueryBuilder('d')
-            ->where('d.system = true')
-            ->orWhere('d.owner = :user')
+            ->where('d.owner = :user')
             ->setParameter('user', $user)
+            ->orderBy('d.createdAt', 'DESC')
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function findSystemDecks(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.system = true')
+            ->orderBy('d.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
     }
 }

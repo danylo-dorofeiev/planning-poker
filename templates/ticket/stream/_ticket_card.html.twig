@@ -1,0 +1,20 @@
+{% if action == "prepend" %}
+    <turbo-stream action="prepend" target="tickets">
+        <template>
+            {% include 'ticket/elements/_ticket_card.html.twig' with { ticket:ticket|default(0), round:round, ticketEditForm:ticketEditForms[ticket.uuid] } %}
+        </template>
+    </turbo-stream>
+{% endif %}
+
+{% if action == "replace" %}
+    <turbo-stream action="replace" target="ticket-{{ ticket.uuid }}">
+        <template>
+            {% include 'ticket/elements/_ticket_card.html.twig' with { ticket:ticket, round:round, ticketEditForm:ticketEditForms[ticket.uuid] } %}
+        </template>
+    </turbo-stream>
+{% endif %}
+
+{% if action == "remove" %}
+    <turbo-stream action="remove" target="ticket-{{ ticket.uuid }}"></turbo-stream>
+{% endif %}
+

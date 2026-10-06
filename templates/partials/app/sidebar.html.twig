@@ -1,0 +1,77 @@
+<aside class="border-r border-secondary-gray-700 bg-primary-black-900 z-10">
+    <div class="h-[calc(100vh-65px)] sticky top-0 p-2">
+        <nav class="h-full flex flex-col items-center gap-2">
+
+            <div class="group relative">
+                <twig:Button type="ghost" size="smaller">
+                    {{ icon('sidebar_left_collapse', 'w-4.5 h-4.5') }}
+                </twig:Button>
+
+                <twig:Tooltip position="right">
+                    Sidebar schließen
+                </twig:Tooltip>
+            </div>
+
+            <hr>
+
+            {% if activeTab is defined and not null %}
+
+                {% if activeTab == "rooms" %}
+                    <twig:Button type="primary" size="small" css="[writing-mode:sideways-lr] font-mono hover:bg-accent-700!">
+                        Räume
+                    </twig:Button>
+                {% else %}
+                    <twig:Button link="{{ path('app') }}" type="ghost" size="small" css="[writing-mode:sideways-lr] font-mono">
+                        Räume
+                    </twig:Button>
+                {% endif %}
+
+                <hr>
+
+                {% if activeTab == "tickets" %}
+                    <twig:Button type="primary" size="small" css="[writing-mode:sideways-lr] font-mono hover:bg-accent-700!">
+                        Tickets
+                    </twig:Button>
+                {% else %}
+                    <twig:Button type="ghost" size="small" css="[writing-mode:sideways-lr] font-mono">
+                        Tickets
+                    </twig:Button>
+                {% endif %}
+
+                <hr>
+
+                {% if activeTab == "decks" %}
+                    <twig:Button type="primary" size="small" css="[writing-mode:sideways-lr] font-mono hover:bg-accent-700!">
+                        Decks
+                    </twig:Button>
+                {% else %}
+                    <twig:Button link="{{ path('deck_list') }}" type="ghost" size="small" css="[writing-mode:sideways-lr] font-mono">
+                        Decks
+                    </twig:Button>
+                {% endif %}
+
+                <div class="mt-auto flex flex-col gap-2">
+                    <div class="group relative">
+                        <twig:Button type="smooth" size="smaller">
+                            {{ icon('bell', 'w-4.5 h-4.5 stroke-secondary-gray') }}
+                        </twig:Button>
+
+                        <twig:Tooltip position="right">
+                            Benachrichtigungen
+                        </twig:Tooltip>
+                    </div>
+
+                    <div class="group relative">
+                        <twig:Button type="smooth" size="smaller">
+                            {{ icon('settings', 'w-4.5 h-4.5 stroke-secondary-gray') }}
+                        </twig:Button>
+
+                        <twig:Tooltip position="right">
+                            Settings
+                        </twig:Tooltip>
+                    </div>
+                </div>
+            {% endif %}
+        </nav>
+    </div>
+</aside>

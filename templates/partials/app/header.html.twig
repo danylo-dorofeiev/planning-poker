@@ -1,0 +1,170 @@
+<header id="app_header" class="space-y-1 bg-primary-black border-b border-secondary-gray-700 px-4 py-2 z-90">
+    <div class="w-full flex justify-between items-center">
+        {{ component('Logo') }}
+
+        <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
+                {% if room is defined and not null %}
+                    {% include 'room/elements/_room_settings.html.twig' with {room:room, decks:decks} %}
+                {% else %}
+
+                    <div class="relative group">
+                        {{ form_start(joinRoomForm) }}
+                        {{ form_widget(joinRoomForm.uuid, {
+                            attr: {
+                                required: true,
+                                class: 'py-1! pr-10! bg-transparent! ' ~ (
+                                error|default('') == 'room_not_found'
+                                ? 'border! border-red-500! focus:border-transparent! rounded-lg!'
+                                : ''
+                                ),
+                                pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}',
+                                title: 'Bitte eine gültige UUID eingeben.'
+                            }
+                        }) }}
+
+                        <div class="absolute top-1/2 right-1 -translate-y-1/2">
+                            <twig:Button func="submit" type="smooth" css="group-has-[input:valid]:bg-accent-600! group-has-[input:valid]:border-accent-500! group-has-[input:valid]:hover:bg-accent-700! rounded-md! p-0.5! transition-all duration-300 ease-in-out">
+                                {{ icon('arrow_right', 'w-4! h-4!') }}
+                            </twig:Button>
+                        </div>
+
+                        {{ form_end(joinRoomForm) }}
+
+                        <twig:Tooltip position="bottom right">
+                            Raum Beitreten
+                        </twig:Tooltip>
+
+                        {% if error|default('') == 'room_not_found' %}
+                            <div class="group-focus-within:hidden absolute top-full left-0 pt-1">
+                                <span class="flex gap-1.5 items-center bg-red-950 rounded-md border border-red-500 px-1.5 py-1 text-xs!">
+                                    {{ icon('error', 'w-3.5! h-3.5!') }}
+                                    Nichts gefunden
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="bg-secondary-gray-700 mx-px w-px h-5"></div>
+
+                <div class="relative group">
+                    <twig:Button link="{{ path('app') }}" type="smooth" size="smaller">
+                        {{ icon('dashboard', 'w-5! h-5! stroke-secondary-gray-400') }}
+                    </twig:Button>
+
+                    <twig:Tooltip poition="bottom center">
+                        Alle Räume
+                    </twig:Tooltip>
+                </div>
+
+                <div class="relative group">
+                    <twig:Button type="smooth" size="smaller">
+                        {{ icon('ticket', 'w-5! h-5! stroke-secondary-gray-400') }}
+                    </twig:Button>
+
+                    <twig:Tooltip poition="bottom center">
+                        Alle Tickets
+                    </twig:Tooltip>
+                </div>
+
+                <div class="relative group">
+                    <twig:Button link="{{ path('deck_list') }}" type="smooth" size="smaller">
+                        {{ icon('deck', 'w-5! h-5! stroke-secondary-gray-400') }}
+                    </twig:Button>
+
+                    <twig:Tooltip poition="bottom center">
+                        Alle Decks
+                    </twig:Tooltip>
+                </div>
+            </div>
+
+            <div data-controller="dropdown" data-action="click@window->dropdown#clickOutside" class="relative group">
+                <div data-action="click->dropdown#toggle" class="bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center border border-transparent hover:brightness-110 cursor-pointer">
+                    <span class="text-sm! uppercase select-none">
+                        {{ app.user.name|slice(0, 2)|upper }}
+                    </span>
+
+                    <twig:Tooltip position="bottom left">
+                        Benutzernavigationsmenü öffnen
+                    </twig:Tooltip>
+                </div>
+
+                <twig:Dropdown width="250">
+                    <ol class="flex flex-col">
+                        <li>
+                            <div class="flex gap-2 items-center p-1">
+                                <div class="bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center">
+                                    <span class="text-sm! uppercase select-none">
+                                        {{ app.user.name|slice(0, 2)|upper }}
+                                    </span>
+                                </div>
+
+                                <span class="font-medium!">
+                                    {{ app.user.name }}
+                                </span>
+                            </div>
+                        </li>
+
+                        <li>
+                            <hr class="my-2">
+                        </li>
+
+                        <li>
+                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('profile', 'w-5! h-5! stroke-secondary-gray!') }}
+                                Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ path('app') }}" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('dashboard', 'w-5! h-5! stroke-secondary-gray!') }}
+                                Rooms
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('ticket', 'w-5! h-5! stroke-secondary-gray!') }}
+                                Tickets
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ path('deck_list') }}" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('deck', 'w-5! h-5! stroke-secondary-gray!') }}
+                                Decks
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('brush', 'w-5 h-5 stroke-secondary-gray!') }}
+                                Appearance
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('settings', 'w-5 h-5 stroke-secondary-gray!') }}
+                                Settings
+                            </a>
+                        </li>
+
+                        <li>
+                            <hr class="my-2">
+                        </li>
+
+                        <li>
+                            <a href="{{ path('app_logout') }}" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('logout', 'w-5 h-5 stroke-secondary-gray!') }}
+                                Sign out
+                            </a>
+                        </li>
+                    </ol>
+                </twig:Dropdown>
+            </div>
+        </div>
+    </div>
+</header>

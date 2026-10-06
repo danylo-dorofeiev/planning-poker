@@ -4,95 +4,85 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\Ticket;
-use App\Event\TicketCreatedEvent;
-use App\Event\TicketDeletedEvent;
-use App\Event\TicketEditedEvent;
+use App\Enum\TicketStatus;
+use App\Event\PokerTableEvent;
+use App\Event\TicketCardListEvent;
 use App\Form\TicketType;
+use App\Repository\RoundRepository;
+use App\Repository\TicketRepository;
 use App\Service\RoomService;
+use App\Service\RoundService;
 use App\Service\TicketService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[IsGranted('ROLE_USER')]
 class TicketController extends AbstractController
 {
-    #[Route('/ticket/list', name: 'ticket_list', methods: ['GET'])]
-    public function list(
-        Security $security,
-        TicketService $ticketService
-    ): Response {
-        $user = $security->getUser();
-        $tickets = $ticketService->findAllByOwner($user);
-
-        return $this->render('ticket/list.html.twig', [
-            'tickets' => $tickets,
-        ]);
-    }
-
     #[Route('/room/{room_id}/ticket/create', name: 'ticket_create', methods: ['POST'])]
     public function create(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
-
         Request $request,
         RoomService $roomService,
         TicketService $ticketService,
-        EventDispatcherInterface $eventDispatcher
+        HubInterface $hub,
     ): Response {
-
         $ticket = new Ticket();
         $ticket->setRoom($room);
-        $form = $this->createForm(TicketType::class, $ticket);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        $ticketCreateForm = $this->createForm(TicketType::class, $ticket);
+        $ticketCreateForm->handleRequest($request);
+
+        if ($ticketCreateForm->isSubmitted() && $ticketCreateForm->isValid()) {
             $ticketService->createTicket($ticket);
 
             $room->setUpdatedAt();
             $roomService->updateRoom($room);
 
-            $eventDispatcher->dispatch(
-                new TicketCreatedEvent($ticket),
+            $hub->publish(
+                new Update(
+                    $room->getUuid(),
+                    json_encode([
+                        'target' => 'ticket_list',
+                        'event' => 'ticket_list:update',
+                        'url' => $this->generateUrl('ticket_list_update', [
+                            'room_id' => $room->getUuid(),
+                        ]),
+                    ])
+                )
             );
 
             $ticket = new Ticket();
             $ticket->setRoom($room);
 
-            return $this->render('ticket/form/create.html.twig', [
-                'form' => $this->createForm(TicketType::class, $ticket)->createView(),
+            return $this->render('ticket/form/_create_form.html.twig', [
+                '$ticketCreateForm' => $this->createForm(TicketType::class, $ticket)->createView(),
                 'room' => $room,
             ]);
         }
-
-        return new Response('', 302);
     }
 
-    #[Route('/room/{room_id}/ticket/{ticket_id}', name: 'ticket_show', methods: ['GET'])]
-    public function show(
-        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
-        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
-    ): Response {
-
-        return $this->render('ticket/elements/_show.html.twig', [
-           'ticket' => $ticket,
-        ]);
-    }
-
-    #[Route('/room/{room_id}/ticket/{ticket_id}/edit', name: 'ticket_edit', methods: ['GET', 'POST'])]
+    #[Route('/room/{room_id}/ticket/{ticket_id}/edit', name: 'ticket_edit', methods: ['POST'])]
     public function edit(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
         #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
-
         RoomService $roomService,
         TicketService $ticketService,
         Request $request,
-        EventDispatcherInterface $eventDispatcher
+        HubInterface $hub,
     ): Response {
+        if ($ticket->getStatus() == TicketStatus::VOTING) {
+            return new Response(status: 400);
+        }
 
         $form = $this->createForm(TicketType::class, $ticket);
         $form->handleRequest($request);
@@ -103,20 +93,23 @@ class TicketController extends AbstractController
             $room->setUpdatedAt();
             $roomService->updateRoom($room);
 
-            $eventDispatcher->dispatch(
-                new TicketEditedEvent($ticket),
+            $hub->publish(
+                new Update(
+                    $room->getUuid(),
+                    json_encode([
+                        'target' => 'ticket_list',
+                        'event' => 'ticket_list:update',
+                        'url' => $this->generateUrl('ticket_list_update', [
+                            'room_id' => $room->getUuid(),
+                        ]),
+                    ])
+                )
             );
 
             return $this->redirectToRoute('room_show', [
                 'room_id' => $room->getUuid(),
             ]);
         }
-
-        return $this->render('ticket/form/edit.html.twig', [
-            'room' => $room,
-            'ticket' => $ticket,
-            'form' => $form,
-        ]);
     }
 
     #[Route('/room/{room_id}/ticket/{ticket_id}/delete', name: 'ticket_delete', methods: ['POST'])]
@@ -125,16 +118,29 @@ class TicketController extends AbstractController
         #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
         RoomService $roomService,
         TicketService $ticketService,
-        EventDispatcherInterface $eventDispatcher
+        HubInterface $hub,
     ): Response {
-        $eventDispatcher->dispatch(
-            new TicketDeletedEvent($ticket),
-        );
+        if ($ticket->getStatus() == TicketStatus::VOTING) {
+            return new Response(status: 400);
+        }
 
         $ticketService->deleteTicket($ticket);
 
         $room->setUpdatedAt();
         $roomService->updateRoom($room);
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'ticket_list',
+                    'event' => 'ticket_list:update',
+                    'url' => $this->generateUrl('ticket_list_update', [
+                        'room_id' => $room->getUuid(),
+                    ]),
+                ])
+            )
+        );
 
         return $this->redirectToRoute('room_show', [
             'room_id' => $room->getUuid(),

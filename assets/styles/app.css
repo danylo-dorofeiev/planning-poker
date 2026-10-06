@@ -1,4 +1,82 @@
 @import "tailwindcss";
 @import './components/button.css';
+@import './components/text.css';
+@import './components/blocks.css';
+@import './components/modal.css';
+@import './fonts.css';
 
 @source not "../../public";
+
+@theme {
+    --font-sans: "Ubuntu", ui-sans-serif, system-ui, sans-serif;
+    --font-ubuntu: "Ubuntu", ui-sans-serif, system-ui, sans-serif;
+    --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+    --color-secondary-grey-light: #9198a0; /* temp */
+    --color-secondary-grey: #3D444D; /* temp */
+
+    --color-primary-white: #F0F6FC;
+
+    --color-primary-black: #0a0a0b;
+    --color-primary-black-50: #fafafa;
+    --color-primary-black-100: #f4f4f5;
+    --color-primary-black-200: #e5e5e6;
+    --color-primary-black-300: #d5d5d7;
+    --color-primary-black-400: #a3a3a8;
+    --color-primary-black-500: #737378;
+    --color-primary-black-600: #545459;
+    --color-primary-black-700: #414144;
+    --color-primary-black-800: #282829;
+    --color-primary-black-900: #19191a;
+    --color-primary-black-950: #0a0a0b; /* <– main */
+
+    --color-secondary-gray: #9198a0;
+    --color-secondary-gray-50: #f9fafb;
+    --color-secondary-gray-100: #f3f4f6;
+    --color-secondary-gray-200: #e6e8ea;
+    --color-secondary-gray-300: #d3d6d9;
+    --color-secondary-gray-400: #9198a0; /* <– main */
+    --color-secondary-gray-500: #6e747d;
+    --color-secondary-gray-600: #4f575f;
+    --color-secondary-gray-700: #3b444d;
+    --color-secondary-gray-800: #232b33;
+    --color-secondary-gray-900: #141b24;
+    --color-secondary-gray-950: #050910;
+
+    --color-accent: #98BD25;
+    --color-accent-50: #f9fce9;
+    --color-accent-100: #f1f8cf;
+    --color-accent-200: #e2f1a5;
+    --color-accent-300: #cde670;
+    --color-accent-400: #b6d744;
+    --color-accent-500: #98bd25; /* <– main */
+    --color-accent-600: #769719;
+    --color-accent-700: #5a7318;
+    --color-accent-800: #485b19;
+    --color-accent-900: #3e4e19;
+    --color-accent-950: #1f2b08;
+}
+
+body {
+    @apply min-h-dvh flex flex-col bg-primary-black;
+}
+
+main {
+    @apply flex-1;
+}
+
+button, a {
+    @apply cursor-pointer underline-offset-3;
+}
+
+input, textarea {
+    @apply border border-secondary-gray-700 bg-primary-black-900 rounded-md px-3 py-2 text-sm focus:outline-1 focus:outline-secondary-gray-300;
+}
+
+textarea {
+    @apply max-h-42 min-h-24;
+}
+
+hr {
+    @apply h-px w-full text-secondary-gray-700;
+}

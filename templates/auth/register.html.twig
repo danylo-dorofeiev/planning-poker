@@ -1,25 +1,65 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/public.html.twig' %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}Register - Planning Poker{% endblock %}
 
 {% block body %}
-{% for flash_error in app.flashes('verify_email_error') %}
-    <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-{% endfor %}
+<main class="flex flex-col">
+    <section class="flex-1 w-full h-full flex items-center justify-center">
+        <div class="flex flex-col gap-6 w-90 p-6 border border-secondary-gray-700 rounded-lg">
+            <twig:Logo size="medium" :isDemo="false"/>
 
-<h1>Sign up</h1>
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="flex gap-1.5 items-center text-red-500! alert alert-danger" role="alert">
+                    {{ icon('error', 'w-5 h-5 stroke-red-500') }}
+                    {{ flash_error }}
+                </div>
+            {% endfor %}
 
-{{ form_errors(registrationForm) }}
+            {{ form_errors(registrationForm) }}
 
-{{ form_start(registrationForm) }}
-    {{ form_row(registrationForm.email) }}
-    {{ form_row(registrationForm.plainPassword, {
-        label: 'Password'
-    }) }}
-    {{ form_row(registrationForm.agreeTerms) }}
+            {{ form_start(registrationForm) }}
 
-    <button type="submit" class="btn">Sign up</button>
-{{ form_end(registrationForm) }}
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col gap-1">
+                    Name
+                    {{ form_widget(registrationForm.name) }}
+                </div>
 
-<p>Have account? <a href="{{ path('app_login') }}">Login</a></p>
+                <div class="flex flex-col gap-1">
+                    E-Mail
+                    {{ form_widget(registrationForm.email) }}
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    Passwort
+                    {{ form_widget(registrationForm.plainPassword) }}
+                </div>
+
+                <div class="flex gap-1.5">
+                    Bedingungen zustimmen
+                    {{ form_widget(registrationForm.agreeTerms) }}
+                </div>
+
+                <div class="flex flex-col gap-3 mt-3">
+                    <twig:Button func="submit" size="large" type="primary" css="mx-auto w-full text-center!">
+                        Sign up
+                    </twig:Button>
+
+                    <span class="text-secondary-gray-400! flex gap-3">
+                        Haben Sie schon ein Konto?
+                        <a href="{{ path('app_login') }}" class="flex items-center gap-1.5">
+                            Sign in
+                            {{ icon('arrow_right', 'w-4 h-4') }}
+                        </a>
+                    </span>
+                </div>
+            </div>
+
+            {{ form_end(registrationForm) }}
+        </div>
+    </section>
+</main>
+
+{% include('partials/public/footer.html.twig') %}
 {% endblock %}
+

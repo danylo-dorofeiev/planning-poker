@@ -1,0 +1,35 @@
+* {
+    @apply text-primary-white font-normal;
+}
+
+h1 {
+    @apply text-5xl tracking-tighter leading-normal;
+}
+
+h2 {
+    @apply text-4xl tracking-tighter leading-normal;
+}
+
+h3 {
+    @apply text-3xl tracking-tighter leading-normal;
+}
+
+h4 {
+    @apply text-2xl tracking-tighter leading-normal;
+}
+
+h5 {
+    @apply text-xl tracking-tighter leading-normal;
+}
+
+h6 {
+    @apply text-lg tracking-tighter leading-normal;
+}
+
+p, span, button, a, li {
+    @apply text-sm;
+}
+
+button {
+    @apply leading-none;
+}

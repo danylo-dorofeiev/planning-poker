@@ -1,0 +1,103 @@
+<div data-controller="dropdown" data-action="click@window->dropdown#clickOutside" class="relative">
+    <div data-action="click->dropdown#toggle" class="relative group">
+        {% if status %}
+            <twig:Button type="primary" size="small">
+                {{ icon('filter', 'w-4! h-4!') }}
+                Filter
+                {{ icon('arrow_list', 'w-3 h-3') }}
+            </twig:Button>
+        {% else %}
+            <twig:Button type="secondary" size="small">
+                {{ icon('filter', 'w-4! h-4! stroke-secondary-gray') }}
+                Filter
+                {{ icon('arrow_list', 'w-3 h-3 stroke-secondary-gray') }}
+            </twig:Button>
+        {% endif %}
+    </div>
+
+    <twig:Dropdown width="180">
+        <form method="get">
+            <ol class="flex flex-col gap-1">
+                <li data-action="click->dropdown#close">
+                    {% if status %}
+                        <twig:Button func="submit" type="ghost" size="smaller" css="w-full justify-start!">
+                            {{ icon('filter', 'w-5 h-5 stroke-secondary-gray') }}
+                            Alle
+                        </twig:Button>
+                    {% else %}
+                        <twig:Button type="secondary" size="smaller" css="w-full justify-start!">
+                            {{ icon('filter', 'w-5 h-5') }}
+                            Alle
+                        </twig:Button>
+                    {% endif %}
+                </li>
+
+                <li data-action="click->dropdown#close" class="relative">
+                    {% if status == "pending" %}
+                        <twig:Button type="secondary" size="smaller" css="w-full justify-start!">
+                            {{ icon('hourglass', 'w-5 h-5') }}
+                            Pending
+                        </twig:Button>
+
+                        <twig:Button func="submit" type="ghost" size="smaller" css="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-secondary-gray-700!">
+                            {{ icon('x', 'w-3 h-3 stroke-secondary-gray') }}
+                        </twig:Button>
+                    {% else %}
+                        <twig:Button func="submit" name="status" value="pending" type="ghost" size="smaller" css="w-full justify-start!">
+                            {{ icon('hourglass', 'w-5 h-5 stroke-secondary-gray') }}
+                            Pending
+                        </twig:Button>
+                    {% endif %}
+                </li>
+
+                <li data-action="click->dropdown#close" class="relative">
+                    {% if status == "voting" %}
+                        <twig:Button type="secondary" size="smaller" css="w-full justify-start!">
+                            {{ icon('circle_dashed', 'w-5 h-5') }}
+                            Voting
+                        </twig:Button>
+
+                        <twig:Button func="submit" type="ghost" size="smaller" css="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-secondary-gray-700!">
+                            {{ icon('x', 'w-3 h-3 stroke-secondary-gray') }}
+                        </twig:Button>
+                    {% else %}
+                        <twig:Button func="submit" name="status" value="voting" type="ghost" size="smaller" css="w-full justify-start!">
+                            {{ icon('circle_dashed', 'w-5 h-5 stroke-secondary-gray') }}
+                            Voting
+                        </twig:Button>
+                    {% endif %}
+                </li>
+
+                <li data-action="click->dropdown#close" class="relative">
+                    {% if status == "finished" %}
+                        <twig:Button type="secondary" size="smaller" css="w-full justify-start!">
+                            {{ icon('check_circle', 'w-5 h-5 stroke-secondary-gray') }}
+                            Finished
+                        </twig:Button>
+
+                        <twig:Button func="submit" type="ghost" size="smaller" css="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-secondary-gray-700!">
+                            {{ icon('x', 'w-3 h-3 stroke-secondary-gray') }}
+                        </twig:Button>
+                    {% else %}
+                        <twig:Button func="submit" name="status" value="finished" type="ghost" size="smaller" css="w-full justify-start!">
+                            {{ icon('check_circle', 'w-5 h-5 stroke-secondary-gray') }}
+                            Finished
+                        </twig:Button>
+                    {% endif %}
+                </li>
+            </ol>
+
+            {% if sortOption %}
+                <input type="hidden" name="sortOption" value="{{ sortOption }}">
+            {% endif %}
+
+            {% if sortDirection %}
+                <input type="hidden" name="sortDirection" value="{{ sortDirection }}">
+            {% endif %}
+
+            {% if search %}
+                <input type="hidden" name="search" value="{{ search }}">
+            {% endif %}
+        </form>
+    </twig:Dropdown>
+</div>

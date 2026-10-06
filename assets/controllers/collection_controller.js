@@ -1,27 +1,47 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ["items"];
+    static targets = ['items', 'prototype', 'addButton'];
+
     static values = {
-        prototype: String,
-        index: Number
+        index: Number,
+        max: {
+            type: Number,
+            default: 11,
+        },
     };
 
+    connect() {
+        this.updateAddButton();
+    }
+
     add() {
-        const html = this.prototypeValue.replace(
+        if (this.itemsTarget.children.length >= this.maxValue) {
+            return;
+        }
+
+        const html = this.prototypeTarget.innerHTML.replace(
             /__name__/g,
             this.indexValue
         );
-        this.itemsTarget.insertAdjacentHTML(
-            'beforeend',
-            `<div class="card-item">
-${html}
-<button type="button" data-action="collection#remove">Delete</button>
-</div>`);
+
+        this.itemsTarget.insertAdjacentHTML('beforeend', html);
+
         this.indexValue++;
+
+        this.updateAddButton();
     }
 
     remove(event) {
-        event.target.closest('.card-item').remove();
+        event.currentTarget
+            .closest('[data-collection-target="item"]')
+            .remove();
+
+        this.updateAddButton();
+    }
+
+    updateAddButton() {
+        this.addButtonTarget.hidden =
+            this.itemsTarget.children.length >= this.maxValue;
     }
 }

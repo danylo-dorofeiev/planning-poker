@@ -1,0 +1,257 @@
+<div id="ticket-{{ ticket.uuid }}" class="flex flex-col gap-1 bg-secondary-grey/20 hover:bg-secondary-grey/30 hover:-translate-x-1 transition-transform duration-150 border {% if ticket.status.value == "voting"%}border-accent! border-l-4{% else %}border-secondary-grey-light/40{% endif %} p-3 rounded-lg">
+    <div class="flex items-start justify-between">
+        <span class="uppercase font-mono text-secondary-grey-light! flex gap-1.5 items-center">
+            {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+            {{ ticket.key }}
+        </span>
+
+        <div class="flex items-center gap-2">
+            {% if ticket.rounds.count > 1 %}
+                <span class="flex gap-1.5 items-center border rounded-lg py-0.5 px-2 border-secondary-grey-light/40 text-secondary-grey-light!">
+                    {{ ticket.rounds.count() }}
+                    {{ icon('reload', 'w-4! h-4! stroke-secondary-grey-light') }}
+                </span>
+            {% endif %}
+
+            {% if ticket.status.value == 'finished' %}
+                <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent text-accent! bg-accent/20">
+                    {{ icon('check_circle', 'w-4! h-4! fill-accent!') }}
+                    {{ ticket.status.value }}
+                </span>
+            {% endif %}
+
+            {% if ticket.status.value == 'voting' %}
+                <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                    {{ icon('circle_dashed', 'w-4! h-4! stroke-primary-white! animate-[spin_3s_linear_infinite]') }}
+                    {{ ticket.status.value }}
+                </span>
+            {% endif %}
+
+            {% if ticket.status.value == 'pending' %}
+                <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-grey-light text-secondary-grey-light! bg-secondary-grey-light/20">
+                    {{ icon('clock', 'w-4! h-4! stroke-secondary-grey-light') }}
+                    {{ ticket.status.value }}
+                </span>
+            {% endif %}
+
+            <div data-controller="dropdown" data-action="click@window->dropdown#close" class="relative group">
+                <div data-action="click->dropdown#toggle">
+                    <button class="btn-smooth btn-smaller flex items-center text-primary-white!">
+                        {{ icon('dots_vertical', 'w-4! h-4! stroke-secondary-grey-light!') }}
+                    </button>
+                </div>
+
+                <div class="opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150 absolute top-full right-0 items-center pt-1">
+                    <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">Bearbeiten</span>
+                </div>
+
+                <div data-dropdown-target="menu" class="absolute top-full right-0 mt-1 opacity-0 -translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                    <ol class="flex flex-col bg-primary-black border border-secondary-grey-light/40 w-50 rounded-lg p-2">
+                        <li>
+                            <button type="button" popovertarget="ticket_{{ ticket.uuid }}_show" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                {{ icon('details', 'w-5! h-5! stroke-secondary-grey-light') }}
+                                Übersicht
+                            </button>
+                        </li>
+
+                        <li>
+                            <button {% if ticket.status.value == "voting"%}disabled{% endif%} type="button" popovertarget="ticket_{{ ticket.uuid }}_edit_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                                {{ icon('pencil', 'w-5! h-5! stroke-secondary-grey-light') }}
+                                Bearbeiten
+                            </button>
+                        </li>
+
+                        <li>
+                            <div class="flex bg-secondary-grey-light/40 my-2 h-px"></div>
+                        </li>
+
+                        <li>
+                            <button {% if ticket.status.value == "voting"%}disabled{% endif%} popovertarget="ticket_{{ ticket.uuid }}_delete_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed! text-red-500!">
+                                {{ icon('trash', 'w-5! h-5! stroke-red-500') }}
+                                Löschen
+                            </button>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+        <h6 class="tracking-normal! text-balance">{{ ticket.title }}</h6>
+
+        {% if ticket.description %}
+            <p class="text-secondary-grey-light!">{{ ticket.description }}</p>
+        {% endif %}
+    </div>
+
+    <div class="flex gap-2 items-end justify-between min-h-7.5">
+        <span class="flex gap-1.5 items-center text-secondary-grey-light! leading-none!">
+            {{ icon('calender', 'w-4! h-4! stroke-secondary-grey-light') }}
+            {{ ticket.updatedAt|date('d.m.Y - H:i') }}
+        </span>
+
+        {% if ticket.status.value == 'pending' %}
+            {% if is_granted('ROUND_START', ticket.room) %}
+                <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
+                    <button {% if round %}disabled{% endif %} type="submit" class="btn-small btn-primary disabled:opacity-50 disabled:cursor-not-allowed!">
+                        {{ icon('play', 'w-4! h-4!') }}
+                        Round Starten
+                    </button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        {% if ticket.status.value == 'voting' %}
+            {% if is_granted('ROUND_REVEAL', ticket.room) %}
+                <form method="post" action="{{ path('round_reveal', {room_id:ticket.room.uuid, ticket_id:ticket.uuid, round_id:round.id}) }}">
+                    <button type="submit" class="flex gap-1.5 items-center btn-primary btn-small">
+                        {{ icon('play', 'w-4! h-4!') }}
+                        Reveal
+                    </button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        {% if ticket.status.value == 'finished' %}
+            {% if is_granted('ROUND_START', ticket.room) %}
+                <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
+                    <button {% if round %}disabled{% endif %} type="submit" class="btn-small btn-smooth disabled:opacity-50 disabled:cursor-not-allowed!">
+                        {{ icon('rotate', 'w-4! h-4! stroke-secondary-grey-light!') }}
+                        Zurücksetzen
+                    </button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<twig:Modal modal="ticket_{{ ticket.uuid }}_edit_modal" title="Ticket bearbeiten" reset="ticket_{{ ticket.uuid }}_edit_form" width="600">
+    {{ form_start(ticketEditForm) }}
+
+    <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-1">
+            {{ form_label(ticketEditForm.key) }}
+            {{ form_widget(ticketEditForm.key) }}
+        </div>
+        <div class="flex flex-col gap-1">
+            {{ form_label(ticketEditForm.title) }}
+            {{ form_widget(ticketEditForm.title) }}
+        </div>
+        <div class="flex flex-col gap-1">
+            {{ form_label(ticketEditForm.description) }}
+            {{ form_widget(ticketEditForm.description) }}
+        </div>
+
+        <div class="flex gap-2 items-end justify-end mt-1">
+            <button type="button" popovertarget="ticket_{{ ticket.uuid }}_edit_modal" popovertargetaction="hide" class="btn-small btn-secondary">
+                Cancel
+            </button>
+
+            <button type="submit" class="btn-primary btn-small">
+                Speichern
+            </button>
+        </div>
+    </div>
+
+    {{ form_end(ticketEditForm) }}
+</twig:Modal>
+
+<twig:Modal modal="ticket_{{ ticket.uuid }}_show" title="Ticket Übersicht" width="600">
+    <div class="flex flex-col gap-3">
+        {% if ticket.rounds is not empty %}
+            <div class="flex flex-col gap-3">
+                <h6>Rounds</h6>
+
+                <div class="flex gap-1.5 flex-wrap text-center">
+                    {% for round in ticket.rounds %}
+                        <a href="{{ path('round_show', {room_id:room.uuid, ticket_id:ticket.uuid, round_id:round.id}) }}" data-turbo-frame="round_overview" class="p-1 border border-secondary-grey-light/40 rounded-lg w-8 h-8 bg-secondary-grey/20 hover:border-accent hover:bg-secondary-grey/30">
+                            {{ round.number }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <turbo-frame id="round_overview"></turbo-frame>
+            </div>
+        {% endif %}
+
+        <div class="flex flex-col gap-1 p-3 border border-secondary-grey-light/40 rounded-lg bg-secondary-grey/20">
+            <span class="uppercase font-mono text-secondary-grey-light! flex gap-1.5 items-center">
+                {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+                {{ ticket.key }}
+            </span>
+            <h4>{{ ticket.title }}</h4>
+            <p class="text-secondary-grey-light!">{{ ticket.description }}</p>
+        </div>
+
+        <table class="table-auto w-full border-collapse text-sm">
+            <thead>
+            <tr>
+                <th class="text-left text-secondary-grey-light!">
+                    Status
+                </th>
+                <th class="text-left text-secondary-grey-light!">
+                    Created at
+                </th>
+                <th class="text-left text-secondary-grey-light!">
+                    Updated at
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    {% if ticket.status.value == 'finished' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent text-accent! bg-accent/20">
+                            {{ icon('check_circle', 'w-4! h-4! fill-accent!') }}
+                            {{ ticket.status.value }}
+                        </span>
+                    {% endif %}
+
+                    {% if ticket.status.value == 'voting' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                            {{ icon('circle_dashed', 'w-4! h-4! stroke-primary-white! animate-[spin_3s_linear_infinite]') }}
+                            {{ ticket.status.value }}
+                        </span>
+                    {% endif %}
+
+                    {% if ticket.status.value == 'pending' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-grey-light text-secondary-grey-light! bg-secondary-grey-light/20">
+                            {{ icon('clock', 'w-4! h-4! stroke-secondary-grey-light') }}
+                            {{ ticket.status.value }}
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ ticket.createdAt|date('d.m.Y  H:i') }}
+                </td>
+                <td>
+                    {{ ticket.updatedAt|date('d.m.Y  H:i') }}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</twig:Modal>
+
+<twig:Modal modal="ticket_{{ ticket.uuid }}_delete_modal" :x="false" width="350">
+    <div class="flex flex-col gap-1 justify-center items-center">
+        {{ icon('trash', 'w-12! h-12! stroke-red-500') }}
+
+        <h4>Ticket löschen?</h4>
+
+        <p class="text-balance text-center text-secondary-grey-light!">Ihr Ticket wird endgültig gelöscht und kann nicht wiederhergestellt werden.</p>
+
+        <div class="flex gap-2 mt-3">
+            <button type="button" popovertarget="ticket_{{ ticket.uuid }}_delete_modal" popovertargetaction="hide" class="btn-small btn-secondary">
+                Cancel
+            </button>
+
+            <form method="POST" action="{{ path('ticket_delete', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
+                <button type="submit" class="btn-secondary btn-small border-red-500! bg-red-500/20! hover:bg-red-500/30!">
+                    Löschen
+                </button>
+            </form>
+        </div>
+    </div>
+</twig:Modal>

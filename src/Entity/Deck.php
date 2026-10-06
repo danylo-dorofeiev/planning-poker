@@ -30,6 +30,7 @@ class Deck
     #[ORM\Column(length: 255)]
     private string $name;
 
+    #[Assert\Valid]
     #[Assert\Count(min: 2, minMessage: 'A deck must contain at least 2 cards.')]
     #[ORM\OneToMany(targetEntity: Card::class, mappedBy: 'deck', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $cards;

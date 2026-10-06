@@ -1,0 +1,14 @@
+dialog, dialog[popover] {
+    @apply overflow-hidden opacity-0 scale-90 transition-all w-full bg-primary-black border border-secondary-grey-light/40 p-4 space-y-3 backdrop:bg-secondary-gray-700/30 mx-auto my-auto rounded-lg;
+}
+
+dialog[open], dialog[popover]:popover-open {
+    @apply opacity-100 scale-100;
+}
+
+@starting-style {
+    dialog[open], dialog[popover]:popover-open {
+        @apply opacity-0 scale-90;
+    }
+}
+

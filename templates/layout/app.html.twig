@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <mercure data-controller="mercure" data-mercure-url-value="{{ mercure(room.uuid) }}">
+        {% include 'partials/app/header.html.twig' with {
+            title: block('title')
+        } %}
+
+        {% block content %}{% endblock %}
+
+        {% include 'partials/app/footer.html.twig' %}
+    </mercure>
+{% endblock %}

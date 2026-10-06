@@ -1,0 +1,15 @@
+<div id="ticket_list"
+     data-mercure-target="stream"
+     class="flex flex-col gap-3"
+>
+    {% if tickets is not empty %}
+        {% for ticket in tickets %}
+            {% include 'ticket/elements/_ticket_card.html.twig' with {ticket:ticket, round:round, ticketEditForm:ticketEditForms[ticket.uuid]} %}
+        {% endfor %}
+    {% else %}
+        <div class="flex flex-col gap-1.5 justify-center items-center">
+            {{ icon('no_ticket', 'w-8! h-8! stroke-secondary-grey-light') }}
+            <span class="text-base! text-secondary-grey-light!">Es sind noch keine Tickets.</span>
+        </div>
+    {% endif %}
+</div>

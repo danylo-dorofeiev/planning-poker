@@ -1,0 +1,5 @@
+<turbo-stream action="replace" target="ticket_list">
+    <template>
+        {% include 'ticket/elements/_ticket_card_list.html.twig' with {room:room, tickets:tickets, round:round|default(0), ticketEditForms:ticketEditForms} %}
+    </template>
+</turbo-stream>

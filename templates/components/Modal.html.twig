@@ -1,0 +1,51 @@
+<dialog id="{{ modal }}" popover data-modal-target="dialog" style="max-width: {{ width }}px">
+    {% if title or x %}
+        <div class="flex gap-3 items-start justify-between pb-2 border-b border-b-secondary-grey-light/40">
+            {% if title %}
+                <h5 class="w-fit">
+                    {{ title }}
+                </h5>
+            {% endif %}
+
+            {% if reset or x %}
+                <div class="flex-1 flex gap-2 items-start justify-end">
+                    {% if reset %}
+                        <div class="relative group">
+                            <button
+                                type="reset"
+                                form="{{ reset }}"
+                                class="btn-smaller btn-smooth"
+                            >
+                                {{ icon('rotate', 'w-4! h-4! stroke-secondary-grey-light') }}
+                            </button>
+
+                            <twig:Tooltip position="bottom left">
+                                Zurücksetzen
+                            </twig:Tooltip>
+                        </div>
+                    {% endif %}
+
+                    {% if x %}
+                        <div class="relative group">
+                            <button
+                                type="button"
+                                popovertarget="{{ modal }}"
+                                popovertargetaction="hide"
+                                data-action="click->modal#close"
+                                class="btn-smaller btn-smooth ml-auto"
+                            >
+                                {{ icon('x', 'w-4! h-4! stroke-secondary-grey-light') }}
+                            </button>
+
+                            <twig:Tooltip position="bottom left">
+                                Schließen
+                            </twig:Tooltip>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {{ block('content') }}
+</dialog>

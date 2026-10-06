@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Room;
 use App\Entity\Round;
 use App\Entity\User;
 use App\Repository\RoundRepository;
@@ -13,6 +14,11 @@ readonly class RoundService
         private RoundRepository          $roundRepository,
         private EntityManagerInterface  $entityManager,
     ) {
+    }
+
+    public function findActiveRoundByRoom(Room $room): ?Round
+    {
+        return $this->roundRepository->findActiveRoundByRoom($room);
     }
 
     public function createRound(Round $round): Round

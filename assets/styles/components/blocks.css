@@ -1,0 +1,15 @@
+.box {
+    @apply border border-secondary-gray-700 rounded-lg;
+}
+
+.card {
+    @apply flex items-center justify-center w-10 h-14 border border-secondary-gray-700 bg-primary-black-900 rounded-lg text-base!;
+}
+
+.card-small {
+    @apply flex items-center justify-center w-8 h-11 border border-secondary-gray-700 bg-primary-black-900 rounded-lg text-sm!;
+}
+
+.card.active {
+    @apply bg-accent/90! border-accent! hover:translate-y-0!;
+}

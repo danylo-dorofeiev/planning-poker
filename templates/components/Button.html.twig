@@ -1,0 +1,25 @@
+{% if link %}
+    <a href="{{ link }}"
+       target="{{ target }}"
+       data-turbo="{{ turbo }}"
+       {% if preload %}data-turbo-preload{% endif %}
+       class="btn-{{ type }} btn-{{ size }} {{ css }} leading-3.5"
+
+       {% if custom_param %}{{ custom_param }}{% endif %}
+    >
+        {{ block('content') }}
+    </a>
+{% else %}
+    <button type="{{ func }}"
+            {% if name %}name="{{ name }}"{% endif %}
+            {% if value %}value="{{ value }}"{% endif %}
+            {% if modal %}popovertarget="{{ modal }}"{% endif %}
+            {% if data_action %}data-action="{{ data_action }}"{% endif %}
+            class="btn-{{ type }} btn-{{ size }} {{ css }}"
+
+            {% if custom_param %}{{ custom_param }}{% endif %}
+    >
+        {{ block('content') }}
+    </button>
+{% endif %}
+

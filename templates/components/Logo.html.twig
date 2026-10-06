@@ -1,0 +1,32 @@
+<div class="flex items-center
+     {% if size == "small" %}        gap-1!
+     {% elseif size == "medium" %}   gap-1.5!
+     {% elseif size == "large" %}    gap-2.5!
+     {% endif %}
+">
+    <a href="{{ path('app') }}" class="flex items-center gap-0.5">
+        {{ icon('pp_logo', {small: 'w-8 h-8', medium: 'w-12 h-12', large: 'w-16 h-16'} [size]) }}
+
+        {% if isText %}
+            <span class="tracking-tight! leading-none!
+                    {% if size == "small" %}        text-sm!
+                    {% elseif size == "medium" %}   text-xl!
+                    {% elseif size == "large" %}    text-4xl!
+                    {% endif %}
+            ">
+                Planning Poker
+            </span>
+        {% endif %}
+    </a>
+
+    {% if isDemo %}
+        <a href="{{ path('app_version') }}" class="mb-2 font-mono tracking-tight! leading-none! text-secondary-gray-400! hover:text-accent! hover:underline
+            {% if size == "small" %}        text-xs!
+            {% elseif size == "medium" %}   text-base!
+            {% elseif size == "large" %}    text-2xl!
+            {% endif %}
+        ">
+            demo
+        </a>
+    {% endif %}
+</div>

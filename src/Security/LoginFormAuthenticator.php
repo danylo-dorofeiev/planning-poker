@@ -48,7 +48,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('room_list'));
+        return new RedirectResponse($this->urlGenerator->generate('app'));
     }
 
     protected function getLoginUrl(Request $request): string

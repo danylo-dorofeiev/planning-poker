@@ -21,6 +21,7 @@ class DeckType extends AbstractType
                 'allow_delete' => true,
                 'by_reference' => false,
                 'prototype' => true,
+                'label' => false,
             ]);
     }
     public function configureOptions(OptionsResolver $resolver): void

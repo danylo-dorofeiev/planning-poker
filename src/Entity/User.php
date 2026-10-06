@@ -21,7 +21,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    private string $name;
+
+    #[ORM\Column(length: 180)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profileImage;
 
     #[ORM\Column]
     private array $roles = [];
@@ -38,9 +44,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Deck::class, cascade: ['persist', 'remove'])]
     private Collection $decks;
 
+    #[ORM\OneToOne(targetEntity: JiraConnection::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?JiraConnection $jiraConnection = null;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getEmail(): ?string

@@ -1,0 +1,43 @@
+<div class="flex flex-col gap-3">
+    {% for deck in decks %}
+        <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_modal" class="w-full flex flex-col gap-2 bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-4 hover:border-accent">
+            <span class="text-xl!">
+                {{ deck.name }}
+            </span>
+
+            <div class="flex gap-1.5 flex-wrap items-end">
+                {% for card in deck.cards %}
+                    <div class="card-small">
+                        {{ card.value }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex gap-2 items-center text-secondary-gray! mt-1">
+                <span class="flex gap-1 text-xs! text-secondary-gray!">
+                    {{ icon('deck', 'w-4 h-4 stroke-secondary-gray') }}
+                    {{ deck.cards.count() }} cards
+                </span>
+
+                <div class="bg-secondary-gray-700 h-2.5 w-px"></div>
+
+                <span class="flex gap-1 text-xs! text-secondary-gray!">
+                    {% if deck.isSystem %}
+                        System
+                    {% else %}
+                        Custom
+                    {% endif %}
+                </span>
+
+                {% if not deck.isSystem %}
+                    <div class="bg-secondary-gray-700 h-2.5 w-px"></div>
+
+                    <span class="flex gap-1 text-xs! text-secondary-gray!">
+                        {{ icon('calender', 'w-4 h-4 stroke-secondary-gray') }}
+                        {{ deck.createdAt|format_datetime(pattern='MMM dd, yyyy', locale='en', timezone='Europe/Berlin') }}
+                    </span>
+                {% endif %}
+            </div>
+        </a>
+    {% endfor %}
+</div>

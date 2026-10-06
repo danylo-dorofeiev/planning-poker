@@ -1,0 +1,28 @@
+<div class="flex flex-col gap-1">
+    {% if round.status.value !== "active" %}
+        <div class="flex gap-3">
+            {% for vote in round.votes %}
+                <div class="flex flex-col gap-1 items-center">
+                    <div class="group relative bg-secondary-grey w-12 h-12 rounded-full flex justify-center items-center hover:brightness-110 hover:scale-110 transition-transform duration-100 ease-in-out">
+                        <span class="text-base! uppercase select-none">
+                            {{ vote.user.name|slice(0, 2)|upper }}
+                        </span>
+
+                        <div class="absolute top-full right-1/2 translate-x-1/2 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150">
+                            <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">{{ vote.user.name }}</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        {{ vote.value }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+            {{ icon('circle_dashed', 'w-4! h-4! stroke-primary-white! animate-[spin_3s_linear_infinite]') }}
+            Round Läuft
+        </span>
+    {% endif %}
+</div>

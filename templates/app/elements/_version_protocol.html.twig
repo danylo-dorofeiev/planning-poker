@@ -1,0 +1,41 @@
+<div class="flex flex-col gap-1.5 bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-4">
+    <span class="font-mono uppercase tracking-wider">
+        Versionsprotokoll
+    </span>
+
+    <ol class="flex flex-col">
+        <li class="relative border-l border-secondary-gray-700 pl-3 pb-3">
+            <div class="group relative min-w-0 flex flex-col gap-1">
+                <span class="pl-2 text-xs! text-secondary-gray!">
+                    vor 16 Stunden
+                </span>
+
+                <span class="pl-2 truncate">
+                    Demo 0.1.1
+                </span>
+            </div>
+
+            <div class="absolute -left-1 top-1 w-2 h-2 bg-secondary-gray-700 rounded-full"></div>
+        </li>
+
+        <li class="relative border-l border-secondary-gray-700 pl-3 pb-3">
+            <div class="group relative min-w-0 flex flex-col gap-1">
+                <span class="pl-2 text-xs! text-secondary-gray!">
+                    vor 4 Tagen
+                </span>
+
+                <span class="pl-2 truncate">
+                    Demo 0.1.0
+                </span>
+            </div>
+
+            <div class="absolute -left-1 top-1 w-2 h-2 bg-secondary-gray-700 rounded-full"></div>
+        </li>
+
+        <li class="mt-1">
+            <a href="{{ path('app_version') }}" class="w-fit text-accent-500! hover:underline">
+                Alle Versionen
+            </a>
+        </li>
+    </ol>
+</div>

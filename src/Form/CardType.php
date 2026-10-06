@@ -13,7 +13,11 @@ class CardType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('value', TextType::class, [
-            'label' => 'VALUE'
+            'label' => false,
+            'attr' => [
+                'data-controller' => 'card-value',
+                'data-action' => 'input->card-value#validate',
+            ],
         ]);
     }
     public function configureOptions(OptionsResolver $resolver): void

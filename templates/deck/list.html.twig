@@ -1,69 +1,132 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/app.html.twig' %}
 
-{% block title %}Deck List{% endblock %}
+{% block title %}Deck Übersicht{% endblock %}
 
 {% block body %}
 
-<div data-controller="form">
+    {% include 'partials/app/header.html.twig' %}
 
-    <h1>Deck List</h1>
+    <main class="flex-1 flex">
+        {% include 'partials/app/sidebar.html.twig' with {activeTab: "decks"} %}
 
-    <style>
-        table, th, td {
-            border: 1px black solid;
-            border-collapse: collapse;
-        }
-    </style>
+        <aside class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900">
+            <div class="sticky top-0 flex flex-col gap-3 p-6">
 
-    <table>
-        <thead>
-        <tr>
-            <th>UUID</th>
-            <th>Name</th>
-            <th>Cards</th>
-            <th>Created at</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for deck in decks %}
-            <tr>
-                <td>{{ deck.uuid }}</td>
-                <td>{{ deck.name }}</td>
-                <td>
-                    {% for card in deck.cards %}
-                        {{ card.value }}
+                <div class="flex gap-3 justify-between items-end">
+                    <h5 class="leading-none!">
+                        Decks
+                    </h5>
+                </div>
+
+                <hr>
+
+                <twig:Button type="smooth" size="medium" modal="deck_create_modal" css="w-full">
+                    {{ icon('plus', 'w-4.5 h-4.5 stroke-secondary-gray') }}
+                    Deck erstellen
+                </twig:Button>
+
+                <twig:Modal width="556" modal="deck_create_modal" title="Neues Deck erstellen">
+                    {% include 'deck/form/_create_form.html.twig' %}
+                </twig:Modal>
+
+                {% if customDecks is not empty %}
+                    <ol class="flex flex-col">
+                        <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
+                            Benutzerdefiniertes
+                        </li>
+
+                        {% for deck in customDecks %}
+                            <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
+                                <div class="group relative min-w-0">
+                                    <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_modal" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
+                                        {{ deck.name|slice(0, 25) }}{% if deck.name|length > 25 %}...{% endif %}
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+
+                <ol class="flex flex-col">
+                    <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
+                        System
+                    </li>
+
+                    {% for deck in systemDecks %}
+                        <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
+                            <div class="group relative min-w-0">
+                                <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_modal" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
+                                    {{ deck.name|slice(0, 25) }}{% if deck.name|length > 25 %}...{% endif %}
+                                </a>
+                            </div>
+                        </li>
                     {% endfor %}
-                </td>
-                <td>{{ deck.createdAt|date('d.m.Y H:i') }}</td>
-                <td>
-                    {% if not deck.system %}
-                    <button
-                        type="button"
-                        data-action="click->form#fetch"
-                        data-url="{{ path('deck_edit', {deck_id:deck.uuid}) }}"
-                    >Edit</button>
+                </ol>
+            </div>
+        </aside>
+
+        <section class="flex gap-6 w-315 mx-auto p-6">
+            <div class="flex-1">
+                <div class="min-h-screen flex-1 flex flex-col gap-6 pb-6">
+                    <div class="flex flex-col gap-3">
+                        <h1 class="leading-none!">
+                            Deck Übersicht
+                        </h1>
+
+                        <p class="text-secondary-gray!">
+                            Hier können Sie Ihre Abstimmungsdecks verwalten. Neue Cards hinzufügen, bearbeiten oder löschen.
+                        </p>
+                    </div>
+
+                    {% if customDecks is not empty %}
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-end gap-3">
+                                <h3 class="leading-none! font-mono">
+                                    Meine Decks
+                                </h3>
+
+                                <span class="text-base! text-secondary-gray!">
+                                    [{{ customDecks|length() }}]
+                                </span>
+                            </div>
+
+                            {% include 'app/elements/_deck_list.html.twig' with {
+                                'decks': customDecks
+                            } %}
+                        </div>
                     {% endif %}
-                </td>
-                <td>
-                    {% if not deck.system %}
-                    <form method="post" action="{{ path('deck_delete', {deck_id:deck.uuid}) }}">
-                        <button type="submit">Delete</button>
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 
-    <!-- deck edit form -->
-    <div data-form-target="form" style="display: none"></div>
-    <!-- deck edit form -->
-</div>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-end gap-3">
+                            <h3 class="leading-none! font-mono">
+                                System Decks
+                            </h3>
 
-<br>
+                            <span class="text-base! text-secondary-gray!">
+                                [{{ systemDecks|length() }}]
+                            </span>
+                        </div>
 
-{{ include('deck/form/create.html.twig') }}
+                        {% include 'app/elements/_deck_list.html.twig' with {
+                            'decks': systemDecks
+                        } %}
+                    </div>
+                </div>
 
+                {% include 'partials/app/footer.html.twig' %}
+            </div>
+
+            <aside class="flex-1 max-w-75">
+
+            </aside>
+        </section>
+    </main>
+
+    <div data-controller="modal">
+        <twig:Modal modal="test" title="Deck Bearbeiten" width="600">
+            <turbo-frame id="deck_modal" data-action="turbo:frame-render->modal#open">
+                <!-- Deck -->
+            </turbo-frame>
+        </twig:Modal>
+    </div>
 {% endblock %}

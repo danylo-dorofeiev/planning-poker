@@ -1,34 +1,73 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/public.html.twig' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Login - Planning Poker{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<main class="flex flex-col">
+    <section class="flex-1 w-full h-full flex items-center justify-center">
+        <div class="flex flex-col gap-6 w-90 p-6 border border-secondary-gray-700 rounded-lg">
+            <twig:Logo size="medium" :isDemo="false"/>
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
+            <form id="sign_in" method="post" class="flex flex-col gap-3">
+                {% if error %}
+                    <div class="flex gap-1.5 items-center text-red-500! alert alert-danger">
+                        {{ icon('error', 'w-5 h-5 stroke-red-500') }}
+                        {% if error.messageKey|trans(error.messageData, 'security') == "Invalid credentials." %}
+                            Ungültige Anmeldedaten.
+                        {% else %}
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        {% endif %}
+                    </div>
+                {% endif %}
 
-    <h1 class="h3 mb-3 font-weight-normal">Login</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
 
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
-    </div>
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-1">
+                        <label for="inputEmail">
+                            E-Mail
+                        </label>
+                        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                    </div>
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Login
-    </button>
-</form>
+                    <div class="flex flex-col gap-1">
+                        <label for="inputPassword">
+                            Passwort
+                        </label>
+                        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                    </div>
 
-<p>No account? <a href="{{ path('app_register') }}">Sign up</a></p>
+                    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="_remember_me" class="mr-1.5">
+                            Angemeldet bleiben
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3 mt-3">
+                    <twig:Button func="submit" size="large" type="primary" css="mx-auto w-full text-center!">
+                        Anmelden
+                    </twig:Button>
+
+                    <span class="text-secondary-gray-400! flex gap-3">
+                        Noch kein Konto?
+                        <a href="{{ path('app_register') }}" class="flex items-center gap-1.5">
+                            Sign up
+                            {{ icon('login', 'w-5 h-5') }}
+                        </a>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+{% include('partials/public/footer.html.twig') %}
 {% endblock %}

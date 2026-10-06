@@ -1,76 +1,188 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/app.html.twig' %}
 
-{% block title %}Room{% endblock %}
+{% block title %}{{ room.name }}{% endblock %}
 
-{% block body %}
+{% block content %}
+    <main class="flex">
+        <aside class="flex-1 max-w-85 border-r border-secondary-grey-light/40 bg-secondary-grey/20">
+            <div class="sticky top-0 p-4">
+                <div class="flex items-end gap-2 justify-between border-b border-b-secondary-grey-light/40 pb-3">
+                    <h4 class="leading-none!">Participants</h4>
 
-    <h1>Room</h1>
+                    <twig:Button type="smooth" size="smaller" tooltip="User hinzufügen" modal="add_user_modal">
+                        {{ icon('plus', 'w-5! h-5! stroke-secondary-grey-light') }}
+                    </twig:Button>
 
-    <div
-        data-controller="room-presence"
-        data-room-presence-heartbeat-url-value="{{ path('room_heartbeat', {
-            room_id: room.uuid
-        }) }}"
-        data-room-presence-members-url-value="{{ path('room_members', {
-            room_id: room.uuid
-        }) }}"
-    >
-        <div data-room-presence-target="members">
-            Loading...
+                    <twig:Modal modal="add_user_modal" title="User hinzufügen" width="600">
+
+                        <div data-controller="clipboard" class="flex gap-2">
+                            <h6 class="text-nowrap">Link teilen:</h6>
+                            <input
+                                type="text"
+                                class="w-full"
+                                data-clipboard-target="input"
+                                value="{{ room.uuid }}"
+                                readonly
+                            >
+
+                            <button
+                                type="button"
+                                class="btn-secondary btn-smaller"
+                                data-clipboard-target="copyButton"
+                                data-action="clipboard#copy"
+                            >
+                                {{ icon('copy', 'w-4! h-4! stroke-secondary-grey-light') }}
+                                Copy
+                            </button>
+
+                            <button
+                                disabled
+                                type="button"
+                                class="hidden! btn-secondary btn-smaller disabled:brightness-50 disabled:cursor-not-allowed"
+                                data-clipboard-target="checkButton"
+                                data-action="clipboard#copy"
+                            >
+                                {{ icon('check', 'w-4! h-4! stroke-secondary-grey-light') }}
+                                Copied
+                            </button>
+                        </div>
+
+                        <div class="flex gap-2 items-end justify-end mt-1">
+                            <button type="button" popovertarget="add_user_modal" popovertargetaction="hide" class="btn-small btn-secondary">
+                                Cancel
+                            </button>
+                        </div>
+                    </twig:Modal>
+                </div>
+
+                {% include 'room/elements/_member_list.html.twig' with {room:room, members:room.members, votedUserIds:votedUserIds} %}
+            </div>
+        </aside>
+
+        <section class="flex-1 flex flex-col">
+            <div class="sticky top-0 p-4">
+                {% include 'room/elements/_poker_table.html.twig' with {room:room, round:round, votedUserIds:votedUserIds} %}
+            </div>
+        </section>
+
+        <aside class="flex-1 max-w-120 min-h-dvh">
+            <div data-controller="ticket-create-form" class="p-4 flex flex-col gap-3">
+                <div class="flex gap-2 items-end">
+                    <h4 class="leading-none!">Tickets</h4>
+
+                    <div class="ml-auto flex gap-2">
+                        <div data-controller="dropdown" data-action="click@window->dropdown#clickOutside" class="relative">
+                            <div data-action="click->dropdown#toggle" class="relative group">
+                                <twig:Button type="secondary" size="small">
+                                    {{ icon('export', 'w-4! h-4! stroke-secondary-gray') }}
+                                    Export
+                                    {{ icon('arrow_list', 'w-3 h-3 stroke-secondary-gray') }}
+                                </twig:Button>
+                            </div>
+
+                            <twig:Dropdown width="180">
+                                <form method="get">
+                                    <ol class="flex flex-col gap-1">
+                                        <li data-action="click->dropdown#close">
+                                            <twig:Button func="submit" type="ghost" size="smaller" css="w-full justify-start!">
+                                                {{ icon('jira', 'w-5 h-5 stroke-secondary-gray') }}
+                                                Aus Jira
+                                            </twig:Button>
+                                        </li>
+                                    </ol>
+                                </form>
+                            </twig:Dropdown>
+                        </div>
+                    </div>
+
+                    <button type="button" data-action="click->ticket-create-form#toggle" class="btn-primary btn-small" data-turbo-permanent>
+                        {{ icon('plus', 'w-4! h-4!') }}
+                        Create Ticket
+                    </button>
+                </div>
+
+                <div data-ticket-create-form-target="form" class="max-h-0 border border-secondary-grey-light/40 border-b-0 rounded-lg bg-secondary-grey/10 p-0 overflow-hidden transition-all duration-300 ease-in-out">
+                    <div class="flex flex-col p-3 border-b border-secondary-grey-light/40!">
+                        <div class="flex items-start gap-2 justify-between">
+                            <h5>Neues Ticket erstellen</h5>
+
+                            <div class="relative group">
+                                <button type="button" data-action="click->ticket-create-form#toggle" class="btn-smooth btn-smaller ml-auto">
+                                    {{ icon('x', 'w-4! h-4!') }}
+                                </button>
+
+                                <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-150 absolute top-full right-0 items-center pt-1">
+                                    <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">
+                                        Close
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{ form_start(ticketCreateForm, {
+                            attr: {
+                                'class': 'flex flex-col gap-3 w-full',
+                                'data-controller': 'ticket-create-form',
+                                'data-action': 'submit->ticket-create-form#submit',
+                            }
+                        }) }}
+
+                        <div class="flex gap-3">
+                            <div class="w-1/5">
+                                {{ form_row(ticketCreateForm.key, {
+                                    row_attr: { class: 'w-full flex flex-col gap-0.5' },
+                                    label_attr: { class: 'text-secondary-grey-light!'},
+                                    attr: { class: 'w-full' }
+                                }) }}
+                            </div>
+
+                            <div class="w-4/5">
+                                {{ form_row(ticketCreateForm.title, {
+                                    row_attr: { class: 'w-full flex flex-col gap-0.5' },
+                                    label_attr: { class: 'text-secondary-grey-light!'},
+                                    attr: { class: 'w-full' }
+                                }) }}
+                            </div>
+
+                        </div>
+
+                        {{ form_row(ticketCreateForm.description, {
+                            row_attr: { class: 'w-full flex flex-col gap-0.5' },
+                            label_attr: { class: 'text-secondary-grey-light!'},
+                            attr: { class: 'w-full' }
+                        }) }}
+
+                        <button type="submit" class="btn-primary btn-small mr-auto">Create</button>
+
+                        {{ form_end(ticketCreateForm) }}
+                    </div>
+                </div>
+
+                {% include 'ticket/elements/_ticket_card_list.html.twig' with {room:room, tickets:tickets, activeRound:activeRound|default(0)} %}
+            </div>
+        </aside>
+    </main>
+
+    <twig:Modal modal="room_{{ room.uuid }}_delete_modal" :x="false" width="350">
+        <div class="flex flex-col gap-1 justify-center items-center">
+            {{ icon('trash', 'w-12! h-12! stroke-red-500') }}
+
+            <h4>Raum löschen?</h4>
+
+            <p class="text-balance text-center text-secondary-grey-light!">Ihr Raum wird endgültig gelöscht und kann nicht wiederhergestellt werden.</p>
+
+            <div class="flex gap-2 mt-3">
+                <button type="button" popovertarget="room_{{ room.uuid }}_delete_modal" popovertargetaction="hide" class="btn-small btn-secondary">
+                    Cancel
+                </button>
+
+                <form method="POST" action="{{ path('room_delete', {room_id:room.uuid}) }}">
+                    <button type="submit" class="btn-danger btn-small">
+                        Löschen
+                    </button>
+                </form>
+            </div>
         </div>
-    </div>
+    </twig:Modal>
 
-    {% include('room/elements/_settings.html.twig') %}
-
-    {% if is_granted('ROOM_EDIT', room) %}
-        <a href="{{ path('room_edit', {room_id:room.uuid}) }}"><button>Edit</button></a>
-    {% endif %}
-
-    {% if is_granted('ROOM_DELETE', room) %}
-        <form method="post" action="{{ path('room_delete', {room_id: room.uuid}) }}">
-            <button type="submit">Delete</button>
-        </form>
-    {% endif %}
-
-    <hr>
-
-    <div data-controller="form">
-
-        <h2>Tickets</h2>
-
-        <style>
-            table, th, td {
-                border: 1px black solid;
-                border-collapse: collapse;
-            }
-        </style>
-
-        <table>
-            <thead>
-            <tr>
-                <th>Key</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Created at</th>
-                <th>Updated at</th>
-            </tr>
-            </thead>
-            <tbody id="tickets">
-                {% for ticket in room.tickets %}
-                    {% include('ticket/elements/_card.html.twig') %}
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <br>
-
-        {% include('ticket/form/create.html.twig') %}
-
-        <hr>
-        {% include('room/elements/_table.html.twig') %}
-
-        <!-- mercure stream source -->
-        {% include('mercure/stream_source.html.twig') %}
-    </div>
 {% endblock %}

@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\CardRepository;
+use App\Validator\CardValue;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CardRepository::class)]
 class Card
@@ -13,6 +15,8 @@ class Card
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank]
+    #[CardValue]
     #[ORM\Column(length: 20)]
     private string $value;
 

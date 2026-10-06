@@ -27,9 +27,8 @@ class Round
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Ticket $ticket = null;
 
-    #[ORM\ManyToMany(targetEntity: Card::class)]
-    #[ORM\JoinTable(name: 'round_card')]
-    private Collection $cards;
+    #[ORM\Column(type: Types::JSON)]
+    private array $cards = [];
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
@@ -40,7 +39,6 @@ class Round
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->cards = new ArrayCollection();
         $this->votes = new ArrayCollection();
     }
 
@@ -82,18 +80,15 @@ class Round
         return $this;
     }
 
-    public function addCard(Card $card): static
-    {
-        if (!$this->cards->contains($card)) {
-            $this->cards->add($card);
-        }
-
-        return $this;
-    }
-
-    public function getCards(): Collection
+    public function getCards(): array
     {
         return $this->cards;
+    }
+
+    public function setCards(array $cards): static
+    {
+        $this->cards = $cards;
+        return $this;
     }
 
     public function getVotes(): Collection

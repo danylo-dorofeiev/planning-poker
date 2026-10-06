@@ -1,0 +1,107 @@
+{% if rooms is not empty %}
+    <div class="flex flex-col gap-3">
+        {% for room in rooms %}
+            {% include 'app/elements/_room_card.html.twig' with {room:room} %}
+        {% endfor %}
+
+        {% if totalPages > 1 %}
+            {% set visiblePages = 10 %}
+
+            {% if totalPages <= visiblePages %}
+                {% set startPage = 1 %}
+                {% set endPage = totalPages %}
+            {% else %}
+                {% set startPage = page - 4 %}
+                {% set endPage = page + 5 %}
+
+                {% if startPage < 1 %}
+                    {% set startPage = 1 %}
+                    {% set endPage = visiblePages %}
+                {% elseif endPage > totalPages %}
+                    {% set endPage = totalPages %}
+                    {% set startPage = totalPages - visiblePages + 1 %}
+                {% endif %}
+            {% endif %}
+
+            <div class="flex justify-center gap-1.5">
+                {% set params = { page: page } %}
+
+                {% if search %}
+                    {% set params = params|merge({ search: search }) %}
+                {% endif %}
+
+                {% if status %}
+                    {% set params = params|merge({ status: status }) %}
+                {% endif %}
+
+                {% if sortOption %}
+                    {% set params = params|merge({ sortOption: sortOption }) %}
+                {% endif %}
+
+                {% if sortDirection %}
+                    {% set params = params|merge({ sortDirection: sortDirection }) %}
+                {% endif %}
+
+                {% if page > 1 %}
+                    {% set params = params|merge({ page: page - 1 }) %}
+
+                    <twig:Button link="{{ path('app', params) }}" type="ghost" size="smaller" css="w-8 h-8" :preload="true">
+                        {{ icon('arrow_left', 'w-4 h-4') }}
+                    </twig:Button>
+                {% endif %}
+
+                {% for i in startPage..endPage %}
+                    {% set params = params|merge({ page: i }) %}
+
+                    {% if i == page %}
+                        <twig:Button link="{{ path('app', params) }}" type="primary" size="smaller" css="w-8 h-8" :preload="true">
+                            {{ i }}
+                        </twig:Button>
+                    {% else %}
+                        <twig:Button link="{{ path('app', params) }}" type="smooth" size="smaller" css="w-8 h-8 text-primary-white!" :preload="true">
+                            {{ i }}
+                        </twig:Button>
+                    {% endif %}
+                {% endfor %}
+
+                {% if endPage < totalPages - 1 %}
+                    <twig:Button type="ghost" size="smaller" css="w-8 h-8 pointer-events-none!" :preload="true">
+                        ...
+                    </twig:Button>
+                {% endif %}
+
+                {% if endPage < totalPages %}
+                    {% set params = params|merge({ page: totalPages }) %}
+
+                    <twig:Button link="{{ path('app', params) }}" type="smooth" size="smaller" css="w-8 h-8 text-primary-white!" :preload="true">
+                        {{ totalPages }}
+                    </twig:Button>
+                {% endif %}
+
+                {% if page < totalPages %}
+                    {% set params = params|merge({ page: page + 1 }) %}
+
+                    <twig:Button link="{{ path('app', params) }}" type="ghost" size="smaller" css="w-8 h-8" :preload="true">
+                        {{ icon('arrow_right', 'w-4 h-4') }}
+                    </twig:Button>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="flex flex-col gap-3 justify-center items-center bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-6">
+        {{ icon('bolt', 'w-8 h-8 stroke-secondary-gray') }}
+
+        <span class="text-base! text-secondary-grey-light!">
+            Kein Raum gefunden.
+        </span>
+
+        <form method="get">
+            <twig:Button func="submit" type="secondary" size="small" css="w-full justify-start!">
+                {{ icon('arrow_right', 'w-4.5 h-4.5 stroke-secondary-gray') }}
+                Alle Räume
+            </twig:Button>
+        </form>
+    </div>
+{% endif %}
+

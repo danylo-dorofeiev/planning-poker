@@ -1,0 +1,97 @@
+<div id="poker_table"
+     data-mercure-target="stream"
+     class="flex flex-col gap-8 max-w-140 mx-auto h-[calc(100vh-64px)] pb-8"
+>
+    <div class="flex-1/5 flex flex-col justify-end">
+        {% if round %}
+            <div class="flex flex-col gap-2 text-center">
+                <span class="uppercase font-mono text-secondary-grey-light!">
+                    #{{ round.ticket.key }}
+                </span>
+
+                <h4 class="tracking-normal! leading-tight! text-balance">{{ round.ticket.title }}</h4>
+
+                {% if round.ticket.description %}
+                    <p>{{ round.ticket.description }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="flex-4/5 flex flex-col gap-8 justify-start">
+        <div data-controller="poker-table" class="w-full aspect-2/1 border border-secondary-grey-light/40 rounded-full bg-secondary-grey/20 mt-5">
+            <div class="relative w-full h-full rounded-full p-10">
+                <div class="border bg-secondary-grey/20 border-secondary-grey-light/40 w-full h-full rounded-full">
+                    {% if round %}
+                        {% if round.status.value == 'active' %}
+                            {% if is_granted('ROUND_REVEAL', round.ticket.room) %}
+                                <form method="post" action="{{ path('round_reveal', {room_id:round.ticket.room.uuid, ticket_id:round.ticket.uuid, round_id:round.id}) }}" class="w-full h-full rounded-full">
+                                    <button type="submit" class="w-full h-full border border-accent bg-accent/20 transition-colors duration-100 ease-in-out hover:bg-accent/30 px-3 py-1.5 rounded-full flex gap-1.5 items-center justify-center text-base!">
+                                        {{ icon('play', 'w-4! h-4!') }}
+                                        Reveal
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+
+                    {% for player in room.members %}
+                        <div data-poker-table-target="player" class="absolute z-10">
+                            <div class="group relative bg-secondary-grey w-12 h-12 rounded-full flex justify-center items-center border {% if round and round.status.value == "active" %}{% if player.user.id in votedUserIds %}border-accent!{% else %}border-transparent{% endif %}{% else %}border-transparent{% endif %} hover:brightness-110 hover:scale-110 transition-transform duration-100 ease-in-out">
+                                <span class="text-base! uppercase select-none">
+                                    {{ player.user.name|slice(0, 2)|upper }}
+                                </span>
+                                <div class="absolute top-full right-1/2 translate-x-1/2 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150">
+                                    <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">{{ player.user.name }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% if round %}
+            {% if round.status.value == 'active' %}
+                <div data-controller="vote"
+                     data-vote-vote-url-value="{{ path('round_vote', {
+                         room_id:round.ticket.room.uuid,
+                         ticket_id:round.ticket.uuid,
+                         round_id:round.id
+                     }) }}"
+                     class="flex items-center justify-center gap-1.5"
+                >
+                    {% for card in round.cards %}
+                        <button type="button"
+                                data-value="{{ card }}"
+                                data-vote-target="button"
+                                data-action="click->vote#submit"
+                                class="card {% if round and round.votes|filter(vote => vote.user == app.user and vote.value == card)|length > 0 %}active{% endif %} transition-transform duration-150 hover:-translate-y-1 active:-translate-y-2 hover:border-accent!"
+                        >
+                            {{ card }}
+                        </button>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="flex gap-2">
+                    {% for vote in round.votes %}
+                        <div class="flex flex-col justify-center items-center gap-2">
+                            <div class="group relative bg-secondary-grey w-12 h-12 rounded-full flex justify-center items-center border border-transparent hover:brightness-110 hover:scale-110 transition-transform duration-100 ease-in-out">
+                                    <span class="text-base! uppercase select-none">
+                                        {{ vote.user.name|slice(0, 2)|upper }}
+                                    </span>
+                                <div class="absolute top-full right-1/2 translate-x-1/2 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150">
+                                    <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">{{ vote.user.name }}</span>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                {{ vote.value }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

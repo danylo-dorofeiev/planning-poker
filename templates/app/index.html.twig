@@ -1,28 +1,49 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/public.html.twig' %}
 
-{% block title %}PlanningPoker{% endblock %}
+{% block title %}Planning Poker{% endblock %}
 
-{% block body %}
+{% block content %}
 
-{% if not app.user %}
-    <a href="{{ path('app_register') }}"><button>Sign up</button></a>
-    <a href="{{ path('app_login') }}"><button>Login</button></a>
-{% endif %}
+<main class="flex py-20">
+    <section class="flex-1 flex max-w-[80%] mx-auto">
+        <div class="w-2/3 h-full flex flex-col gap-6">
+            {{ icon('pp_logo', 'w-24 h-24') }}
 
-<h1>PlanningPoker</h1>
+            <h1 class="text-8xl! leading-none!">
+                Schätzen. Abstimmen. <br> Gemeinsam entscheiden.
+            </h1>
 
-<p>
-    Schätzen Sie Aufgaben gemeinsam im Team, erkennen Sie Risiken frühzeitig und schaffen Sie ein
-    gemeinsames Verständnis für die Anforderungen, bevor die Entwicklung beginnt.
-</p>
+            <p class="text-base! text-balance">
+                Schätzen Sie Aufgaben gemeinsam im Team, erkennen Sie Risiken frühzeitig und schaffen Sie ein
+                gemeinsames Verständnis für die Anforderungen, bevor die Entwicklung beginnt.
+            </p>
 
-<a href="{{ path('room_create') }}"><button>Room erstellen</button></a>
-<a href="{{ path('room_join') }}"><button>Room beitreten</button></a>
+            <div class="flex items-center gap-3 mt-3">
+                <div class="relative">
+                    <label for="joinRoomForm" class="hidden">Room ID</label>
+                    <input id="joinRoomForm" placeholder="Raum-ID eingeben" maxlength="36" class="min-w-100 py-2! pl-3! pr-40!"/>
+
+                    <div class="absolute top-1/2 right-1 -translate-y-1/2">
+                        <twig:Button link="{{ path('app_login') }}" size="smaller" type="secondary">
+                            {{ icon('arrow_right', 'w-4 h-4') }}
+                            Raum Beitreten
+                        </twig:Button>
+                    </div>
+                </div>
+
+                <twig:Button link="{{ path('app_login') }}" size="medium" type="primary" css="btn-glow">
+                    {{ icon('plus', 'w-4.5 h-4.5') }}
+                    Raum erstellen
+                </twig:Button>
+            </div>
+        </div>
+
+        <div class="relative h-full w-1/3">
+            <div style="background-image: url('{{ asset('images/elements/main_page_cards.png') }}'); background-size: contain; background-repeat: no-repeat; background-position: center center;" class="absolute inset-0"></div>
+        </div>
 
 
-{% if app.user %}
-    <a href="{{ path('room_list') }}"><button>Room List</button></a>
-    <a href="{{ path('deck_list') }}"><button>Deck List</button></a>
-{% endif %}
+    </section>
+</main>
 
 {% endblock %}

@@ -1,0 +1,19 @@
+{{ form_start(roomCreateForm) }}
+
+<div class="space-y-4">
+    <div class="flex flex-col gap-1">
+        {{ form_label(roomCreateForm.name) }}
+        {{ form_widget(roomCreateForm.name) }}
+    </div>
+
+    <div class="flex flex-col gap-1">
+        {{ form_label(roomCreateForm.description) }}
+        {{ form_widget(roomCreateForm.description) }}
+    </div>
+
+    <twig:Button func="submit" type="primary" size="small" css="ml-auto">
+        Create
+    </twig:Button>
+</div>
+
+{{ form_end(roomCreateForm) }}

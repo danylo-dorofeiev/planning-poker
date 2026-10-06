@@ -26,6 +26,11 @@ security:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/verify/email, roles: PUBLIC_ACCESS }
-        - { path: ^/verify/email, roles: PUBLIC_ACCESS }
+
+        - { path: ^/faq, roles: PUBLIC_ACCESS }
+        - { path: ^/about, roles: PUBLIC_ACCESS }
+        - { path: ^/imprint, roles: PUBLIC_ACCESS }
+        - { path: ^/privacy-statement, roles: PUBLIC_ACCESS }
+        - { path: ^/version, roles: PUBLIC_ACCESS }
 
         - { path: ^/, roles: ROLE_USER }

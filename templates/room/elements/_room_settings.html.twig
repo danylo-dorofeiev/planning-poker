@@ -1,0 +1,72 @@
+<div id="room_settings"
+     data-mercure-target="stream"
+     class="flex items-center gap-2">
+    <span>
+        {{ room.name }}
+    </span>
+
+    {% if room.owner == app.user %}
+        <div class="relative">
+            <twig:Button type="smooth" size="smaller" tooltip="Room Einstellungen" modal="room_settings_modal">
+                {{ icon('settings', 'w-5! h-5! stroke-secondary-grey-light') }}
+            </twig:Button>
+
+            <twig:Modal modal="room_settings_modal" title="Room Einstellungen" reset="room_settings_form" width="600">
+                {{ form_start(roomSettingsForm) }}
+
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-1">
+                        {{ form_label(roomSettingsForm.name) }}
+                        {{ form_widget(roomSettingsForm.name) }}
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        {{ form_label(roomSettingsForm.description) }}
+                        {{ form_widget(roomSettingsForm.description) }}
+                    </div>
+
+                    <div class="flex gap-2 items-end justify-end mt-1">
+                        <button type="button" popovertarget="{{ modal }}" popovertargetaction="hide" class="btn-small btn-secondary">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="btn-primary btn-small">
+                            Speichern
+                        </button>
+                    </div>
+                </div>
+
+                {{ form_end(roomSettingsForm) }}
+            </twig:Modal>
+        </div>
+
+        <div data-controller="dropdown" data-action="click@window->dropdown#close" class="relative group">
+            <div data-action="click->dropdown#toggle">
+                <button class="btn-smooth btn-smaller flex items-center text-primary-white!">
+                    {{ icon('play_card', 'w-5! h-5! stroke-secondary-grey-light') }}
+                    {{ room.deck.name }}
+                    {{ icon('arrow_list', 'w-3! h-3! stroke-secondary-grey-light') }}
+                </button>
+            </div>
+
+            <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-150 absolute top-full left-1/2 -translate-x-1/2 items-center pt-1">
+                <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">Deck auswählen</span>
+            </div>
+
+            <div data-dropdown-target="menu" class="absolute top-full right-0 mt-1 opacity-0 -translate-y-2 pointer-events-none transition-all duration-200 z-10">
+                <ol class="flex flex-col bg-primary-black border border-secondary-grey-light/40 w-50 rounded-lg p-2">
+                    {% for deck in decks %}
+                        <li>
+                            <form method="post" action="{{ path('deck_select', {room_id:room.uuid, deck_id:deck.uuid}) }}">
+                                <button type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                                    {{ icon('play_card', 'w-5! h-5! stroke-secondary-grey-light') }}
+                                    {{ deck.name }}
+                                </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    {% endif %}
+</div>

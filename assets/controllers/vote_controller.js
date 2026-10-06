@@ -4,8 +4,21 @@ export default class extends Controller {
     static values = {
         voteUrl: String
     };
+
     async submit(event) {
-        const value = event.currentTarget.dataset.value;
+        const clickedButton = event.currentTarget;
+        const value = clickedButton.dataset.value;
+
+        if (clickedButton.classList.contains('active')) {
+            return;
+        }
+
+        this.element.querySelectorAll('.active').forEach(button => {
+            button.classList.remove('active');
+        });
+
+        clickedButton.classList.add('active');
+
         await fetch(this.voteUrlValue, {
             method: 'POST',
             headers: {

@@ -1,0 +1,63 @@
+<turbo-frame id="deck_modal">
+    {% if deck.isSystem %}
+        <div class="flex flex-col gap-2">
+            <h3 class="leading-none!">
+                {{ deck.name }}
+            </h3>
+
+            <div class="flex gap-1.5">
+                {% for card in deck.cards %}
+                    <div class="card pointer-events-none">
+                        {{ card.value }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <span class="text-secondary-gray! text-xs!">
+                Das ist ein System-Deck und kann weder gelöscht noch bearbeitet werden.
+            </span>
+        </div>
+    {% else %}
+        {% include 'deck/form/_edit_form.html.twig' with {
+            deckEditForm: deckEditForm
+        } %}
+    {% endif %}
+
+    {% if not deck.isSystem %}
+        <div class="group absolute right-13.5 top-4">
+            <twig:Button modal="deck_{{ deck.uuid }}_delete_modal" type="danger" size="smaller">
+                {{ icon('trash', 'w-4 h-4 stroke-red-500')  }}
+            </twig:Button>
+
+            <twig:Tooltip position="bottom left">
+                Deck Löschen
+            </twig:Tooltip>
+        </div>
+    {% endif %}
+
+    {% if not deck.isSystem %}
+        <twig:Modal modal="deck_{{ deck.uuid }}_delete_modal" :x="false" width="350">
+            <div class="flex flex-col gap-1 justify-center items-center">
+                {{ icon('trash', 'w-12! h-12! stroke-red-500') }}
+
+                <h4>Deck löschen?</h4>
+
+                <p class="text-balance text-center text-secondary-grey-light!">
+                    Ihr Deck wird endgültig gelöscht und kann nicht wiederhergestellt werden.
+                </p>
+
+                <div class="flex gap-2 mt-3">
+                    <button type="button" popovertarget="deck_{{ deck.uuid }}_delete_modal" popovertargetaction="hide" class="btn-small btn-secondary">
+                        Cancel
+                    </button>
+
+                    <form method="POST" action="{{ path('deck_delete', {deck_id:deck.uuid}) }}" data-turbo="false">
+                        <twig:Button func="submit" type="danger" size="small">
+                            Löschen
+                        </twig:Button>
+                    </form>
+                </div>
+            </div>
+        </twig:Modal>
+    {% endif %}
+</turbo-frame>

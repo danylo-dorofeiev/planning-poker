@@ -12,7 +12,11 @@ class JoinRoomType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('uuid', TextType::class, [
-            'label' => 'Room UUID',
+            'label' => false,
+            'attr' => [
+                'placeholder' => 'Raum-ID eingeben',
+                'maxlength' => 36,
+            ],
             'required' => true,
         ]);
     }
