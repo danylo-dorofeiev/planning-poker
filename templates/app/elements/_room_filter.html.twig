@@ -98,6 +98,10 @@
             {% if search %}
                 <input type="hidden" name="search" value="{{ search }}">
             {% endif %}
+
+            {% if onlyOwned %}
+                <input type="hidden" name="onlyOwned" value="{{ onlyOwned }}">
+            {% endif %}
         </form>
     </twig:block>
 </twig:Dropdown>

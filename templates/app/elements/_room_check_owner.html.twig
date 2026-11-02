@@ -1,0 +1,40 @@
+<form method="GET">
+    <label class="w-fit flex items-center gap-2 cursor-pointer">
+        <input
+            type="checkbox"
+            name="onlyOwned"
+            value="1"
+            class="peer sr-only"
+            {{ app.request.query.getBoolean('onlyOwned') ? 'checked' : '' }}
+            onchange="this.form.requestSubmit()"
+        >
+
+        <span class="relative w-10 h-5 rounded-full bg-secondary-gray-700 transition-colors
+             peer-checked:bg-accent-600
+             peer-focus-visible:outline-2 peer-focus-visible:outline-accent-500
+             after:absolute after:top-0.5 after:left-0.5
+             after:size-4 after:rounded-full after:bg-white
+             after:transition-transform peer-checked:after:translate-x-5">
+        </span>
+
+        <span class="text-secondary-gray!">
+            Nur meine Räume
+        </span>
+    </label>
+
+    {% if sortOption %}
+        <input type="hidden" name="sortOption" value="{{ sortOption }}">
+    {% endif %}
+
+    {% if sortDirection %}
+        <input type="hidden" name="sortDirection" value="{{ sortDirection }}">
+    {% endif %}
+
+    {% if search %}
+        <input type="hidden" name="search" value="{{ search }}">
+    {% endif %}
+
+    {% if status %}
+        <input type="hidden" name="search" value="{{ status }}">
+    {% endif %}
+</form>

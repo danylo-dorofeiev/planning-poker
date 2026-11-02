@@ -53,6 +53,17 @@
                 <div class="relative group">
                     <span class="flex gap-1 text-xs! text-secondary-gray-400!">
                         {{ icon('profile', 'w-4 h-4 stroke-secondary-gray') }}
+                        {{ room.owner.name }}
+                    </span>
+
+                    <twig:Tooltip delay="1000">
+                        Besitzer
+                    </twig:Tooltip>
+                </div>
+
+                <div class="relative group">
+                    <span class="flex gap-1 text-xs! text-secondary-gray-400!">
+                        {{ icon('users', 'w-4 h-4 stroke-secondary-gray') }}
                         {{ room.members.count() }}
                     </span>
 

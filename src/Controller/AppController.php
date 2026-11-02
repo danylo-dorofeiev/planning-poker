@@ -47,14 +47,16 @@ final class AppController extends AbstractController
             $sortOption = $request->query->get('sortOption');
             $sortDirection = $request->query->get('sortDirection');
 
-            $totalRooms = $roomRepository->countByOwnerWithFilter($user, $search, $status);
+            $onlyOwned = $request->query->get('onlyOwned');
+
+            $totalRooms = $roomRepository->countRoomsByUserWithFilter($user, $search, $status, $onlyOwned);
             $totalPages = max(1, (int) ceil($totalRooms / $limit));
 
             $page = min($page, $totalPages);
 
             $recentlyUpdated = $roomRepository->findRecentlyUpdated($user);
 
-            $rooms = $roomRepository->findByOwnerWithFilter($user, $search, $status, $sortOption, $sortDirection, $page, $limit);
+            $rooms = $roomRepository->findRoomsByUserWithFilter($user, $search, $status, $sortOption, $sortDirection, $onlyOwned, $page, $limit);
 
             $hasRooms = $roomRepository->hasRooms($user);
 
@@ -69,6 +71,7 @@ final class AppController extends AbstractController
                 'status' => $status,
                 'sortOption' => $sortOption,
                 'sortDirection' => $sortDirection,
+                'onlyOwned' => $onlyOwned,
                 'hasRooms' => $hasRooms,
             ]);
         }

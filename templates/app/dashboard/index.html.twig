@@ -120,6 +120,8 @@
                                 {% endif %}
 
                                 <div class="ml-auto flex gap-2 items-end">
+                                    {% include 'app/elements/_room_check_owner.html.twig' %}
+
                                     <form method="get" class="relative flex gap-2 items-center">
                                         <input type="text" name="search" value="{{ search }}" placeholder="Suchen..." class="pl-10! btn-smallest">
 

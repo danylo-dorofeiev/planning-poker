@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\RoomMemberRole;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(
@@ -28,6 +29,9 @@ class RoomMember
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
+
+    #[ORM\Column(enumType: RoomMemberRole::class)]
+    private RoomMemberRole $role = RoomMemberRole::MEMBER;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $lastSeen = null;
@@ -56,6 +60,18 @@ class RoomMember
     public function setUser(User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getRole(): RoomMemberRole
+    {
+        return $this->role;
+    }
+
+    public function setRole(RoomMemberRole $role): self
+    {
+        $this->role = $role;
+
         return $this;
     }
 
