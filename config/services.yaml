@@ -10,6 +10,7 @@ parameters:
     app.mail_from_name: '%env(MAILER_FROM_NAME)%'
     app.mail_from_address: '%env(MAILER_FROM_ADRESS)%'
     app.mail_signature: '%env(MAILER_SIGNATURE)%'
+    app.version: '%env(APP_VERSION)%'
 
 services:
     # default configuration for services in *this* file
