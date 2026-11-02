@@ -1,42 +1,42 @@
-<header id="app_header" class="space-y-1 bg-primary-black border-b border-secondary-gray-700 px-4 py-2 z-90">
+<header id="app_header" class="bg-primary-black border-b border-secondary-gray-700 px-4 py-2 z-90">
     <div class="w-full flex justify-between items-center">
-        {{ component('Logo') }}
+        <twig:Logo />
 
         <div class="flex gap-2 items-center">
             <div class="flex items-center gap-2">
                 {% if room is defined and not null %}
-                    {% include 'room/elements/_room_settings.html.twig' with {room:room, decks:decks} %}
+                    {% include 'room/elements/_room_settings.html.twig' with {room:room} %}
                 {% else %}
 
-                    <div class="relative group">
-                        {{ form_start(joinRoomForm) }}
-                        {{ form_widget(joinRoomForm.uuid, {
-                            attr: {
-                                required: true,
-                                class: 'py-1! pr-10! bg-transparent! ' ~ (
-                                error|default('') == 'room_not_found'
-                                ? 'border! border-red-500! focus:border-transparent! rounded-lg!'
-                                : ''
-                                ),
-                                pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}',
-                                title: 'Bitte eine gültige UUID eingeben.'
-                            }
-                        }) }}
+                    <div id="room_join_form" class="relative group">
+                        <form method="get" action="{{ path('room_join') }}" data-turbo="false">
+                            {% set flashErrors = app.flashes('error') %}
+                            {% set roomNotFound = 'room_not_found' in flashErrors %}
 
-                        <div class="absolute top-1/2 right-1 -translate-y-1/2">
-                            <twig:Button func="submit" type="smooth" css="group-has-[input:valid]:bg-accent-600! group-has-[input:valid]:border-accent-500! group-has-[input:valid]:hover:bg-accent-700! rounded-md! p-0.5! transition-all duration-300 ease-in-out">
-                                {{ icon('arrow_right', 'w-4! h-4!') }}
-                            </twig:Button>
-                        </div>
+                            <input
+                                type="text"
+                                name="room_id"
+                                required
+                                placeholder="Raum-ID eingeben",
+                                maxlength=36,
+                                pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}"
+                                title="Bitte eine gültige UUID eingeben."
+                                class="py-1! pr-10! bg-transparent! {% if roomNotFound %}border! border-red-500! focus:border-transparent! rounded-lg!{% endif %}"
+                            >
 
-                        {{ form_end(joinRoomForm) }}
+                            <div class="absolute top-1/2 right-1 -translate-y-1/2">
+                                <twig:Button func="submit" type="smooth" css="group-has-[input:valid]:bg-accent-600! group-has-[input:valid]:border-accent-500! group-has-[input:valid]:hover:bg-accent-700! rounded-md! p-0.5! transition-all duration-300 ease-in-out">
+                                    {{ icon('arrow_right', 'w-4! h-4!') }}
+                                </twig:Button>
+                            </div>
+                        </form>
 
                         <twig:Tooltip position="bottom right">
                             Raum Beitreten
                         </twig:Tooltip>
 
-                        {% if error|default('') == 'room_not_found' %}
-                            <div class="group-focus-within:hidden absolute top-full left-0 pt-1">
+                        {% if roomNotFound %}
+                            <div class="group-focus-within:hidden absolute top-full left-0 pt-1 z-10">
                                 <span class="flex gap-1.5 items-center bg-red-950 rounded-md border border-red-500 px-1.5 py-1 text-xs!">
                                     {{ icon('error', 'w-3.5! h-3.5!') }}
                                     Nichts gefunden
@@ -50,21 +50,11 @@
 
                 <div class="relative group">
                     <twig:Button link="{{ path('app') }}" type="smooth" size="smaller">
-                        {{ icon('dashboard', 'w-5! h-5! stroke-secondary-gray-400') }}
+                        {{ icon('dashboard', 'w-5 h-5 stroke-secondary-gray-400') }}
                     </twig:Button>
 
                     <twig:Tooltip poition="bottom center">
                         Alle Räume
-                    </twig:Tooltip>
-                </div>
-
-                <div class="relative group">
-                    <twig:Button type="smooth" size="smaller">
-                        {{ icon('ticket', 'w-5! h-5! stroke-secondary-gray-400') }}
-                    </twig:Button>
-
-                    <twig:Tooltip poition="bottom center">
-                        Alle Tickets
                     </twig:Tooltip>
                 </div>
 
@@ -79,30 +69,35 @@
                 </div>
             </div>
 
-            <div data-controller="dropdown" data-action="click@window->dropdown#clickOutside" class="relative group">
-                <div data-action="click->dropdown#toggle" class="bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center border border-transparent hover:brightness-110 cursor-pointer">
-                    <span class="text-sm! uppercase select-none">
-                        {{ app.user.name|slice(0, 2)|upper }}
-                    </span>
 
-                    <twig:Tooltip position="bottom left">
-                        Benutzernavigationsmenü öffnen
-                    </twig:Tooltip>
-                </div>
+            <twig:Dropdown width="250" position="bottom left">
+                <twig:block name="toggle">
+                    <div class="relative group">
+                        <div class="bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center border border-transparent hover:brightness-110 cursor-pointer">
+                            <span class="text-sm! uppercase select-none">
+                                {{ app.user.name|slice(0, 2)|upper }}
+                             </span>
+                        </div>
 
-                <twig:Dropdown width="250">
+                        <twig:Tooltip position="bottom left">
+                            Benutzernavigationsmenü öffnen
+                        </twig:Tooltip>
+                    </div>
+                </twig:block>
+
+                <twig:block name="content">
                     <ol class="flex flex-col">
                         <li>
                             <div class="flex gap-2 items-center p-1">
-                                <div class="bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center">
-                                    <span class="text-sm! uppercase select-none">
-                                        {{ app.user.name|slice(0, 2)|upper }}
-                                    </span>
+                                <div class="bg-secondary-gray-700 w-9 h-9 rounded-full flex justify-center items-center">
+                                <span class="text-sm! uppercase select-none">
+                                    {{ app.user.name|slice(0, 2)|upper }}
+                                </span>
                                 </div>
 
                                 <span class="font-medium!">
-                                    {{ app.user.name }}
-                                </span>
+                                {{ app.user.name }}
+                            </span>
                             </div>
                         </li>
 
@@ -111,45 +106,38 @@
                         </li>
 
                         <li>
-                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                            <twig:Button link="{{ path('app_profile') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
                                 {{ icon('profile', 'w-5! h-5! stroke-secondary-gray!') }}
-                                Profile
-                            </a>
+                                Profil
+                            </twig:Button>
                         </li>
 
                         <li>
-                            <a href="{{ path('app') }}" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                            <twig:Button link="{{ path('app') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
                                 {{ icon('dashboard', 'w-5! h-5! stroke-secondary-gray!') }}
-                                Rooms
-                            </a>
+                                Räume
+                            </twig:Button>
                         </li>
 
                         <li>
-                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
-                                {{ icon('ticket', 'w-5! h-5! stroke-secondary-gray!') }}
-                                Tickets
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ path('deck_list') }}" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                            <twig:Button link="{{ path('deck_list') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
                                 {{ icon('deck', 'w-5! h-5! stroke-secondary-gray!') }}
                                 Decks
-                            </a>
+                            </twig:Button>
                         </li>
 
                         <li>
-                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                            <twig:Button link="{{ path('app_appearance') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
                                 {{ icon('brush', 'w-5 h-5 stroke-secondary-gray!') }}
-                                Appearance
-                            </a>
+                                Darstellung
+                            </twig:Button>
                         </li>
 
                         <li>
-                            <a href="" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                            <twig:Button link="{{ path('app_settings') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
                                 {{ icon('settings', 'w-5 h-5 stroke-secondary-gray!') }}
-                                Settings
-                            </a>
+                                Einstellungen
+                            </twig:Button>
                         </li>
 
                         <li>
@@ -157,14 +145,14 @@
                         </li>
 
                         <li>
-                            <a href="{{ path('app_logout') }}" data-turbo="false" class="py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
+                            <twig:Button link="{{ path('app_logout') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
                                 {{ icon('logout', 'w-5 h-5 stroke-secondary-gray!') }}
-                                Sign out
-                            </a>
+                                Abmelden
+                            </twig:Button>
                         </li>
                     </ol>
-                </twig:Dropdown>
-            </div>
+                </twig:block>
+            </twig:Dropdown>
         </div>
     </div>
 </header>

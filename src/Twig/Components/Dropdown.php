@@ -8,4 +8,5 @@ use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 class Dropdown
 {
     public int $width=200;
+    public string $position="bottom left";
 }

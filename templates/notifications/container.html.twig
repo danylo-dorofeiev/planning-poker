@@ -1,0 +1,11 @@
+<div class="notification-enter bg-primary-black border border-secondary-gray-700 rounded-lg p-3 relative flex gap-3 items-start">
+    <div class="flex-1">
+        {% block body %}
+            <!-- Notification / Error -->
+        {% endblock %}
+    </div>
+
+    <twig:Button data_action="click->notification#close" type="ghost" size="smallest">
+        {{ icon('x', 'w-4 h-4 stroke-secondary-gray') }}
+    </twig:Button>
+</div>

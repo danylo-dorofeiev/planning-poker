@@ -3,6 +3,7 @@
 @import './components/text.css';
 @import './components/blocks.css';
 @import './components/modal.css';
+@import './components/notifications.css';
 @import './fonts.css';
 
 @source not "../../public";
@@ -70,7 +71,7 @@ button, a {
 }
 
 input, textarea {
-    @apply border border-secondary-gray-700 bg-primary-black-900 rounded-md px-3 py-2 text-sm focus:outline-1 focus:outline-secondary-gray-300;
+    @apply border border-secondary-gray-700 bg-primary-black-900 rounded-md px-2 py-1.5 text-sm focus:outline-1 focus:outline-secondary-gray-300;
 }
 
 textarea {

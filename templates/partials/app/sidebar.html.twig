@@ -2,76 +2,79 @@
     <div class="h-[calc(100vh-65px)] sticky top-0 p-2">
         <nav class="h-full flex flex-col items-center gap-2">
 
-            <div class="group relative">
-                <twig:Button type="ghost" size="smaller">
-                    {{ icon('sidebar_left_collapse', 'w-4.5 h-4.5') }}
-                </twig:Button>
+            <div data-controller="sidebar" class="group relative mb-4">
+                <div data-sidebar-target="closeIcon">
+                    <twig:Button type="ghost" size="smaller" data_action="click->sidebar#close">
+                        {{ icon('sidebar_left_collapse', 'w-5 h-5 stroke-secondary-gray') }}
+                    </twig:Button>
 
-                <twig:Tooltip position="right">
-                    Sidebar schließen
-                </twig:Tooltip>
+                    <twig:Tooltip position="right">
+                        Sidebar schließen
+                    </twig:Tooltip>
+                </div>
+
+                <div data-sidebar-target="openIcon" class="hidden">
+                    <twig:Button type="ghost" size="smaller" data_action="click->sidebar#open">
+                        {{ icon('sidebar_left_expand', 'w-5 h-5 stroke-secondary-gray') }}
+                    </twig:Button>
+
+                    <twig:Tooltip position="right">
+                        Sidebar öffnen
+                    </twig:Tooltip>
+                </div>
             </div>
 
-            <hr>
+            <div class="flex flex-col justify-center items-center">
+                {% if activeTab is defined and activeTab == "rooms" %}
+                    <twig:Button type="primary" size="smaller">
+                        {{ icon('dashboard', 'w-5 h-5') }}
+                    </twig:Button>
 
-            {% if activeTab is defined and not null %}
-
-                {% if activeTab == "rooms" %}
-                    <twig:Button type="primary" size="small" css="[writing-mode:sideways-lr] font-mono hover:bg-accent-700!">
+                    <span class="text-xs! text-accent!">
                         Räume
-                    </twig:Button>
+                    </span>
                 {% else %}
-                    <twig:Button link="{{ path('app') }}" type="ghost" size="small" css="[writing-mode:sideways-lr] font-mono">
+                    <twig:Button link="{{ path('app') }}" type="ghost" size="smaller">
+                        {{ icon('dashboard', 'w-5 h-5 stroke-secondary-gray') }}
+                    </twig:Button>
+
+                    <span class="text-xs! text-secondary-gray!">
                         Räume
-                    </twig:Button>
+                    </span>
                 {% endif %}
+            </div>
 
-                <hr>
-
-                {% if activeTab == "tickets" %}
-                    <twig:Button type="primary" size="small" css="[writing-mode:sideways-lr] font-mono hover:bg-accent-700!">
-                        Tickets
+            <div class="flex flex-col justify-center items-center">
+                {% if activeTab is defined and activeTab == "decks" %}
+                    <twig:Button type="primary" size="smaller">
+                        {{ icon('deck', 'w-5 h-5') }}
                     </twig:Button>
-                {% else %}
-                    <twig:Button type="ghost" size="small" css="[writing-mode:sideways-lr] font-mono">
-                        Tickets
-                    </twig:Button>
-                {% endif %}
 
-                <hr>
-
-                {% if activeTab == "decks" %}
-                    <twig:Button type="primary" size="small" css="[writing-mode:sideways-lr] font-mono hover:bg-accent-700!">
+                    <span class="text-xs! text-accent!">
                         Decks
-                    </twig:Button>
+                    </span>
                 {% else %}
-                    <twig:Button link="{{ path('deck_list') }}" type="ghost" size="small" css="[writing-mode:sideways-lr] font-mono">
-                        Decks
+                    <twig:Button link="{{ path('deck_list') }}" type="ghost" size="smaller">
+                        {{ icon('deck', 'w-5 h-5 stroke-secondary-gray') }}
                     </twig:Button>
+
+                    <span class="text-xs! text-secondary-gray!">
+                        Decks
+                    </span>
                 {% endif %}
+            </div>
 
-                <div class="mt-auto flex flex-col gap-2">
-                    <div class="group relative">
-                        <twig:Button type="smooth" size="smaller">
-                            {{ icon('bell', 'w-4.5 h-4.5 stroke-secondary-gray') }}
-                        </twig:Button>
+            <div class="mt-auto flex flex-col gap-2">
+                <div class="group relative">
+                    <twig:Button link="{{ path('app_settings') }}" type="smooth" size="smaller">
+                        {{ icon('settings', 'w-5 h-5 stroke-secondary-gray') }}
+                    </twig:Button>
 
-                        <twig:Tooltip position="right">
-                            Benachrichtigungen
-                        </twig:Tooltip>
-                    </div>
-
-                    <div class="group relative">
-                        <twig:Button type="smooth" size="smaller">
-                            {{ icon('settings', 'w-4.5 h-4.5 stroke-secondary-gray') }}
-                        </twig:Button>
-
-                        <twig:Tooltip position="right">
-                            Settings
-                        </twig:Tooltip>
-                    </div>
+                    <twig:Tooltip position="right">
+                        Settings
+                    </twig:Tooltip>
                 </div>
-            {% endif %}
+            </div>
         </nav>
     </div>
 </aside>

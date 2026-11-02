@@ -12,4 +12,5 @@ class Modal
     public string $title="";
     public bool $x=true;
     public string $reset="";
+    public bool $turbo=false;
 }

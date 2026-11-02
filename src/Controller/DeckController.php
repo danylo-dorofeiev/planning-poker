@@ -33,9 +33,7 @@ final class DeckController extends AbstractController
     public function list(
         Security $security,
         DeckService $deckService,
-        RoomRepository $roomRepository,
         DeckRepository $deckRepository,
-        Request $request,
     ): Response {
         $user = $security->getUser();
 
@@ -56,44 +54,7 @@ final class DeckController extends AbstractController
         $customDecks = $deckService->findAllByOwner($user);
         $systemDecks = $deckRepository->findSystemDecks();
 
-        $joinRoomForm = $this->createForm(JoinRoomType::class, null, [
-            'attr' => [
-                'id' => 'room_join_form',
-            ],
-            'method' => 'POST',
-        ]);
-
-        $joinRoomForm->handleRequest($request);
-
-        if ($joinRoomForm->isSubmitted() && $joinRoomForm->isValid()) {
-            $data = $joinRoomForm->getData();
-            $uuid = $data['uuid'];
-
-            if (!Uuid::isValid($uuid)) {
-                throw $this->createNotFoundException('Invalid Room ID');
-            }
-
-            $room = $roomRepository->findOneBy([
-                'uuid' => $uuid,
-            ]);
-
-            if(!$room) {
-                return $this->redirectToRoute('app', [
-                    'room_id' => $uuid,
-                    'error' => 'room_not_found',
-                ]);
-            }
-
-            return $this->redirectToRoute('room_join', [
-                'room_id' => $uuid
-            ]);
-        }
-
-        $error = $request->query->get('error');
-
         return $this->render('deck/list.html.twig', [
-            'error' => $error,
-            'joinRoomForm' => $joinRoomForm->createView(),
             'customDecks' => $customDecks,
             'systemDecks' => $systemDecks,
             'deckCreateForm' => $deckCreateForm,

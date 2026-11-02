@@ -1,0 +1,19 @@
+{% extends 'notifications/container.html.twig' %}
+
+{% block body %}
+    <div class="flex gap-3">
+        <div class="flex pt-1">
+            {{ icon('alert_circle', 'w-6 h-6 stroke-red-500') }}
+        </div>
+
+        <div class="flex-1 flex flex-col gap-3">
+            <h5 class="leading-none! pt-1">
+                Geschätzter Aufwand
+            </h5>
+
+            <p class="text-secondary-gray!">
+                Aus Jira importierte Tickets können nur zeitbasiert geschätzt werden.
+            </p>
+        </div>
+    </div>
+{% endblock %}

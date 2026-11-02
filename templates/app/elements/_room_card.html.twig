@@ -1,40 +1,44 @@
 <div class="flex-1 flex flex-row-reverse border border-secondary-gray-700 rounded-lg p-4 bg-primary-black-900">
-    <div data-controller="dropdown" data-action="click@window->dropdown#clickOutside" class="h-fit relative">
-        <div data-action="click->dropdown#toggle" class="relative group">
-            <twig:Button type="smooth" size="smaller">
-                {{ icon('dots_vertical', 'w-4 h-4') }}
-            </twig:Button>
-
-            <twig:Tooltip position="bottom left">
-                Options
-            </twig:Tooltip>
-        </div>
-
-        <twig:Dropdown width="180">
-            <ol class="flex flex-col">
-                <li data-action="click->dropdown#close">
-                    <twig:Button link="{{ path('room_show', {room_id:room.uuid}) }}" type="ghost" size="smaller" css="w-full justify-start!">
-                        {{ icon('door_enter', 'w-5! h-5! stroke-secondary-gray') }}
-                        Beitreten
+    <div class="flex items-start">
+        <twig:Dropdown width="180" position="bottom left">
+            <twig:block name="toggle">
+                <div class="relative group">
+                    <twig:Button type="smooth" size="smaller">
+                        {{ icon('dots_vertical', 'w-4 h-4 stroke-secondary-gray') }}
                     </twig:Button>
-                </li>
 
-                <li>
-                    <hr class="my-2">
-                </li>
+                    <twig:Tooltip position="bottom left">
+                        Options
+                    </twig:Tooltip>
+                </div>
+            </twig:block>
 
-                <li data-action="click->dropdown#close">
-                    <twig:Button type="ghost" size="smaller" css="w-full justify-start! text-red-500! hover:bg-red-950!" modal="room_{{ room.uuid }}_delete_modal">
-                        {{ icon('trash', 'w-5! h-5! stroke-red-500') }}
-                        Löschen
-                    </twig:Button>
-                </li>
-            </ol>
+            <twig:block name="content">
+                <ol class="flex flex-col">
+                    <li data-action="click->dropdown#close">
+                        <twig:Button link="{{ path('room_show', {room_id:room.uuid}) }}" type="ghost" size="smaller" css="w-full justify-start!">
+                            {{ icon('door_enter', 'w-5! h-5! stroke-secondary-gray') }}
+                            Beitreten
+                        </twig:Button>
+                    </li>
+
+                    <li>
+                        <hr class="my-2">
+                    </li>
+
+                    <li data-action="click->dropdown#close">
+                        <twig:Button type="ghost" size="smaller" css="w-full justify-start! text-red-500! hover:bg-red-950!" modal="room_{{ room.uuid }}_delete_modal">
+                            {{ icon('trash', 'w-5! h-5! stroke-red-500') }}
+                            Löschen
+                        </twig:Button>
+                    </li>
+                </ol>
+            </twig:block>
         </twig:Dropdown>
     </div>
 
-    <div class="flex-1 flex flex-col gap-1">
-        <a href="{{ path('room_show', {room_id:room.uuid}) }}" class="w-fit text-xl! hover:underline">
+    <div class="flex-1 flex flex-col gap-3">
+        <a href="{{ path('room_show', {room_id:room.uuid}) }}" class="leading-none! w-fit text-xl! hover:underline">
             {{ room.name }}
         </a>
 
@@ -42,8 +46,6 @@
             <p class="text-balance text-secondary-gray-400!">
                 {% if room.description %}
                     {{ room.description }}
-                {% else %}
-                    ...
                 {% endif %}
             </p>
 
@@ -102,9 +104,13 @@
     <div class="flex flex-col gap-1 justify-center items-center">
         {{ icon('trash', 'w-12! h-12! stroke-red-500') }}
 
-        <h4>Raum löschen?</h4>
+        <h4>
+            Raum löschen?
+        </h4>
 
-        <p class="text-balance text-center text-secondary-grey-light!">Ihr Raum wird endgültig gelöscht und kann nicht wiederhergestellt werden.</p>
+        <p class="text-balance text-center text-secondary-grey-light!">
+            Ihr Raum wird endgültig gelöscht und kann nicht wiederhergestellt werden.
+        </p>
 
         <div class="flex gap-2 mt-3">
             <button type="button" popovertarget="room_{{ room.uuid }}_delete_modal" popovertargetaction="hide" class="btn-small btn-secondary">

@@ -3,59 +3,120 @@
 {% block title %}{{ room.name }}{% endblock %}
 
 {% block content %}
-    <main class="flex">
-        <aside class="flex-1 max-w-85 border-r border-secondary-grey-light/40 bg-secondary-grey/20">
-            <div class="sticky top-0 p-4">
-                <div class="flex items-end gap-2 justify-between border-b border-b-secondary-grey-light/40 pb-3">
-                    <h4 class="leading-none!">Participants</h4>
+    <main class="flex-1 flex">
+        {% include 'partials/app/sidebar.html.twig' %}
 
-                    <twig:Button type="smooth" size="smaller" tooltip="User hinzufügen" modal="add_user_modal">
-                        {{ icon('plus', 'w-5! h-5! stroke-secondary-grey-light') }}
-                    </twig:Button>
+        <aside id="sidebar" class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900 transition-all duration-300">
+            <div class="max-h-[calc(100vh-65px)] sticky top-0 overflow-hidden">
+                <div class="flex flex-col gap-3 p-6">
+                    <div class="flex gap-3 justify-between items-center">
 
-                    <twig:Modal modal="add_user_modal" title="User hinzufügen" width="600">
+                        <div class="flex gap-1.5 items-center">
+                            {{ icon('users', 'w-5 h-5 stroke-secondary-gray stroke-2!') }}
 
-                        <div data-controller="clipboard" class="flex gap-2">
-                            <h6 class="text-nowrap">Link teilen:</h6>
-                            <input
-                                type="text"
-                                class="w-full"
-                                data-clipboard-target="input"
-                                value="{{ room.uuid }}"
-                                readonly
-                            >
-
-                            <button
-                                type="button"
-                                class="btn-secondary btn-smaller"
-                                data-clipboard-target="copyButton"
-                                data-action="clipboard#copy"
-                            >
-                                {{ icon('copy', 'w-4! h-4! stroke-secondary-grey-light') }}
-                                Copy
-                            </button>
-
-                            <button
-                                disabled
-                                type="button"
-                                class="hidden! btn-secondary btn-smaller disabled:brightness-50 disabled:cursor-not-allowed"
-                                data-clipboard-target="checkButton"
-                                data-action="clipboard#copy"
-                            >
-                                {{ icon('check', 'w-4! h-4! stroke-secondary-grey-light') }}
-                                Copied
-                            </button>
+                            <h5>
+                                Participants
+                            </h5>
                         </div>
 
-                        <div class="flex gap-2 items-end justify-end mt-1">
-                            <button type="button" popovertarget="add_user_modal" popovertargetaction="hide" class="btn-small btn-secondary">
-                                Cancel
-                            </button>
+                        <div class="relative group">
+                            <twig:Button type="ghost" size="smaller" modal="add_user_modal">
+                                {{ icon('link', 'w-5 h-5 stroke-secondary-gray') }}
+                            </twig:Button>
+
+                            <twig:Tooltip position="bottom left">
+                                Mitglied hinzufügen
+                            </twig:Tooltip>
                         </div>
-                    </twig:Modal>
+
+                        <twig:Modal modal="add_user_modal" width="450" :x="false">
+                            <div class="flex flex-col gap-3">
+
+                                <div data-controller="clipboard" class="flex flex-col gap-3">
+                                    <div class="flex gap-3 justify-between items-center">
+                                        <span class="text-sm! text-secondary-gray! flex gap-1.5 items-center">
+                                            {{ icon('share', 'w-4 h-4 stroke-secondary-gray') }}
+                                            Link teilen
+                                        </span>
+
+                                        <div class="relative group">
+                                            {{ icon('info', 'w-4 h-4 stroke-secondary-gray') }}
+
+                                            <twig:Tooltip position="bottom left">
+                                                Bitte veröffentlichen Sie den Link nicht öffentlich.
+                                            </twig:Tooltip>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative">
+                                        <input
+                                            type="text"
+                                            data-clipboard-target="input"
+                                            value="https://planning-poker.quantumfrog.de/room/{{ room.uuid }}"
+                                            class="relative w-full pr-10!"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-clipboard-target="copyButton"
+                                            data-action="clipboard#copy"
+                                            class="btn-ghost btn-smaller absolute top-1/2 right-1 -translate-y-1/2"
+                                        >
+                                            {{ icon('copy', 'w-3.5! h-3.5!') }}
+                                        </button>
+
+                                        <button
+                                            disabled
+                                            type="button"
+                                            data-clipboard-target="checkButton"
+                                            data-action="clipboard#copy"
+                                            class="hidden! btn-ghost btn-smaller absolute top-1/2 right-1 -translate-y-1/2"
+                                        >
+                                            {{ icon('check', 'w-3.5! h-3.5! stroke-secondary-gray') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div data-controller="clipboard" class="flex flex-col gap-3 items-start">
+                                    <p class="text-sm! text-secondary-gray! flex gap-1">
+                                        ...oder den
+
+                                        <span
+                                            data-clipboard-target="copyButton"
+                                            data-action="click->clipboard#copy"
+                                            class="text-accent! hover:underline cursor-pointer flex gap-1 items-center"
+                                        >
+                                            Raum-ID
+                                            {{ icon('copy', 'w-4 h-4 stroke-accent') }}
+                                        </span>
+
+                                        <span
+                                            data-clipboard-target="checkButton"
+                                            class="hidden! text-secondary-gray! flex gap-1 items-center"
+                                        >
+                                            Raum-ID
+                                            {{ icon('check', 'w-4 h-4 stroke-secondary-gray') }}
+                                        </span>
+
+                                        teilen.
+                                    </p>
+
+                                    <input
+                                        hidden
+                                        type="text"
+                                        data-clipboard-target="input"
+                                        value="{{ room.uuid }}"
+                                        class="hidden"
+                                    >
+                                </div>
+                            </div>
+                        </twig:Modal>
+                    </div>
+
+                    <hr>
+
+                    {% include 'room/elements/_member_list.html.twig' with {room:room, members:room.members, votedUserIds:votedUserIds} %}
                 </div>
-
-                {% include 'room/elements/_member_list.html.twig' with {room:room, members:room.members, votedUserIds:votedUserIds} %}
             </div>
         </aside>
 
@@ -66,39 +127,45 @@
         </section>
 
         <aside class="flex-1 max-w-120 min-h-dvh">
-            <div data-controller="ticket-create-form" class="p-4 flex flex-col gap-3">
-                <div class="flex gap-2 items-end">
-                    <h4 class="leading-none!">Tickets</h4>
+            <div data-controller="ticket-create-form" class="p-6 flex flex-col gap-3">
+                <div class="flex gap-3 items-end">
 
-                    <div class="ml-auto flex gap-2">
-                        <div data-controller="dropdown" data-action="click@window->dropdown#clickOutside" class="relative">
-                            <div data-action="click->dropdown#toggle" class="relative group">
-                                <twig:Button type="secondary" size="small">
-                                    {{ icon('export', 'w-4! h-4! stroke-secondary-gray') }}
-                                    Export
-                                    {{ icon('arrow_list', 'w-3 h-3 stroke-secondary-gray') }}
-                                </twig:Button>
-                            </div>
+                    <div class="flex gap-1.5 items-center">
+                        {{ icon('ticket', 'w-5 h-5 stroke-secondary-gray') }}
 
-                            <twig:Dropdown width="180">
-                                <form method="get">
-                                    <ol class="flex flex-col gap-1">
-                                        <li data-action="click->dropdown#close">
-                                            <twig:Button func="submit" type="ghost" size="smaller" css="w-full justify-start!">
-                                                {{ icon('jira', 'w-5 h-5 stroke-secondary-gray') }}
-                                                Aus Jira
-                                            </twig:Button>
-                                        </li>
-                                    </ol>
-                                </form>
-                            </twig:Dropdown>
-                        </div>
+                        <h5>
+                            Tickets
+                        </h5>
                     </div>
 
-                    <button type="button" data-action="click->ticket-create-form#toggle" class="btn-primary btn-small" data-turbo-permanent>
-                        {{ icon('plus', 'w-4! h-4!') }}
-                        Create Ticket
-                    </button>
+
+                    <div class="ml-auto flex gap-2">
+                        <twig:Dropdown width="180" position="bottom left">
+                            <twig:block name="toggle">
+                                <twig:Button type="secondary" size="small" css="text-nowrap">
+                                    {{ icon('export', 'w-4! h-4! stroke-secondary-gray') }}
+                                    Tickets Import
+                                    {{ icon('arrow_list', 'w-3 h-3 stroke-secondary-gray') }}
+                                </twig:Button>
+                            </twig:block>
+
+                            <twig:block name="content">
+                                <ol class="flex flex-col gap-1">
+                                    <li data-action="click->dropdown#close">
+                                        <twig:Button data_turbo_frame='jira_import' link="{{ path('jira_projects', {room_id: room.uuid}) }}" type="ghost" size="smaller" css="w-full justify-start!">
+                                            {{ icon('jira', 'w-5 h-5 stroke-secondary-gray') }}
+                                            Aus Jira
+                                        </twig:Button>
+                                    </li>
+                                </ol>
+                            </twig:block>
+                        </twig:Dropdown>
+
+                        <button type="button" data-action="click->ticket-create-form#toggle" class="btn-primary btn-small text-nowrap" data-turbo-permanent>
+                            {{ icon('plus', 'w-4! h-4!') }}
+                            Create Ticket
+                        </button>
+                    </div>
                 </div>
 
                 <div data-ticket-create-form-target="form" class="max-h-0 border border-secondary-grey-light/40 border-b-0 rounded-lg bg-secondary-grey/10 p-0 overflow-hidden transition-all duration-300 ease-in-out">
@@ -143,12 +210,11 @@
                                     attr: { class: 'w-full' }
                                 }) }}
                             </div>
-
                         </div>
 
                         {{ form_row(ticketCreateForm.description, {
                             row_attr: { class: 'w-full flex flex-col gap-0.5' },
-                            label_attr: { class: 'text-secondary-grey-light!'},
+                            label_attr: { class: 'text-secondary-grey-light!' },
                             attr: { class: 'w-full' }
                         }) }}
 
@@ -185,4 +251,7 @@
         </div>
     </twig:Modal>
 
+    <twig:Modal :turbo="true" modal="jira_import" title="Jira Tickets Import" width="600">
+        <!-- Jira Projects Overview -->
+    </twig:Modal>
 {% endblock %}

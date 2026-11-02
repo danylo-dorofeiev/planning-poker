@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\JiraConnection;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -147,5 +148,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getDecks(): Collection
     {
         return $this->decks;
+    }
+
+    public function getJiraConnection(): ?JiraConnection
+    {
+        return $this->jiraConnection;
+    }
+
+    public function setJiraConnection(?JiraConnection $jiraConnection): static
+    {
+        $this->jiraConnection = $jiraConnection;
+
+        if ($jiraConnection !== null && $jiraConnection->getUser() !== $this) {
+            $jiraConnection->setUser($this);
+        }
+
+        return $this;
     }
 }

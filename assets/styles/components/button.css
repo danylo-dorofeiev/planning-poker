@@ -18,23 +18,23 @@
     @apply px-3.5 py-2.5 text-base;
 }
 
-.btn-primary {
+.btn-primary:not(.hidden) {
     @apply flex gap-1.5 items-center justify-center rounded-md bg-accent-700 border border-accent-500 font-normal text-primary-white hover:bg-accent-600;
 }
 
-.btn-secondary {
+.btn-secondary:not(.hidden) {
     @apply flex gap-1.5 items-center justify-center rounded-md bg-secondary-gray-800 border border-secondary-gray-700 font-normal hover:bg-secondary-gray-700;
 }
 
-.btn-smooth {
+.btn-smooth:not(.hidden) {
     @apply flex gap-1.5 items-center justify-center rounded-md bg-transparent border border-secondary-gray-700 font-normal text-secondary-gray hover:bg-secondary-gray-800;
 }
 
-.btn-danger {
+.btn-danger:not(.hidden) {
     @apply flex gap-1.5 items-center justify-center rounded-md bg-red-950 border border-red-500 font-normal text-red-500 hover:brightness-110;
 }
 
-.btn-ghost {
+.btn-ghost:not(.hidden) {
     @apply flex gap-1.5 items-center justify-center rounded-md bg-transparent border border-transparent font-normal hover:bg-secondary-gray-800;
 }
 

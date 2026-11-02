@@ -1,0 +1,29 @@
+<a href="{{ path('jira_issues', {room_id: room.uuid, project: project.key}) }}"
+   data-live-search-target="item"
+   data-item-name="{{ project.name|lower }}"
+   data-item-key="{{ project.key|lower }}"
+   class="flex gap-3 items-center hover:bg-secondary-gray-700/30 py-1.5"
+>
+    {% if project.avatarUrls['24x24'] %}
+        <img src="{{ project.avatarUrls['24x24'] }}" alt="{{ project.name }}" class="w-6 h-6 rounded-sm"
+             onerror="const fallback = this.nextElementSibling.cloneNode(true); fallback.classList.remove('hidden'); fallback.classList.add('flex'); this.replaceWith(fallback)"
+        >
+
+        <div class="hidden w-6 h-6 rounded-sm bg-secondary-gray-700 items-center justify-center">
+            {{ icon('photo', 'w-5 h-5 stroke-secondary-gray') }}
+        </div>
+    {% endif %}
+
+
+    <div class="flex-1">
+        <span class="">
+            {{ project.name }}
+        </span>
+    </div>
+
+    <div class="w-20">
+        <span class="">
+             {{ project.key }}
+        </span>
+    </div>
+</a>

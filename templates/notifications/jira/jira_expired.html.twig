@@ -1,0 +1,24 @@
+{% extends 'notifications/container.html.twig' %}
+
+{% block body %}
+    <div class="flex gap-3">
+        <div class="flex pt-1">
+            {{ icon('alert_circle', 'w-6 h-6 stroke-red-500') }}
+        </div>
+
+        <div class="flex-1 flex flex-col gap-3 items-start">
+            <h5 class="leading-none! pt-1">
+                Jira-Verbindung
+            </h5>
+
+            <p class="text-secondary-gray!">
+                Ihre Jira-Verbindung ist abgelaufen.
+            </p>
+
+            <twig:Button link="{{ path('jira_connection') }}" target="_blank" type="secondary" size="small">
+                {{ icon('rotate', 'w-4 h-4 stoke-secondary-gray') }}
+                Reconnect
+            </twig:Button>
+        </div>
+    </div>
+{% endblock %}

@@ -24,6 +24,7 @@ class Button
     public string $value="";
 
     public string $data_action="";
+    public string $data_turbo_frame="";
 
     public string $custom_param="";
     public string $css="";

@@ -1,52 +1,99 @@
-<div id="ticket-{{ ticket.uuid }}" class="flex flex-col gap-1 bg-secondary-grey/20 hover:bg-secondary-grey/30 hover:-translate-x-1 transition-transform duration-150 border {% if ticket.status.value == "voting"%}border-accent! border-l-4{% else %}border-secondary-grey-light/40{% endif %} p-3 rounded-lg">
+<div id="ticket-{{ ticket.uuid }}" class="flex flex-col gap-1 bg-primary-black-900  transition-transform duration-150 border {% if ticket.status.value == "voting"%}border-accent! border-l-4{% else %}border-secondary-gray-700{% endif %} p-3 rounded-lg">
     <div class="flex items-start justify-between">
-        <span class="uppercase font-mono text-secondary-grey-light! flex gap-1.5 items-center">
-            {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+        <span class="uppercase font-mono text-secondary-gray! flex gap-1.5 items-center">
+            {% if ticket.source.value == 'jira' %}
+                {{ icon('jira', 'w-4 h-4 stroke-secondary-gray') }}
+            {% else %}
+                {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+            {% endif %}
+
             {{ ticket.key }}
         </span>
 
         <div class="flex items-center gap-2">
             {% if ticket.rounds.count > 1 %}
-                <span class="flex gap-1.5 items-center border rounded-lg py-0.5 px-2 border-secondary-grey-light/40 text-secondary-grey-light!">
+                <span class="flex gap-1.5 items-center border rounded-lg py-0.5 px-2 border-secondary-gray-700 text-secondary-gray!">
                     {{ ticket.rounds.count() }}
-                    {{ icon('reload', 'w-4! h-4! stroke-secondary-grey-light') }}
+                    {{ icon('reload', 'w-4! h-4! stroke-secondary-gray') }}
                 </span>
             {% endif %}
 
             {% if ticket.status.value == 'finished' %}
                 <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent text-accent! bg-accent/20">
-                    {{ icon('check_circle', 'w-4! h-4! fill-accent!') }}
-                    {{ ticket.status.value }}
+                    {{ icon('check_circle', 'w-4! h-4! stroke-accent!') }}
+                    Abgeschlossen
+                </span>
+            {% endif %}
+
+            {% if ticket.status.value == 'revealed' %}
+                <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                    {{ icon('check_circle_dashed', 'w-4! h-4!') }}
+                    Aufgedeckt
                 </span>
             {% endif %}
 
             {% if ticket.status.value == 'voting' %}
                 <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
-                    {{ icon('circle_dashed', 'w-4! h-4! stroke-primary-white! animate-[spin_3s_linear_infinite]') }}
-                    {{ ticket.status.value }}
+                    {{ icon('circle_dashed', 'w-4! h-4! animate-[spin_3s_linear_infinite]') }}
+                    Läuft
                 </span>
             {% endif %}
 
             {% if ticket.status.value == 'pending' %}
-                <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-grey-light text-secondary-grey-light! bg-secondary-grey-light/20">
-                    {{ icon('clock', 'w-4! h-4! stroke-secondary-grey-light') }}
-                    {{ ticket.status.value }}
+                <span class="flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-gray-700 text-secondary-gray! bg-secondary-gray-800">
+                    {{ icon('clock', 'w-4! h-4! stroke-secondary-gray') }}
+                    Ausstehend
                 </span>
             {% endif %}
 
-            <div data-controller="dropdown" data-action="click@window->dropdown#close" class="relative group">
-                <div data-action="click->dropdown#toggle">
-                    <button class="btn-smooth btn-smaller flex items-center text-primary-white!">
-                        {{ icon('dots_vertical', 'w-4! h-4! stroke-secondary-grey-light!') }}
-                    </button>
-                </div>
+            <twig:Dropdown width="200" position="bottom left">
+                <twig:block name="toggle">
+                    <twig:Button type="smooth" size="smaller">
+                        {{ icon('dots_vertical', 'w-4! h-4! stroke-secondary-gray!') }}
+                    </twig:Button>
 
-                <div class="opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150 absolute top-full right-0 items-center pt-1">
-                    <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">Bearbeiten</span>
-                </div>
+                    <twig:Tooltip position="bottom left">
+                        Bearbeiten
+                    </twig:Tooltip>
+                </twig:block>
 
-                <div data-dropdown-target="menu" class="absolute top-full right-0 mt-1 opacity-0 -translate-y-2 pointer-events-none transition-all duration-200 z-10">
-                    <ol class="flex flex-col bg-primary-black border border-secondary-grey-light/40 w-50 rounded-lg p-2">
+                <twig:block name="content">
+                    <ol class="flex flex-col">
+                        <li>
+                            {% if ticket.status.value == 'pending' %}
+                                {% if is_granted('ROUND_START', ticket.room) %}
+                                    <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
+                                        <button {% if round %}disabled{% endif %} data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                                            {{ icon('play', 'w-5! h-5! stroke-secondary-gray') }}
+                                            Round Starten
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if ticket.status.value == 'voting' %}
+                                {% if is_granted('ROUND_REVEAL', ticket.room) %}
+                                    <form method="post" action="{{ path('round_reveal', {room_id:ticket.room.uuid, ticket_id:ticket.uuid, round_id:round.id}) }}">
+                                        <button data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                                            {{ icon('play', 'w-5! h-5! stroke-secondary-gray') }}
+                                            Reveal
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if ticket.status.value == 'revealed' or ticket.status.value == 'finished' %}
+                                {% if is_granted('ROUND_START', ticket.room) %}
+                                    <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
+                                        <button {% if round %}disabled{% endif %} data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                                            {{ icon('rotate', 'w-5! h-5! stroke-secondary-gray') }}
+                                            Zurücksetzen
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </li>
+
                         <li>
                             <button type="button" popovertarget="ticket_{{ ticket.uuid }}_show" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey">
                                 {{ icon('details', 'w-5! h-5! stroke-secondary-grey-light') }}
@@ -62,18 +109,18 @@
                         </li>
 
                         <li>
-                            <div class="flex bg-secondary-grey-light/40 my-2 h-px"></div>
+                            <div class="flex bg-secondary-gray-700 my-2 h-px"></div>
                         </li>
 
                         <li>
-                            <button {% if ticket.status.value == "voting"%}disabled{% endif%} popovertarget="ticket_{{ ticket.uuid }}_delete_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed! text-red-500!">
+                            <button {% if ticket.status.value == "voting"%}disabled{% endif%} popovertarget="ticket_{{ ticket.uuid }}_delete_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed! text-red-500! hover:bg-red-950!">
                                 {{ icon('trash', 'w-5! h-5! stroke-red-500') }}
                                 Löschen
                             </button>
                         </li>
                     </ol>
-                </div>
-            </div>
+                </twig:block>
+            </twig:Dropdown>
         </div>
     </div>
 
@@ -81,52 +128,191 @@
         <h6 class="tracking-normal! text-balance">{{ ticket.title }}</h6>
 
         {% if ticket.description %}
-            <p class="text-secondary-grey-light!">{{ ticket.description }}</p>
+            <p class="text-secondary-grey-light!">
+                {{ ticket.description }}
+            </p>
         {% endif %}
     </div>
 
     <div class="flex gap-2 items-end justify-between min-h-7.5">
-        <span class="flex gap-1.5 items-center text-secondary-grey-light! leading-none!">
-            {{ icon('calender', 'w-4! h-4! stroke-secondary-grey-light') }}
-            {{ ticket.updatedAt|date('d.m.Y - H:i') }}
+        <span class="flex gap-1.5 items-center text-secondary-gray! leading-none! text-xs!">
+            {{ icon('calender', 'w-3.5! h-3.5! stroke-secondary-grey-light') }}
+            {{ ticket.createdAt|format_datetime(pattern='MMM dd, yyyy', locale='en', timezone='Europe/Berlin') }}
         </span>
 
-        {% if ticket.status.value == 'pending' %}
-            {% if is_granted('ROUND_START', ticket.room) %}
-                <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
-                    <button {% if round %}disabled{% endif %} type="submit" class="btn-small btn-primary disabled:opacity-50 disabled:cursor-not-allowed!">
-                        {{ icon('play', 'w-4! h-4!') }}
-                        Round Starten
-                    </button>
-                </form>
+        <div
+            data-controller="voting-result"
+            data-voting-result-url-value="{{ path('ticket_voting_result', {
+                room_id: room.uuid,
+                ticket_id: ticket.uuid
+            }) }}"
+            data-voting-result-time-based-url-value="{{ path('ticket_time_based', {
+                room_id: room.uuid,
+                ticket_id: ticket.uuid
+            }) }}"
+            data-voting-result-delete-url-value="{{ path('ticket_voting_result_delete', {
+                room_id:room.uuid,
+                ticket_id:ticket.uuid
+            }) }}"
+            data-voting-result-voting-result-value="{{ ticket.votingResult ?? '' }}"
+            class="relative"
+        >
+            {% if ticket.votingResult or ticket.votingResult == "0" %}
+                <twig:Button custom_param="data-voting-result-target=toggleButtonOpen" data_action="click->voting-result#inputBlockToggle" type="primary" size="small">
+                    {% if ticket.isTimeBased %}
+                        {{ ticket.votingResult }} Std.
+                    {% else %}
+                        {{ ticket.votingResult }}
+                    {% endif %}
+                </twig:Button>
+            {% else %}
+                <twig:Button custom_param="data-voting-result-target=toggleButtonOpen" data_action="click->voting-result#inputBlockToggle" type="smooth" size="smaller">
+                    {{ icon('clock', 'w-4 h-4 stroke-secondary-gray') }}
+                </twig:Button>
             {% endif %}
-        {% endif %}
 
-        {% if ticket.status.value == 'voting' %}
-            {% if is_granted('ROUND_REVEAL', ticket.room) %}
-                <form method="post" action="{{ path('round_reveal', {room_id:ticket.room.uuid, ticket_id:ticket.uuid, round_id:round.id}) }}">
-                    <button type="submit" class="flex gap-1.5 items-center btn-primary btn-small">
-                        {{ icon('play', 'w-4! h-4!') }}
-                        Reveal
-                    </button>
-                </form>
-            {% endif %}
-        {% endif %}
+            <div
+                data-voting-result-target="inputBlock"
+                class="opacity-0 translate-x-0 pointer-events-none transition-all duration-200 z-10"
+            >
+                <div class="absolute top-1/2 right-full -translate-y-1/2">
+                    <div class="bg-primary-black p-3 border border-secondary-gray-700 rounded-lg flex flex-col gap-3">
 
-        {% if ticket.status.value == 'finished' %}
-            {% if is_granted('ROUND_START', ticket.room) %}
-                <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
-                    <button {% if round %}disabled{% endif %} type="submit" class="btn-small btn-smooth disabled:opacity-50 disabled:cursor-not-allowed!">
-                        {{ icon('rotate', 'w-4! h-4! stroke-secondary-grey-light!') }}
-                        Zurücksetzen
-                    </button>
-                </form>
-            {% endif %}
-        {% endif %}
+                        <div class="flex flex-col gap-2">
+                            <div class="flex gap-3 items-center">
+                                <span class="text-sm! text-secondary-gray! ">
+                                    Geschätzter Aufwand
+                                </span>
+
+                                <div class="ml-auto flex gap-2">
+                                    {% if ticket.votingResult or ticket.votingResult == "0" %}
+                                        <button
+                                            type="button"
+                                            data-action="click->voting-result#deleteVotingResult"
+                                            class="btn-ghost btn-smallest hover:bg-red-950!"
+                                        >
+                                            {{ icon('trash', 'w-4 h-4 stroke-red-500') }}
+                                        </button>
+                                    {% endif %}
+
+                                    <twig:Button custom_param="data-voting-result-target=toggleButtonClose" data_action="click->voting-result#inputBlockToggle" type="smooth" size="smallest">
+                                        {{ icon('x', 'w-4 h-4 stroke-secondary-gray') }}
+                                    </twig:Button>
+                                </div>
+                            </div>
+
+                            <hr>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <div class="relative flex justify-end gap-2">
+                                <span class="text-sm! text-secondary-gray!">
+                                    Zeitaufwand
+                                </span>
+
+                                <label class="w-fit flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        class="peer sr-only"
+                                        data-voting-result-target="timeBasedSelect"
+                                        data-action="change->voting-result#updateTimeBased"
+                                        data-previous-value="{{ ticket.isTimeBased ? '1' : '0' }}"
+                                        {{ ticket.isTimeBased ? 'checked' : '' }}
+
+                                    >
+
+                                    <span class="relative w-10 h-5 rounded-full bg-secondary-gray-700 transition-colors
+                                         peer-checked:bg-accent-600
+                                         peer-focus-visible:outline-2 peer-focus-visible:outline-accent-500
+                                         after:absolute after:top-0.5 after:left-0.5
+                                         after:size-4 after:rounded-full after:bg-white
+                                         after:transition-transform peer-checked:after:translate-x-5">
+                                    </span>
+                                </label>
+
+                                <span>
+                                    {{ icon('info', 'w-3.5 h-3.5 stroke-secondary-gray') }}
+                                </span>
+                            </div>
+
+                            <div class="flex gap-2 items-center">
+                                <label>
+                                    <input
+                                        type="text"
+                                        required
+                                        name="voting-result"
+                                        value="{{ ticket.votingResult ?? '' }}"
+                                        placeholder="Std."
+                                        data-voting-result-target="input"
+                                        data-action="input->voting-result#validateInput
+                                                     keydown.enter->voting-result#save"
+                                    >
+                                </label>
+
+                                <twig:Button data_action="click->voting-result#reset" type="smooth" size="smaller">
+                                    {{ icon('rotate', 'w-4 h-4 stroke-secondary-gray') }}
+                                </twig:Button>
+                            </div>
+
+                            <twig:Button type="primary" size="medium" data_action="click->voting-result#save">
+                                Speichern
+                            </twig:Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <twig:Modal modal="ticket_{{ ticket.uuid }}_edit_modal" title="Ticket bearbeiten" reset="ticket_{{ ticket.uuid }}_edit_form" width="600">
+    {% if ticket.source.value == "jira" %}
+
+    {% endif %}
+
+    {% if ticket.source.value == "jira" %}
+        <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-1">
+                <p class="text-base!">
+                    Key
+                </p>
+
+                <label>
+                    <input value="{{ ticket.key }}" readonly class="w-full"/>
+                </label>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <p class="text-base!">
+                    Titel
+                </p>
+
+                <label>
+                    <input value="{{ ticket.title }}" readonly class="w-full"/>
+                </label>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <p class="text-base!">
+                    Beschreibung
+                </p>
+
+                <label>
+                    <textarea readonly class="w-full">
+                        {{ ticket.description }}
+                    </textarea>
+                </label>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <span class="flex gap-1.5 items-center text-xs! text-secondary-gray!">
+                    {{ icon('info', 'w-3.5 h-3.5 stroke-secondary-gray') }}
+                    Importierte Jira-Tickets können <b>nur in Jira</b> bearbeitet werden.
+                </span>
+            </div>
+        </div>
+    {% else %}
+
     {{ form_start(ticketEditForm) }}
 
     <div class="flex flex-col gap-3">
@@ -134,10 +320,12 @@
             {{ form_label(ticketEditForm.key) }}
             {{ form_widget(ticketEditForm.key) }}
         </div>
+
         <div class="flex flex-col gap-1">
             {{ form_label(ticketEditForm.title) }}
             {{ form_widget(ticketEditForm.title) }}
         </div>
+
         <div class="flex flex-col gap-1">
             {{ form_label(ticketEditForm.description) }}
             {{ form_widget(ticketEditForm.description) }}
@@ -155,6 +343,8 @@
     </div>
 
     {{ form_end(ticketEditForm) }}
+
+    {% endif %}
 </twig:Modal>
 
 <twig:Modal modal="ticket_{{ ticket.uuid }}_show" title="Ticket Übersicht" width="600">
@@ -177,60 +367,84 @@
 
         <div class="flex flex-col gap-1 p-3 border border-secondary-grey-light/40 rounded-lg bg-secondary-grey/20">
             <span class="uppercase font-mono text-secondary-grey-light! flex gap-1.5 items-center">
-                {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+                {% if ticket.source.value == 'jira' %}
+                   {{ icon('jira', 'w-4 h-4 stroke-secondary-gray') }}
+                {% else %}
+                    {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+                {% endif %}
+
                 {{ ticket.key }}
             </span>
             <h4>{{ ticket.title }}</h4>
-            <p class="text-secondary-grey-light!">{{ ticket.description }}</p>
+            <p class="text-secondary-grey-light!">
+                {{ ticket.description }}
+            </p>
         </div>
 
         <table class="table-auto w-full border-collapse text-sm">
             <thead>
-            <tr>
-                <th class="text-left text-secondary-grey-light!">
-                    Status
-                </th>
-                <th class="text-left text-secondary-grey-light!">
-                    Created at
-                </th>
-                <th class="text-left text-secondary-grey-light!">
-                    Updated at
-                </th>
-            </tr>
+                <tr>
+                    <th class="text-left text-secondary-grey-light!">
+                        Status
+                    </th>
+                    <th class="text-left text-secondary-grey-light!">
+                        Created at
+                    </th>
+                    <th class="text-left text-secondary-grey-light!">
+                        Updated at
+                    </th>
+                </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>
-                    {% if ticket.status.value == 'finished' %}
-                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent text-accent! bg-accent/20">
-                            {{ icon('check_circle', 'w-4! h-4! fill-accent!') }}
-                            {{ ticket.status.value }}
-                        </span>
-                    {% endif %}
+                <tr>
+                    <td>
+                        {% if ticket.status.value == 'finished' %}
+                            <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent text-accent! bg-accent/20">
+                                {{ icon('check_circle', 'w-4! h-4! stroke-accent!') }}
+                                Abgeschlossen
+                            </span>
+                        {% endif %}
 
-                    {% if ticket.status.value == 'voting' %}
-                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
-                            {{ icon('circle_dashed', 'w-4! h-4! stroke-primary-white! animate-[spin_3s_linear_infinite]') }}
-                            {{ ticket.status.value }}
-                        </span>
-                    {% endif %}
+                        {% if ticket.status.value == 'revealed' %}
+                            <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                                {{ icon('check_circle_dashed', 'w-4! h-4!') }}
+                                Aufgedeckt
+                            </span>
+                        {% endif %}
 
-                    {% if ticket.status.value == 'pending' %}
-                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-grey-light text-secondary-grey-light! bg-secondary-grey-light/20">
-                            {{ icon('clock', 'w-4! h-4! stroke-secondary-grey-light') }}
-                            {{ ticket.status.value }}
-                        </span>
-                    {% endif %}
-                </td>
-                <td>
-                    {{ ticket.createdAt|date('d.m.Y  H:i') }}
-                </td>
-                <td>
-                    {{ ticket.updatedAt|date('d.m.Y  H:i') }}
-                </td>
-            </tr>
+                        {% if ticket.status.value == 'voting' %}
+                            <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                                {{ icon('circle_dashed', 'w-4! h-4! animate-[spin_3s_linear_infinite]') }}
+                                Läuft
+                            </span>
+                        {% endif %}
+
+                        {% if ticket.status.value == 'pending' %}
+                            <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-gray-700 text-secondary-gray! bg-secondary-gray-800">
+                                {{ icon('clock', 'w-4! h-4! stroke-secondary-grey-light') }}
+                                Ausstehend
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ ticket.createdAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                    </td>
+                    <td>
+                        {{ ticket.updatedAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                    </td>
+                </tr>
             </tbody>
         </table>
+
+        {% if ticket.source.value == 'jira' %}
+            <span class="flex gap-1.5 items-center text-secondary-gray! text-xs!">
+                Importiert von
+                <a href="https://www.atlassian.com/software/jira" target="_blank" class="text-accent! hover:underline text-xs! flex gap-1 items-center">
+                    Jira
+                    {{ icon('external_link', 'w-3.5 h-3.5 stroke-accent') }}
+                </a>
+            </span>
+        {% endif %}
     </div>
 </twig:Modal>
 
@@ -238,9 +452,13 @@
     <div class="flex flex-col gap-1 justify-center items-center">
         {{ icon('trash', 'w-12! h-12! stroke-red-500') }}
 
-        <h4>Ticket löschen?</h4>
+        <h4>
+            Ticket löschen?
+        </h4>
 
-        <p class="text-balance text-center text-secondary-grey-light!">Ihr Ticket wird endgültig gelöscht und kann nicht wiederhergestellt werden.</p>
+        <p class="text-balance text-center text-secondary-grey-light!">
+            Ihr Ticket wird endgültig gelöscht und kann nicht wiederhergestellt werden.
+        </p>
 
         <div class="flex gap-2 mt-3">
             <button type="button" popovertarget="ticket_{{ ticket.uuid }}_delete_modal" popovertargetaction="hide" class="btn-small btn-secondary">
@@ -248,9 +466,9 @@
             </button>
 
             <form method="POST" action="{{ path('ticket_delete', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
-                <button type="submit" class="btn-secondary btn-small border-red-500! bg-red-500/20! hover:bg-red-500/30!">
+                <twig:Button func="submit" type="danger">
                     Löschen
-                </button>
+                </twig:Button>
             </form>
         </div>
     </div>

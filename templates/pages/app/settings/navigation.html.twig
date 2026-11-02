@@ -1,0 +1,50 @@
+{% if activeTab is not defined %}
+    {% set activeTab = "profile" %}
+{% endif %}
+
+<ol class="flex flex-col">
+    <li class="flex gap-2 items-center mb-3">
+        <twig:Avatar size="small" />
+
+        <span>
+            {{ app.user.name }}
+        </span>
+    </li>
+
+    <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
+        Einstellungen
+    </li>
+
+    <li class="{% if activeTab == 'profile' %}border-secondary-gray!{% endif %} has-group-hover:border-secondary-gray/50 border-l border-secondary-gray-700 pl-2">
+        <div class="group relative min-w-0">
+            <a href="{{ path('app_profile') }}" class="{% if activeTab == 'profile' %}bg-secondary-gray-700! *:stroke-primary-white{% endif %} flex gap-1.5 items-center pl-2 btn-small truncate rounded-md hover:bg-secondary-gray-700/50">
+                {{ icon('profile', 'w-4 h-4 stroke-secondary-gray') }}
+                Profil
+            </a>
+        </div>
+    </li>
+
+    <li class="{% if activeTab == 'appearance' %}border-secondary-gray!{% endif %} has-group-hover:border-secondary-gray/50 border-l border-secondary-gray-700 pl-2">
+        <div class="group relative min-w-0">
+            <a href="{{ path('app_appearance') }}" class="{% if activeTab == 'appearance' %}bg-secondary-gray-700! *:stroke-primary-white{% endif %} flex gap-1.5 items-center pl-2 btn-small truncate rounded-md hover:bg-secondary-gray-700/50">
+                {{ icon('brush', 'w-4 h-4 stroke-secondary-gray') }}
+                Darstellung
+            </a>
+        </div>
+    </li>
+</ol>
+
+<ol class="flex flex-col">
+    <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
+        Integrationen
+    </li>
+
+    <li class="{% if activeTab == 'services' %}border-secondary-gray!{% endif %} has-group-hover:border-secondary-gray/50 border-l border-secondary-gray-700 pl-2">
+        <div class="group relative min-w-0">
+            <a href="{{ path('app_services') }}" class="{% if activeTab == 'services' %}bg-secondary-gray-700! *:stroke-primary-white{% endif %} flex gap-1.5 items-center pl-2 btn-small truncate rounded-md hover:bg-secondary-gray-700/50">
+                {{ icon('applications', 'w-4 h-4 stroke-secondary-gray') }}
+                Anwendungen
+            </a>
+        </div>
+    </li>
+</ol>

@@ -9,83 +9,85 @@
     <main class="flex-1 flex">
         {% include 'partials/app/sidebar.html.twig' with {activeTab: "rooms"} %}
 
-        <aside class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900">
-            <div class="sticky top-0 flex flex-col gap-3 p-6">
+        <aside id="sidebar" class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900 transition-all duration-300">
+            <div class="max-h-[calc(100vh-65px)] sticky top-0 overflow-hidden">
+                <div class="flex flex-col gap-3 p-6">
 
-                <div class="flex gap-3 justify-between items-end">
-                    <h5 class="leading-none!">
-                        Räume
-                    </h5>
-                </div>
+                    <div class="flex gap-3 justify-between items-end">
+                        <h5 class="leading-none!">
+                            Räume
+                        </h5>
+                    </div>
 
-                <hr>
+                    <hr>
 
-                <twig:Button type="smooth" size="medium" modal="room_create_modal" css="w-full">
-                    {{ icon('plus', 'w-4.5! h-4.5! stroke-secondary-gray') }}
-                    Raum erstellen
-                </twig:Button>
+                    <twig:Button type="smooth" size="medium" modal="room_create_modal" css="w-full text-nowrap overflow-hidden">
+                        {{ icon('plus', 'w-4.5! h-4.5! stroke-secondary-gray') }}
+                        Raum erstellen
+                    </twig:Button>
 
-                <twig:Modal width="500" modal="room_create_modal" title="Neues Raum erstellen">
-                    {% include 'room/form/_create_form.html.twig' %}
-                </twig:Modal>
+                    <twig:Modal width="500" modal="room_create_modal" title="Neues Raum erstellen">
+                        {% include 'room/form/_create_form.html.twig' %}
+                    </twig:Modal>
 
-                {% if hasRooms and recentlyUpdated is not empty %}
-                    <ol class="flex flex-col">
-                        <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
-                            Kürzlich
-                        </li>
-
-                        {% for room in recentlyUpdated %}
-                            <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
-                                <div class="group relative min-w-0">
-                                    <a href="{{ path('room_show', {room_id:room.uuid}) }}" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
-                                        {{ room.name|slice(0, 25) }}{% if room.name|length > 25 %}...{% endif %}
-                                    </a>
-
-                                    <twig:Tooltip type="description" position="bottom right" delay="1000" pointer="none" css="ml-5">
-                                        <div class="flex flex-col gap-3">
-                                            <p class="text-balance text-secondary-gray-400!">
-                                                {% if room.description %}
-                                                    {{ room.description }}
-                                                {% else %}
-                                                    ...
-                                                {% endif %}
-                                            </p>
-
-                                            <div class="flex gap-3 flex-wrap">
-                                                <span class="flex gap-1 text-xs! text-secondary-gray-400!">
-                                                    {{ icon('profile', 'w-4 h-4 stroke-secondary-gray') }}
-                                                    {{ room.members.count() }}
-                                                </span>
-
-                                                {% if room.tickets.count() > 0 %}
-                                                    <span class="flex gap-1 text-xs! text-secondary-gray-400!">
-                                                        {{ icon('ticket', 'w-4 h-4 stroke-secondary-gray') }}
-                                                        {{ room.tickets.count() }}
-                                                    </span>
-                                                {% endif %}
-
-                                                <span class="flex gap-1 text-xs! text-secondary-gray-400!">
-                                                    {{ icon('calender', 'w-4 h-4 stroke-secondary-gray') }}
-                                                    {{ room.createdAt|format_datetime(pattern='MMM dd, yyyy', locale='en', timezone='Europe/Berlin') }}
-                                                </span>
-
-                                                <span class="flex gap-1 text-xs! text-secondary-gray-400!">
-                                                    {{ icon('clock', 'w-4 h-4 stroke-secondary-gray') }}
-                                                    {{ room.updatedAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </twig:Tooltip>
-                                </div>
+                    {% if hasRooms and recentlyUpdated is not empty %}
+                        <ol class="flex flex-col">
+                            <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
+                                Kürzlich
                             </li>
-                        {% endfor %}
-                    </ol>
-                {% else %}
-                    <span class="w-full text-center text-secondary-grey-light!">
-                        Es sind noch keine Raum.
-                    </span>
-                {% endif %}
+
+                            {% for room in recentlyUpdated %}
+                                <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
+                                    <div class="group relative min-w-0">
+                                        <a href="{{ path('room_show', {room_id:room.uuid}) }}" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
+                                            {{ room.name|slice(0, 25) }}{% if room.name|length > 25 %}...{% endif %}
+                                        </a>
+
+                                        <twig:Tooltip type="description" position="bottom right" delay="1000" pointer="none" css="ml-5">
+                                            <div class="flex flex-col gap-3">
+                                                <p class="text-balance text-secondary-gray-400!">
+                                                    {% if room.description %}
+                                                        {{ room.description }}
+                                                    {% else %}
+                                                        ...
+                                                    {% endif %}
+                                                </p>
+
+                                                <div class="flex gap-3 flex-wrap">
+                                                    <span class="flex gap-1 text-xs! text-secondary-gray-400!">
+                                                        {{ icon('profile', 'w-4 h-4 stroke-secondary-gray') }}
+                                                        {{ room.members.count() }}
+                                                    </span>
+
+                                                    {% if room.tickets.count() > 0 %}
+                                                        <span class="flex gap-1 text-xs! text-secondary-gray-400!">
+                                                            {{ icon('ticket', 'w-4 h-4 stroke-secondary-gray') }}
+                                                            {{ room.tickets.count() }}
+                                                        </span>
+                                                    {% endif %}
+
+                                                    <span class="flex gap-1 text-xs! text-secondary-gray-400!">
+                                                        {{ icon('calender', 'w-4 h-4 stroke-secondary-gray') }}
+                                                        {{ room.createdAt|format_datetime(pattern='MMM dd, yyyy', locale='en', timezone='Europe/Berlin') }}
+                                                    </span>
+
+                                                    <span class="flex gap-1 text-xs! text-secondary-gray-400!">
+                                                        {{ icon('clock', 'w-4 h-4 stroke-secondary-gray') }}
+                                                        {{ room.updatedAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </twig:Tooltip>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% else %}
+                        <span class="w-full text-center text-secondary-grey-light!">
+                            Es sind noch keine Raum.
+                        </span>
+                    {% endif %}
+                </div>
             </div>
         </aside>
 
@@ -94,23 +96,9 @@
         <section class="flex gap-6 w-315 mx-auto p-6">
             <div class="flex-1">
                 <div class="min-h-screen flex-1 flex flex-col gap-6 pb-6">
-                    <div class="flex flex-col gap-3">
-                        <h1 class="leading-none!">
-                            Dashboard
-                        </h1>
-
-                        <div class="flex gap-2">
-                            <twig:Button type="secondary" size="medium">
-                                {{ icon('ticket', 'w-4.5 h-4.5 stroke-secondary-gray') }}
-                                Tickets
-                            </twig:Button>
-
-                            <twig:Button link="{{ path('deck_list') }}" type="secondary" size="medium">
-                                {{ icon('deck', 'w-4.5 h-4.5 stroke-secondary-gray') }}
-                                Decks
-                            </twig:Button>
-                        </div>
-                    </div>
+                    <h1 class="leading-none!">
+                        Dashboard
+                    </h1>
 
                     <div class="flex flex-col gap-3">
                         {% if hasRooms %}
@@ -142,7 +130,7 @@
 
                                     {% include 'app/elements/_room_filter.html.twig' %}
 
-                                    {% if status or sortDirection or sortOption %}
+                                    {% if status or search or sortDirection or sortOption %}
                                         <form method="get" class="relative group">
                                             <twig:Button func="submit" type="primary" size="small">
                                                 {{ icon('bomb', 'w-4 h-4') }}
@@ -166,7 +154,7 @@
 
                                 <twig:Button type="primary" size="large" modal="room_create_modal" css="btn-glow">
                                     {{ icon('plus', 'w-4.5 h-4.5') }}
-                                    Neue erstellen
+                                    Raum erstellen
                                 </twig:Button>
                             </div>
                         {% endif %}

@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Entity\Room;
 use App\Entity\RoomMember;
 use App\Entity\Ticket;
+use App\Enum\TicketSource;
 use App\Event\RoomSettingsEvent;
 use App\Form\RoomType;
 use App\Form\TicketType;
 use App\Repository\DeckRepository;
 use App\Repository\RoomMemberRepository;
+use App\Repository\RoomRepository;
 use App\Repository\RoundRepository;
 use App\Repository\TicketRepository;
 use App\Repository\VoteRepository;
@@ -59,13 +61,28 @@ final class RoomController extends AbstractController
         }
     }
 
-    #[Route('/room/{room_id}/join', name: 'room_join', methods: ['GET', 'POST'])]
+    #[Route('/room/join', name: 'room_join', methods: ['GET'])]
     public function join(
-        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        Request $request,
+        RoomRepository $roomRepository,
         RoomMemberService $roomMemberService,
     ): Response {
         $user = $this->getUser();
         $now = new \DateTimeImmutable();
+
+        $room_id = $request->get('room_id');
+
+        $room = $roomRepository->findOneBy([
+            'uuid' => $room_id
+        ]);
+
+        if (!$room) {
+            $this->addFlash('error', 'room_not_found');
+
+            return $this->redirect(
+                $this->generateUrl('app')
+            );
+        }
 
         $roomMember = $roomMemberService->findMember($room, $user);
 
@@ -93,6 +110,7 @@ final class RoomController extends AbstractController
         TicketRepository $ticketRepository,
         RoomMemberRepository $roomMemberRepository,
         VoteRepository $voteRepository,
+        DeckRepository $deckRepository,
         DeckService $deckService,
     ): Response {
         $user = $this->getUser();
@@ -115,6 +133,7 @@ final class RoomController extends AbstractController
                 'room_id' => $room->getUuid(),
             ]),
             'method' => 'POST',
+            'editable' => $ticket->getSource() !== TicketSource::JIRA,
         ]);
 
         $roomSettingsForm = $this->createForm(RoomType::class, $room, [
@@ -138,7 +157,9 @@ final class RoomController extends AbstractController
             $votedUserIds = $voteRepository->findVotedUserIds($activeRound);
         }
 
-        $decks = $deckService->findAllByOwner($user);
+        $systemDecks = $deckRepository->findSystemDecks();
+        $userDecks = $deckService->findAllByOwner($user);
+
         $tickets = $ticketRepository->findBy(['room' => $room], ['updatedAt' => 'DESC']);
 
         $ticketEditForms = [];
@@ -163,7 +184,8 @@ final class RoomController extends AbstractController
             'ticketEditForms' => $ticketEditForms,
             'round' => $round,
             'votedUserIds' => $votedUserIds,
-            'decks' => $decks
+            'systemDecks' => $systemDecks,
+            'userDecks' => $userDecks,
         ]);
     }
 

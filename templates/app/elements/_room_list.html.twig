@@ -46,7 +46,7 @@
                     {% set params = params|merge({ page: page - 1 }) %}
 
                     <twig:Button link="{{ path('app', params) }}" type="ghost" size="smaller" css="w-8 h-8" :preload="true">
-                        {{ icon('arrow_left', 'w-4 h-4') }}
+                        {{ icon('chevron_left', 'w-5 h-5') }}
                     </twig:Button>
                 {% endif %}
 
@@ -82,7 +82,7 @@
                     {% set params = params|merge({ page: page + 1 }) %}
 
                     <twig:Button link="{{ path('app', params) }}" type="ghost" size="smaller" css="w-8 h-8" :preload="true">
-                        {{ icon('arrow_right', 'w-4 h-4') }}
+                        {{ icon('chevron_right', 'w-5 h-5') }}
                     </twig:Button>
                 {% endif %}
             </div>
@@ -90,8 +90,6 @@
     </div>
 {% else %}
     <div class="flex flex-col gap-3 justify-center items-center bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-6">
-        {{ icon('bolt', 'w-8 h-8 stroke-secondary-gray') }}
-
         <span class="text-base! text-secondary-grey-light!">
             Kein Raum gefunden.
         </span>

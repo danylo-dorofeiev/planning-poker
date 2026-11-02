@@ -1,21 +1,29 @@
 <div id="member_list"
      data-mercure-target="stream"
+     class="flex flex-col gap-3 divide-y divide-solid divide-secondary-gray-700"
 >
     {% for member in members %}
-        <div class="flex gap-2 items-center justify-between border-t first:border-none py-2 border-secondary-grey-light/40">
+        <div class="flex gap-2 items-center justify-between pb-3">
             <div class="flex gap-2 items-center">
-                <div class="{% if member.user.id in votedUserIds %}border-accent!{% endif %} bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center border border-transparent">
+                <div class="{% if member.user.id in votedUserIds %}border-accent!{% endif %} bg-secondary-grey-light/50 min-w-9 min-h-9 rounded-full flex justify-center items-center border border-transparent">
                     <span class="text-sm! uppercase select-none">
                         {{ member.user.name|slice(0, 2)|upper }}
                     </span>
                 </div>
 
                 <div class="flex flex-col">
-                    <span>{{ member.user.name }}</span>
+                    <span class="text-nowrap">
+                        {{ member.user.name }}
+                    </span>
+
                     {% if member.room.owner == member.user %}
-                        <span class="text-xs! text-secondary-grey-light!">Admin</span>
+                        <span class="text-xs! text-secondary-grey-light!">
+                            Admin
+                        </span>
                     {% else %}
-                        <span class="text-xs! text-secondary-grey-light!">Member</span>
+                        <span class="text-xs! text-secondary-grey-light!">
+                            Member
+                        </span>
                     {% endif %}
                 </div>
             </div>

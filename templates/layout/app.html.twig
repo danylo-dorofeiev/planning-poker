@@ -1,13 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <mercure data-controller="mercure" data-mercure-url-value="{{ mercure(room.uuid) }}">
-        {% include 'partials/app/header.html.twig' with {
-            title: block('title')
-        } %}
+    {% if room is defined and not null %}
+        <mercure data-controller="mercure" data-mercure-url-value="{{ mercure(room.uuid) }}">
+    {% endif %}
 
-        {% block content %}{% endblock %}
+            {% include 'partials/app/header.html.twig' %}
 
-        {% include 'partials/app/footer.html.twig' %}
-    </mercure>
+            {% block content %}{% endblock %}
+
+            {% include 'partials/app/footer.html.twig' %}
+
+    {% if room is defined and not null %}
+        </mercure>
+    {% endif %}
+
+    <twig:Notification></twig:Notification>
 {% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'pages/app/settings/settings.html.twig' %}
+
+{% block title %}Jira Verbindung{% endblock %}
+
+{% block navigation %}
+    {% include 'pages/app/settings/navigation.html.twig' with {activeTab: "services"} %}
+{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col gap-2">
+        {{ icon('applications', 'w-14 h-14 stroke-accent') }}
+
+        <h1 class="leading-none!">
+            Anwendungen
+        </h1>
+
+        <p class="text-secondary-gray! text-pretty mt-2">
+            Verwalte verbundene Anwendungen und Einstellungen deiner Integrationen.
+        </p>
+    </div>
+
+    <hr>
+
+    <div class="flex flex-col gap-2">
+        <h4 class="font-mono flex gap-2 items-center">
+            {{ icon('link', 'w-8 h-8 stroke-secondary-gray') }}
+            Verbindungen zu anderen Diensten
+        </h4>
+
+        <div class="bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-4">
+            <ol class="flex flex-col gap-2">
+                {% if jiraConnection %}
+                    <li class="flex gap-3 items-center">
+                        <div class="w-10 h-10" style="background: url('{{ asset("images/logo/services/jira_icon.svg") }}'); background-size: contain; background-repeat: no-repeat; background-position: center center;"></div>
+
+                        {{ icon('link', 'w-6 h-6') }}
+
+                        <twig:Logo size="medium" :isText="false" :isDemo="false"/>
+
+                        <div class="ml-auto flex flex-col gap-1">
+                            <span class="flex gap-1 items-center text-xs! text-secondary-gray-400! leading-none!">
+                                {{ icon('calender', 'w-3.5 h-3.5 stroke-secondary-gray') }}
+                                Erstellt am:
+                            </span>
+
+                            <span class="text-xs! text-secondary-gray-400! leading-none!">
+                                {{ jiraConnection.createdAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                            </span>
+                        </div>
+
+                        <div class="bg-secondary-gray-700 h-10 w-px"></div>
+
+                        <div class="flex flex-col gap-1 text-xs! text-secondary-gray-400!">
+                            <span class="flex gap-1 items-center text-xs! text-secondary-gray-400! leading-none!">
+                                {{ icon('rotate', 'w-3.5 h-3.5 stroke-secondary-gray') }}
+                                Abgelaufen am:
+                            </span>
+
+                            <span class="text-xs! text-secondary-gray-400! leading-none!">
+                                {{ jiraConnection.accessTokenExpiresAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                            </span>
+                        </div>
+
+                        <div class="bg-secondary-gray-700 h-10 w-px"></div>
+
+                        <div class="flex items-center gap-2">
+                            {% if jiraConnection.accessTokenExpiresAt < date('now', 'UTC') %}
+                                <twig:Button link="{{ path('jira_connection') }}" target="_blank" type="primary" size="small">
+                                    {{ icon('rotate', 'w-4 h-4') }}
+                                    Erneuern
+                                </twig:Button>
+                            {% endif %}
+
+                            <twig:Button type="danger" size="small" modal="jira_connection_remove_modal">
+                                {{ icon('unlink', 'w-4 h-4 stroke-red-500') }}
+                                Trennen
+                            </twig:Button>
+
+                            <twig:Modal modal="jira_connection_remove_modal" :x="false" width="350">
+                                <div class="flex flex-col gap-1 justify-center items-center">
+                                    {{ icon('unlink', 'w-12! h-12! stroke-red-500') }}
+
+                                    <h4>Verbindung trennen?</h4>
+
+                                    <p class="text-balance text-center text-secondary-grey-light!">
+                                        ***
+                                    </p>
+
+                                    <div class="flex gap-2 mt-3">
+                                        <button type="button" popovertarget="jira_connection_remove_modal" popovertargetaction="hide" class="btn-small btn-secondary">
+                                            Cancel
+                                        </button>
+
+                                        <form method="post" action="{{ path('jira_disconnect') }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('jira_disconnect') }}">
+
+                                            <twig:Button func="submit" type="danger" size="small">
+                                                Trennen
+                                            </twig:Button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </twig:Modal>
+
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="flex-1 flex flex-col gap-2 h-20 justify-center items-center">
+                        {{ icon('unlink', 'w-5 h-5') }}
+                        <span>
+                            Es gibt keine aktive Verbindung.
+                        </span>
+                    </li>
+                {% endif %}
+            </ol>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="flex flex-col gap-2">
+        <h4 class="font-mono flex gap-2 items-center">
+            {{ icon('world_search', 'w-8 h-8 stroke-secondary-gray') }}
+            Planning Poker Inegrationen
+        </h4>
+
+        <div class="bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-4">
+            <ol class="flex flex-col gap-2">
+                <li class="w-full bg-primary-black-950 border border-secondary-gray-700 rounded-lg p-4 flex items-center">
+                    <div class="relative w-25 h-10" style="background: url('{{ asset("images/logo/services/jira_logo.svg") }}'); background-size: contain; background-repeat: no-repeat; background-position: center center;">
+                        <a href="https://www.atlassian.com/software/jira" target="_blank" class="absolute top-0 -right-5.5">
+                            {{ icon('info', 'w-4 h-4 stroke-secondary-gray hover:stroke-accent') }}
+                        </a>
+                    </div>
+
+                    <div class="ml-auto flex items-center gap-2">
+                        <twig:Button link="https://www.atlassian.com/software/jira" target="_blank" type="ghost" size="small" css="text-secondary-gray! text-xs!">
+                            Mehr Info
+                            {{ icon('external_link', 'w-3 h-3') }}
+                        </twig:Button>
+
+                        {% if jiraConnection and jiraConnection.accessTokenExpiresAt > date('now', 'UTC') %}
+                            <span class="text-accent! bg-accent-700/30 border border-accent rounded-md flex items-center gap-1.5 py-1 px-2">
+                                {{ icon('check_circle', 'w-4.5 h-4.5 stroke-accent') }}
+                                Aktiv
+                            </span>
+                        {% elseif jiraConnection %}
+                            <span class="text-secondary-gray! bg-secondary-gray-700/30 border border-secondary-gray-700 rounded-md flex items-center gap-1.5 py-1 px-2">
+                                {{ icon('circle_dashed', 'w-4.5 h-4.5 stroke-secondary-gray') }}
+                                Inaktiv
+                            </span>
+                        {% else %}
+                            <twig:Button link="{{ path('jira_connection') }}" target="_blank" type="primary" size="small">
+                                {{ icon('link', 'w-4 h-4') }}
+                                Mit Jira Verbinden
+                            </twig:Button>
+                        {% endif %}
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="flex gap-1.5 items-center justify-center">
+        {{ icon('info', 'w-4 h-4 stroke-secondary-gray') }}
+
+        <span class="text-sm! text-secondary-gray!">
+            Weitere Informationen zur Verarbeitung personenbezogener Daten in unserer <a href="{{ path('app_privacy') }}" class="text-accent! hover:underline">Datenschutzerklärung</a>.
+        </span>
+    </div>
+{% endblock %}

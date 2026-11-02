@@ -75,7 +75,6 @@ final class RoundController extends AbstractController
         $ticket->addRound($round);
 
         $ticket->setStatus(TicketStatus::VOTING);
-        $ticket->setUpdatedAt();
 
         $room->setStatus(RoomStatus::VOTING);
         $room->setUpdatedAt();
@@ -210,8 +209,11 @@ final class RoundController extends AbstractController
 
         $round->setStatus(RoundStatus::REVEALED);
 
-        $ticket->setStatus(TicketStatus::FINISHED);
-        $ticket->setUpdatedAt();
+        if ($ticket->getVotingResult() !== null) {
+            $ticket->setStatus(TicketStatus::FINISHED);
+        } else {
+            $ticket->setStatus(TicketStatus::REVEALED);
+        }
 
         $ticketService->updateTicket($ticket);
         $roundService->updateRound($round);

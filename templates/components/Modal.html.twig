@@ -1,6 +1,6 @@
-<dialog id="{{ modal }}" popover data-modal-target="dialog" style="max-width: {{ width }}px">
+<dialog {% if not turbo %}id="{{ modal }}"{% endif %} {% if turbo %}data-controller="modal" data-modal-target="dialog"{% endif %} popover style="max-width: {{ width }}px">
     {% if title or x %}
-        <div class="flex gap-3 items-start justify-between pb-2 border-b border-b-secondary-grey-light/40">
+        <div class="flex gap-3 items-start justify-between pb-2 border-b border-b-secondary-gray-700">
             {% if title %}
                 <h5 class="w-fit">
                     {{ title }}
@@ -29,9 +29,10 @@
                         <div class="relative group">
                             <button
                                 type="button"
-                                popovertarget="{{ modal }}"
+                                {% if turbo %} data-action="click->modal#close"
+                                {% else %} popovertarget="{{ modal }}"
+                                {% endif %}
                                 popovertargetaction="hide"
-                                data-action="click->modal#close"
                                 class="btn-smaller btn-smooth ml-auto"
                             >
                                 {{ icon('x', 'w-4! h-4! stroke-secondary-grey-light') }}
@@ -47,5 +48,10 @@
         </div>
     {% endif %}
 
-    {{ block('content') }}
+    {% if turbo %}
+        {{ block('content') }}
+        <turbo-frame id="{{ modal }}" data-action="turbo:frame-render->modal#open"></turbo-frame>
+    {% else %}
+        {{ block('content') }}
+    {% endif %}
 </dialog>

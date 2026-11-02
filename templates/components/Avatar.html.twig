@@ -1,0 +1,19 @@
+<div class="bg-secondary-grey rounded-full flex justify-center items-center
+            {% if size == 'small' %}w-10 h-10
+            {% elseif size == 'medium' %}w-12 h-12
+            {% elseif size == 'large'%}w-14 h-14
+
+            {% else %} w-12 h-12
+            {% endif %}
+">
+    <span class="uppercase select-none
+                {% if size == 'small' %}text-sm!
+                {% elseif size == 'medium' %}text-base!
+                {% elseif size == 'large'%}text-lg!
+
+                {% else %} text-base!
+                {% endif %}
+    ">
+        {{ app.user.name|slice(0, 2)|upper }}
+    </span>
+</div>

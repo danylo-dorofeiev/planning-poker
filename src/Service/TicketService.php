@@ -2,10 +2,10 @@
 
 namespace App\Service;
 
-use App\Entity\Room;
 use App\Entity\Ticket;
 use App\Entity\User;
 use App\Repository\TicketRepository;
+use App\Twig\AdfExtension;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class TicketService
@@ -13,6 +13,7 @@ readonly class TicketService
     public function __construct(
         private TicketRepository        $ticketRepository,
         private EntityManagerInterface  $entityManager,
+        private AdfExtension            $adfExtension,
     ) {
     }
 

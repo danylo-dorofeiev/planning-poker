@@ -4,17 +4,25 @@ export default class extends Controller {
     static targets = ['menu'];
 
     connect() {
-        this.closeOtherDropdowns = (event) => {
+        this.closeOtherElements = (event) => {
             if (event.detail !== this.element) {
                 this.close();
             }
         };
 
-        window.addEventListener('dropdown:open', this.closeOtherDropdowns);
+        this.handleOutsideClick = (event) => {
+            if (!this.element.contains(event.target)) {
+                this.close();
+            }
+        };
+
+        window.addEventListener('ui:open', this.closeOtherElements);
+        document.addEventListener('click', this.handleOutsideClick);
     }
 
     disconnect() {
-        window.removeEventListener('dropdown:open', this.closeOtherDropdowns);
+        window.removeEventListener('ui:open', this.closeOtherElements);
+        document.removeEventListener('click', this.handleOutsideClick);
     }
 
     toggle(event) {
@@ -24,15 +32,19 @@ export default class extends Controller {
 
         if (isClosed) {
             window.dispatchEvent(
-                new CustomEvent('dropdown:open', {
-                    detail: this.element
+                new CustomEvent('ui:open', {
+                    detail: this.element,
                 })
             );
-        }
 
-        this.menuTarget.classList.toggle('opacity-0');
-        this.menuTarget.classList.toggle('-translate-y-2');
-        this.menuTarget.classList.toggle('pointer-events-none');
+            this.menuTarget.classList.remove(
+                'opacity-0',
+                '-translate-y-2',
+                'pointer-events-none'
+            );
+        } else {
+            this.close();
+        }
     }
 
     close() {
@@ -41,11 +53,5 @@ export default class extends Controller {
             '-translate-y-2',
             'pointer-events-none'
         );
-    }
-
-    clickOutside(event) {
-        if (!this.element.contains(event.target)) {
-            this.close();
-        }
     }
 }

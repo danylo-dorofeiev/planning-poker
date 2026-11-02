@@ -1,0 +1,28 @@
+<label
+    class="flex gap-3 items-center hover:bg-secondary-gray-700/30 py-1.5 cursor-pointer"
+    data-live-search-target="item"
+    data-item-name="{{ issue.fields.summary|lower }}"
+    data-item-key="{{ issue.key|lower }}"
+>
+    <input
+        type="checkbox"
+        name="issues[]"
+        value="{{ issue.key }}"
+        class="w-4 h-4"
+    >
+
+    <img
+        src="{{ issue.fields.issuetype.iconUrl }}"
+        alt="{{ issue.fields.issuetype.name }}"
+        title="{{ issue.fields.issuetype.name }}"
+        class="w-4 h-4"
+    >
+
+    <span>
+        {{ issue.key }}
+    </span>
+
+    <span>
+        {{ issue.fields.summary }}
+    </span>
+</label>

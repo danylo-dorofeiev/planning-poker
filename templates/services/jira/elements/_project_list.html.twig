@@ -1,0 +1,50 @@
+{% if connection %}
+    <div data-controller="live-search" class="flex flex-col gap-3">
+        <div class="flex gap-3 justify-between items-end">
+            <span class="text-base!">
+                Projekt auswählen
+            </span>
+
+            <div class="relative">
+                <input
+                    type="text"
+                    data-live-search-target="input"
+                    data-action="input->live-search#search"
+                    placeholder="Search projects by name or key..."
+                    class="relative"
+                >
+
+                <twig:Button data_action="click->live-search#clear" type="ghost" size="smaller" css="absolute top-1/2 right-2 -translate-y-1/2">
+                    {{ icon('x', 'w-3 h-3 stroke-secondary-gray') }}
+                </twig:Button>
+            </div>
+        </div>
+
+        {% if projects %}
+            <div class="min-h-0 max-h-96 overflow-y-auto px-4 pb-4 bg-primary-black-900 border border-secondary-gray-700 rounded-lg divide-y divide-secondary-gray-700 divide-solid">
+                <div class="sticky top-0 pt-4 bg-primary-black-900 flex gap-6 pb-1.5">
+                    <span class="pl-9 flex-1 text-secondary-gray!">Name</span>
+                    <span class="w-20 text-secondary-gray!">Schlüssel</span>
+                </div>
+
+                {% for project in projects %}
+                    {% include 'services/jira/elements/_project_card.html.twig' %}
+                {% endfor %}
+
+                <p data-live-search-target="empty" hidden>
+                    Keine Projekte gefunden.
+                </p>
+            </div>
+        {% else %}
+            <div class="flex flex-col gap-3 justify-center items-center bg-primary-black-900 border border-secondary-gray-700 rounded-lg p-6">
+                <span class="text-base! text-secondary-grey-light!">
+                    Keine Projekte gefunden.
+                </span>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <twig:Button link="{{ path('jira_connection') }}" target="_blank" type="primary" size="medium">
+        Mit Jira Verbinden
+    </twig:Button>
+{% endif %}

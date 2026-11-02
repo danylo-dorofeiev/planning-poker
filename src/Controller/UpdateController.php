@@ -82,7 +82,8 @@ class UpdateController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
     ): Response {
         $user = $this->getUser();
-        $decks = $deckRepository->findAllByOwner($user);
+        $systemDecks = $deckRepository->findSystemDecks();
+        $userDecks = $deckRepository->findAllByOwner($user);
 
         $roomSettingsForm = $formFactory->create(RoomType::class, $room, [
             'attr' => [
@@ -96,7 +97,8 @@ class UpdateController extends AbstractController
 
         return $this->render('room/stream/_room_settings.html.twig', [
             'room' => $room,
-            'decks' => $decks,
+            'systemDecks' => $systemDecks,
+            'userDecks' => $userDecks,
             'roomSettingsForm' => $roomSettingsForm->createView(),
         ]);
     }

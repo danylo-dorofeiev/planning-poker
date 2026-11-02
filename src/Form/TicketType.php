@@ -19,19 +19,23 @@ class TicketType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Key',
                 ],
+                'disabled' => !$options['editable'],
             ])
             ->add('title', TextType::class, [
-                'label' => 'Title',
+                'label' => 'Titel',
                 'attr' => [
                     'placeholder' => 'Title',
                 ],
+                'disabled' => !$options['editable'],
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description',
                 'required' => false,
+                'label' => 'Beschreibung',
                 'attr' => [
-                    'placeholder' => 'Description',
+                    'rows' => 5,
+                    'placeholder' => 'Beschreibung',
                 ],
+                'disabled' => !$options['editable'],
             ])
         ;
     }
@@ -40,6 +44,9 @@ class TicketType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Ticket::class,
+            'editable' => true,
         ]);
+
+        $resolver->setAllowedTypes('editable', ['bool']);
     }
 }

@@ -2,6 +2,7 @@
     <a href="{{ link }}"
        target="{{ target }}"
        data-turbo="{{ turbo }}"
+       {% if data_turbo_frame %}data-turbo-frame="{{ data_turbo_frame }}"{% endif %}
        {% if preload %}data-turbo-preload{% endif %}
        class="btn-{{ type }} btn-{{ size }} {{ css }} leading-3.5"
 

@@ -9,59 +9,62 @@
     <main class="flex-1 flex">
         {% include 'partials/app/sidebar.html.twig' with {activeTab: "decks"} %}
 
-        <aside class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900">
-            <div class="sticky top-0 flex flex-col gap-3 p-6">
+        <aside id="sidebar" class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900 transition-all duration-300">
+            <div class="max-h-[calc(100vh-65px)] sticky top-0 overflow-hidden">
 
-                <div class="flex gap-3 justify-between items-end">
-                    <h5 class="leading-none!">
-                        Decks
-                    </h5>
-                </div>
+                <div class="flex flex-col gap-3 p-6">
 
-                <hr>
+                    <div class="flex gap-3 justify-between items-end">
+                        <h5 class="leading-none!">
+                            Decks
+                        </h5>
+                    </div>
 
-                <twig:Button type="smooth" size="medium" modal="deck_create_modal" css="w-full">
-                    {{ icon('plus', 'w-4.5 h-4.5 stroke-secondary-gray') }}
-                    Deck erstellen
-                </twig:Button>
+                    <hr>
 
-                <twig:Modal width="556" modal="deck_create_modal" title="Neues Deck erstellen">
-                    {% include 'deck/form/_create_form.html.twig' %}
-                </twig:Modal>
+                    <twig:Button type="smooth" size="medium" modal="deck_create_modal" css="w-full text-nowrap overflow-hidden">
+                        {{ icon('plus', 'w-4.5 h-4.5 stroke-secondary-gray') }}
+                        Deck erstellen
+                    </twig:Button>
 
-                {% if customDecks is not empty %}
+                    <twig:Modal width="556" modal="deck_create_modal" title="Neues Deck erstellen">
+                        {% include 'deck/form/_create_form.html.twig' %}
+                    </twig:Modal>
+
+                    {% if customDecks is not empty %}
+                        <ol class="flex flex-col">
+                            <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
+                                Benutzerdefiniertes
+                            </li>
+
+                            {% for deck in customDecks %}
+                                <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
+                                    <div class="group relative min-w-0">
+                                        <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_overview" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
+                                            {{ deck.name|slice(0, 25) }}{% if deck.name|length > 25 %}...{% endif %}
+                                        </a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+
                     <ol class="flex flex-col">
                         <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
-                            Benutzerdefiniertes
+                            System
                         </li>
 
-                        {% for deck in customDecks %}
+                        {% for deck in systemDecks %}
                             <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
                                 <div class="group relative min-w-0">
-                                    <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_modal" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
+                                    <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_overview" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
                                         {{ deck.name|slice(0, 25) }}{% if deck.name|length > 25 %}...{% endif %}
                                     </a>
                                 </div>
                             </li>
                         {% endfor %}
                     </ol>
-                {% endif %}
-
-                <ol class="flex flex-col">
-                    <li class="font-mono uppercase text-secondary-gray-400! tracking-wider mb-1">
-                        System
-                    </li>
-
-                    {% for deck in systemDecks %}
-                        <li class="has-group-hover:border-secondary-gray border-l border-secondary-gray-700 pl-2">
-                            <div class="group relative min-w-0">
-                                <a href="{{ path('deck_show', {deck_id:deck.uuid}) }}" data-turbo-frame="deck_modal" class="pl-2 btn-small block truncate rounded-md hover:bg-secondary-gray-700">
-                                    {{ deck.name|slice(0, 25) }}{% if deck.name|length > 25 %}...{% endif %}
-                                </a>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ol>
+                </div>
             </div>
         </aside>
 
@@ -117,16 +120,12 @@
             </div>
 
             <aside class="flex-1 max-w-75">
-
+                {% include 'app/elements/_version_protocol.html.twig' %}
             </aside>
         </section>
     </main>
 
-    <div data-controller="modal">
-        <twig:Modal modal="test" title="Deck Bearbeiten" width="600">
-            <turbo-frame id="deck_modal" data-action="turbo:frame-render->modal#open">
-                <!-- Deck -->
-            </turbo-frame>
-        </twig:Modal>
-    </div>
+    <twig:Modal :turbo="true" modal="deck_overview" title="Deck Bearbeiten" width="600">
+        <!-- Deck Overview -->
+    </twig:Modal>
 {% endblock %}

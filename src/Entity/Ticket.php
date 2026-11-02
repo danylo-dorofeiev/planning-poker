@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\Enum\EstimationUnit;
+use App\Enum\TicketSource;
 use App\Enum\TicketStatus;
 use App\Repository\TicketRepository;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
@@ -25,11 +28,17 @@ class Ticket
     #[ORM\Column(length: 255)]
     private string $title;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(enumType: TicketStatus::class)]
     private TicketStatus $status;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $votingResult = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isTimeBased = true;
 
     #[ORM\ManyToOne(inversedBy: 'tickets')]
     #[ORM\JoinColumn(nullable: false)]
@@ -39,11 +48,14 @@ class Ticket
     #[ORM\OrderBy(['number' => 'ASC'])]
     private Collection $rounds;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $updatedAt;
+
+    #[ORM\Column(enumType: TicketSource::class)]
+    private TicketSource $source;
 
     public function __construct()
     {
@@ -51,6 +63,7 @@ class Ticket
         $this->status = TicketStatus::PENDING;
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->source = TicketSource::LOCAL;
     }
 
     public function getId(): ?int
@@ -93,6 +106,7 @@ class Ticket
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -104,6 +118,30 @@ class Ticket
     public function setStatus(TicketStatus $status): static
     {
         $this->status = $status;
+        return $this;
+    }
+
+    public function getVotingResult(): ?string
+    {
+        return $this->votingResult;
+    }
+
+    public function setVotingResult(?string $votingResult): static
+    {
+        $this->votingResult = $votingResult;
+
+        return $this;
+    }
+
+    public function isTimeBased(): bool
+    {
+        return $this->isTimeBased;
+    }
+
+    public function setIsTimeBased(bool $isTimeBased): static
+    {
+        $this->isTimeBased = $isTimeBased;
+
         return $this;
     }
 
@@ -149,6 +187,12 @@ class Ticket
         return $this->createdAt;
     }
 
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
@@ -157,6 +201,18 @@ class Ticket
     public function setUpdatedAt(): static
     {
         $this->updatedAt = new \DateTimeImmutable();
+        return $this;
+    }
+
+    public function getSource(): TicketSource
+    {
+        return $this->source;
+    }
+
+    public function setSource(TicketSource $source): static
+    {
+        $this->source = $source;
+
         return $this;
     }
 }

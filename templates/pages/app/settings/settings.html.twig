@@ -1,0 +1,36 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Einstellungen{% endblock %}
+
+{% block body %}
+    {% include 'partials/app/header.html.twig' %}
+
+    <main class="flex-1 flex">
+        {% include 'partials/app/sidebar.html.twig' %}
+
+        <aside id="sidebar" class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900 transition-all duration-300">
+            <div class="max-h-[calc(100vh-65px)] sticky top-0 overflow-hidden">
+                <div class="sticky top-0 flex flex-col gap-3 p-6">
+                    {% block navigation %}
+                        {% include 'pages/app/settings/navigation.html.twig' %}
+                    {% endblock %}
+                </div>
+            </div>
+        </aside>
+
+        <section class="flex gap-6 w-315 mx-auto p-6">
+            <div class="flex-1">
+                <div class="min-h-screen flex-1 flex flex-col gap-6 pb-6">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+
+                {% include 'partials/app/footer.html.twig' %}
+            </div>
+
+            <aside class="flex-1 max-w-75">
+                {% include 'app/elements/_version_protocol.html.twig' %}
+            </aside>
+        </section>
+    </main>
+{% endblock %}

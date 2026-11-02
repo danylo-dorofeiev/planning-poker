@@ -24,3 +24,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\JiraImportService:
+        arguments:
+            $clientId: '%env(JIRA_CLIENT_ID)%'
+            $clientSecret: '%env(JIRA_CLIENT_SECRET)%'
+            $redirectUri: '%env(JIRA_REDIRECT_URI)%'
