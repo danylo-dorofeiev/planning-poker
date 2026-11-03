@@ -33,8 +33,11 @@ class RoomMember
     #[ORM\Column(enumType: RoomMemberRole::class)]
     private RoomMemberRole $role = RoomMemberRole::MEMBER;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastSeen = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isOnline = false;
 
     public function getId(): ?int
     {
@@ -83,6 +86,25 @@ class RoomMember
     public function setLastSeen(\DateTimeImmutable $lastSeen): static
     {
         $this->lastSeen = $lastSeen;
+        return $this;
+    }
+
+    public function updateLastSeen(): static
+    {
+        $this->lastSeen = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function isOnline(): bool
+    {
+        return $this->isOnline;
+    }
+
+    public function setOnline(bool $isOnline): static
+    {
+        $this->isOnline = $isOnline;
+
         return $this;
     }
 }

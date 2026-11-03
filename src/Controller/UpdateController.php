@@ -7,6 +7,7 @@ use App\Entity\Round;
 use App\Form\RoomType;
 use App\Form\TicketType;
 use App\Repository\DeckRepository;
+use App\Repository\RoomMemberRepository;
 use App\Repository\RoundRepository;
 use App\Repository\TicketRepository;
 use App\Repository\VoteRepository;
@@ -106,15 +107,16 @@ class UpdateController extends AbstractController
     #[Route('/room/{room_id}/member_list/update', name: 'member_list_update')]
     public function member_list_update(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        RoomMemberRepository $roomMemberRepository,
         RoundRepository $roundRepository,
         VoteRepository $voteRepository,
     ): Response {
-        $members = $room->getMembers();
+        $members = $roomMemberRepository->findMembersWithOnlineStatus($room);
 
         $activeRound = $roundRepository->findActiveRoundByRoom($room);
 
         $votedUserIds = [];
-        if($activeRound) {
+        if ($activeRound) {
             $votedUserIds = $voteRepository->findVotedUserIds($activeRound);
         }
 

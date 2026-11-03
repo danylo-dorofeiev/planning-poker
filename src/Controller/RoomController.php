@@ -18,6 +18,7 @@ use App\Repository\VoteRepository;
 use App\Security\Voter\RoomVoter;
 use App\Service\DeckService;
 use App\Service\RoomMemberService;
+use App\Service\RoomMemberStatusPublisher;
 use App\Service\RoomService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -66,9 +67,10 @@ final class RoomController extends AbstractController
         Request $request,
         RoomRepository $roomRepository,
         RoomMemberService $roomMemberService,
+        RoomMemberStatusPublisher $publisher,
+        HubInterface $hub,
     ): Response {
         $user = $this->getUser();
-        $now = new \DateTimeImmutable();
 
         $room_id = $request->get('room_id');
 
@@ -89,14 +91,30 @@ final class RoomController extends AbstractController
         if (!$roomMember) {
             $roomMember = (new RoomMember())
                 ->setRoom($room)
-                ->setUser($user)
-                ->setLastSeen($now);
+                ->setUser($user);
+        }
 
+        $roomMember->updateLastSeen();
+        $roomMember->setOnline(true);
+
+        if ($roomMember->getId() === null) {
             $roomMemberService->createRoomMember($roomMember);
         } else {
-            $roomMember->setLastSeen($now);
             $roomMemberService->updateRoomMember($roomMember);
         }
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'member_list',
+                    'event' => 'member_list:update',
+                    'url' => $this->generateUrl('member_list_update', [
+                        'room_id' => $room->getUuid(),
+                    ]),
+                ])
+            )
+        );
 
         return $this->redirectToRoute('room_show', [
             'room_id' => $room->getUuid(),
@@ -112,6 +130,8 @@ final class RoomController extends AbstractController
         VoteRepository $voteRepository,
         DeckRepository $deckRepository,
         DeckService $deckService,
+        RoomMemberStatusPublisher $publisher,
+        HubInterface $hub,
     ): Response {
         $user = $this->getUser();
         $roomMember = $roomMemberRepository->findMember($room, $user);
@@ -121,6 +141,19 @@ final class RoomController extends AbstractController
                 'room_id' => $room->getUuid()
             ]);
         }
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'member_list',
+                    'event' => 'member_list:update',
+                    'url' => $this->generateUrl('member_list_update', [
+                        'room_id' => $room->getUuid(),
+                    ]),
+                ])
+            )
+        );
 
         $ticket = new Ticket();
         $ticket->setRoom($room);
@@ -176,6 +209,8 @@ final class RoomController extends AbstractController
             ])->createView();
         }
 
+        $members = $roomMemberRepository->findMembersWithOnlineStatus($room);
+
         return $this->render('room/show.html.twig', [
             'room' => $room,
             'tickets' => $tickets,
@@ -186,6 +221,7 @@ final class RoomController extends AbstractController
             'votedUserIds' => $votedUserIds,
             'systemDecks' => $systemDecks,
             'userDecks' => $userDecks,
+            'members' => $members,
         ]);
     }
 
@@ -225,6 +261,42 @@ final class RoomController extends AbstractController
                 'room_id' => $room->getUuid(),
             ]);
         }
+    }
+
+    #[Route('/room/{room_id}/heartbeat', name: 'room_heartbeat', methods: ['POST'])]
+    public function heartbeat(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        RoomMemberRepository $roomMemberRepository,
+        RoomMemberService $roomMemberService,
+        RoomMemberStatusPublisher $publisher,
+    ): Response {
+        $user = $this->getUser();
+
+        $roomMember = $roomMemberRepository->findMember($room, $user);
+
+        if (!$roomMember) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $wasOffline = !$roomMember->isOnline();
+
+        $roomMember->updateLastSeen();
+        $roomMember->setOnline(true);
+
+        $roomMemberService->updateRoomMember($roomMember);
+
+        if ($wasOffline) {
+            $publisher->publish($room);
+        }
+
+        dump([
+            'source' => 'heartbeat',
+            'user_id' => $user->getId(),
+            'member_id' => $roomMember->getId(),
+            'time' => (new \DateTimeImmutable())->format('H:i:s'),
+        ]);
+
+        return new Response(null, Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/room/{room_id}/delete', name: 'room_delete', methods: ['POST'])]

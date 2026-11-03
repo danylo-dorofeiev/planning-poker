@@ -2,12 +2,20 @@
      data-mercure-target="stream"
      class="flex flex-col gap-3 divide-y divide-solid divide-secondary-gray-700"
 >
-    {% for member in members %}
+    {% for item in members %}
+        {% set member = item.member %}
+
         <div class="flex gap-2 items-center justify-between pb-3">
             <div class="flex gap-2 items-center">
-                <div class="{% if member.user.id in votedUserIds %}border-accent!{% endif %} bg-secondary-grey-light/50 min-w-9 min-h-9 rounded-full flex justify-center items-center border border-transparent">
-                    <span class="text-sm! uppercase select-none">
-                        {{ member.user.name|slice(0, 2)|upper }}
+                <div class="relative">
+                    <div class="bg-secondary-grey-light/50 min-w-9 min-h-9 rounded-full flex justify-center items-center border border-transparent">
+                        <span class="text-sm! uppercase select-none">
+                            {{ member.user.name|slice(0, 2)|upper }}
+                        </span>
+                    </div>
+
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full
+                        {{ item.isOnline ? 'bg-accent' : 'bg-secondary-gray-700' }}">
                     </span>
                 </div>
 

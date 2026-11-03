@@ -8,7 +8,10 @@
 
         <aside id="sidebar" class="flex-1 max-w-85 border-r border-secondary-gray-700 bg-primary-black-900 transition-all duration-300">
             <div class="max-h-[calc(100vh-65px)] sticky top-0 overflow-hidden">
-                <div class="flex flex-col gap-3 p-6">
+                <div data-controller="heartbeat"
+                     data-heartbeat-url-value="{{ path('room_heartbeat', { room_id: room.uuid }) }}"
+                     class="flex flex-col gap-3 p-6
+                ">
                     <div class="flex gap-3 justify-between items-center">
 
                         <div class="flex gap-1.5 items-center">
@@ -115,7 +118,7 @@
 
                     <hr>
 
-                    {% include 'room/elements/_member_list.html.twig' with {room:room, members:room.members, votedUserIds:votedUserIds} %}
+                    {% include 'room/elements/_member_list.html.twig' with {room:room, members:members, votedUserIds:votedUserIds} %}
                 </div>
             </div>
         </aside>
