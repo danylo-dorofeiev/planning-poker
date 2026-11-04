@@ -46,7 +46,6 @@ final class RoundController extends AbstractController
     public function start(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
         #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
-        TicketRepository $ticketRepository,
         RoomService $roomService,
         TicketService $ticketService,
         RoundService $roundService,
@@ -54,10 +53,32 @@ final class RoundController extends AbstractController
     ): Response {
         $this->denyAccessUnlessGranted(RoomVoter::START, $room);
 
-        $votingTicket = $ticketRepository->findVotingTicket($room);
-        if($votingTicket !== null) {
-            throw $this->createAccessDeniedException(
-                'Another ticket is currently voted for this room.'
+        $activeRound = $roundService->findActiveRoundByRoom($room);
+
+        if ($activeRound !== null) {
+            $activeTicket = $activeRound->getTicket();
+            $roundService->deleteRound($activeRound);
+
+            if ($activeTicket->getVotingResult() !== null) {
+                $activeTicket->setStatus(TicketStatus::FINISHED);
+            } elseif ($activeTicket->getRounds()->count() > 0) {
+                $activeTicket->setStatus(TicketStatus::REVEALED);
+            } else {
+                $activeTicket->setStatus(TicketStatus::PENDING);
+            }
+
+            $hub->publish(
+                new Update(
+                    $room->getUuid(),
+                    json_encode([
+                        'target' => 'ticket-' . $activeTicket->getUuid(),
+                        'event' => 'ticket_card:update',
+                        'url' => $this->generateUrl('ticket_card_update', [
+                            'room_id' => $room->getUuid(),
+                            'ticket_id' => $activeTicket->getUuid(),
+                        ]),
+                    ])
+                )
             );
         }
 
@@ -100,10 +121,11 @@ final class RoundController extends AbstractController
             new Update(
                 $room->getUuid(),
                 json_encode([
-                    'target' => 'ticket_list',
-                    'event' => 'ticket_list:update',
-                    'url' => $this->generateUrl('ticket_list_update', [
+                    'target' => 'ticket-' . $ticket->getUuid(),
+                    'event' => 'ticket_card:update',
+                    'url' => $this->generateUrl('ticket_card_update', [
                         'room_id' => $room->getUuid(),
+                        'ticket_id' => $ticket->getUuid(),
                     ]),
                 ])
             )
@@ -249,10 +271,11 @@ final class RoundController extends AbstractController
             new Update(
                 $room->getUuid(),
                 json_encode([
-                    'target' => 'ticket_list',
-                    'event' => 'ticket_list:update',
-                    'url' => $this->generateUrl('ticket_list_update', [
+                    'target' => 'ticket-' . $ticket->getUuid(),
+                    'event' => 'ticket_card:update',
+                    'url' => $this->generateUrl('ticket_card_update', [
                         'room_id' => $room->getUuid(),
+                        'ticket_id' => $ticket->getUuid(),
                     ]),
                 ])
             )

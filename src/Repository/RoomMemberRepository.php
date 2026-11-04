@@ -17,7 +17,7 @@ class RoomMemberRepository extends ServiceEntityRepository
         parent::__construct($registry, RoomMember::class);
     }
 
-    public function findMember(Room $room, User $user): object
+    public function findMember(Room $room, User $user): ?RoomMember
     {
         return $this->findOneBy([
             'room' => $room,

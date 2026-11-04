@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\Round;
+use App\Entity\Ticket;
 use App\Form\RoomType;
 use App\Form\TicketType;
 use App\Repository\DeckRepository;
@@ -60,17 +61,120 @@ class UpdateController extends AbstractController
         ]);
     }
 
-    #[Route('/room/{room_id}/round/{round_id}/poker_table/update', name: 'poker_table_update')]
+    #[Route('/room/{room_id}/ticket/{ticket_id}/create', name: 'ticket_card_create')]
+    public function ticket_card_create(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+        RoundRepository $roundRepository,
+        TicketRepository $ticketRepository,
+        FormFactoryInterface $formFactory,
+        UrlGeneratorInterface $urlGenerator,
+    ): Response {
+        $tickets = $ticketRepository->findBy(
+            ['room' => $room],
+            ['updatedAt' => 'DESC'],
+        );
+
+        $ticketEditForms = [];
+        foreach ($tickets as $currentTicket) {
+            $uuid = $currentTicket->getUuid()->toRfc4122();
+
+            $ticketEditForms[$uuid] = $formFactory
+                ->create(TicketType::class, $currentTicket, [
+                    'action' => $urlGenerator->generate('ticket_edit', [
+                        'room_id' => $room->getUuid(),
+                        'ticket_id' => $currentTicket->getUuid(),
+                    ]),
+                    'method' => 'POST',
+                ])
+                ->createView();
+        }
+
+        $round = $roundRepository->findActiveRoundByRoom($room);
+
+        return $this->render('ticket/stream/_ticket_card.html.twig', [
+            'action' => "prepend",
+            'room' => $room,
+            'ticket' => $ticket,
+            'round' => $round,
+            'ticketEditForms' => $ticketEditForms,
+        ], new Response(headers: [
+            'Content-Type' => 'text/vnd.turbo-stream.html',
+        ]));
+    }
+
+    #[Route('/room/{room_id}/ticket/{ticket_id}/update', name: 'ticket_card_update')]
+    public function ticket_card_update(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+        RoundRepository $roundRepository,
+        TicketRepository $ticketRepository,
+        FormFactoryInterface $formFactory,
+        UrlGeneratorInterface $urlGenerator,
+    ): Response {
+        $tickets = $ticketRepository->findBy(
+            ['room' => $room],
+            ['updatedAt' => 'DESC'],
+        );
+
+        $ticketEditForms = [];
+        foreach ($tickets as $currentTicket) {
+            $uuid = $currentTicket->getUuid()->toRfc4122();
+
+            $ticketEditForms[$uuid] = $formFactory
+                ->create(TicketType::class, $currentTicket, [
+                    'action' => $urlGenerator->generate('ticket_edit', [
+                        'room_id' => $room->getUuid(),
+                        'ticket_id' => $currentTicket->getUuid(),
+                    ]),
+                    'method' => 'POST',
+                ])
+                ->createView();
+        }
+
+        $round = $roundRepository->findActiveRoundByRoom($room);
+
+        return $this->render('ticket/stream/_ticket_card.html.twig', [
+            'action' => "replace",
+            'room' => $room,
+            'ticket' => $ticket,
+            'round' => $round,
+            'ticketEditForms' => $ticketEditForms,
+        ], new Response(headers: [
+            'Content-Type' => 'text/vnd.turbo-stream.html',
+        ]));
+    }
+
+    #[Route('/room/{room_id}/ticket/{ticket_id}/remove', name: 'ticket_card_remove')]
+    public function ticket_card_remove(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        string $ticket_id,
+        RoundRepository $roundRepository,
+    ): Response {
+        return $this->render('ticket/stream/_ticket_card.html.twig', [
+            'action' => "remove",
+            'ticket_id' => $ticket_id,
+        ], new Response(headers: [
+            'Content-Type' => 'text/vnd.turbo-stream.html',
+        ]));
+    }
+
+    #[Route('/room/{room_id}/poker_table/update', name: 'poker_table_update')]
     public function poker_table_update(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
-        #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
+        RoundRepository $roundRepository,
         VoteRepository $voteRepository,
     ): Response {
-        $votedUserIds = $voteRepository->findVotedUserIds($round);
+        $activeRound = $roundRepository->findActiveRoundByRoom($room);
+
+        $votedUserIds = [];
+        if ($activeRound) {
+            $votedUserIds = $voteRepository->findVotedUserIds($activeRound);
+        }
 
         return $this->render('room/stream/_poker_table.html.twig', [
             'room' => $room,
-            'round' => $round,
+            'round' => $activeRound,
             'votedUserIds' => $votedUserIds,
         ]);
     }

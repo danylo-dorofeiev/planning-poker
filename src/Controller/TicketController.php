@@ -4,13 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\Ticket;
+use App\Enum\RoundStatus;
 use App\Enum\TicketSource;
 use App\Enum\TicketStatus;
 use App\Form\TicketType;
+use App\Repository\RoundRepository;
 use App\Service\JiraImportService;
 use App\Service\NotificationService;
 use App\Service\RoomService;
+use App\Service\RoundService;
 use App\Service\TicketService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -51,9 +55,10 @@ class TicketController extends AbstractController
                     $room->getUuid(),
                     json_encode([
                         'target' => 'ticket_list',
-                        'event' => 'ticket_list:update',
-                        'url' => $this->generateUrl('ticket_list_update', [
+                        'event' => 'ticket_card:update',
+                        'url' => $this->generateUrl('ticket_card_create', [
                             'room_id' => $room->getUuid(),
+                            'ticket_id' => $ticket->getUuid(),
                         ]),
                     ])
                 )
@@ -62,10 +67,7 @@ class TicketController extends AbstractController
             $ticket = new Ticket();
             $ticket->setRoom($room);
 
-            return $this->render('ticket/form/_create_form.html.twig', [
-                '$ticketCreateForm' => $this->createForm(TicketType::class, $ticket)->createView(),
-                'room' => $room,
-            ]);
+            return new Response(status: 200);
         }
     }
 
@@ -73,17 +75,30 @@ class TicketController extends AbstractController
     public function edit(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
         #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
+        RoundRepository $roundRepository,
         RoomService $roomService,
         TicketService $ticketService,
+        RoundService $roundService,
         Request $request,
         HubInterface $hub,
     ): Response {
-        if ($ticket->getStatus() == TicketStatus::VOTING) {
+        if ($ticket->getSource() == TicketSource::JIRA) {
             return new Response(status: 400);
         }
 
-        if ($ticket->getSource() == TicketSource::JIRA) {
-            return new Response(status: 400);
+        $activeRound = $roundRepository->findActiveRoundByRoom($room);
+
+        if ($activeRound and $activeRound->getTicket() == $ticket) {
+            $activeTicket = $activeRound->getTicket();
+            $roundService->deleteRound($activeRound);
+
+            if ($activeTicket->getVotingResult() !== null) {
+                $activeTicket->setStatus(TicketStatus::FINISHED);
+            } elseif ($activeTicket->getRounds()->count() > 0) {
+                $activeTicket->setStatus(TicketStatus::REVEALED);
+            } else {
+                $activeTicket->setStatus(TicketStatus::PENDING);
+            }
         }
 
         $form = $this->createForm(TicketType::class, $ticket, [
@@ -101,18 +116,44 @@ class TicketController extends AbstractController
                 new Update(
                     $room->getUuid(),
                     json_encode([
-                        'target' => 'ticket_list',
-                        'event' => 'ticket_list:update',
-                        'url' => $this->generateUrl('ticket_list_update', [
+                        'target' => 'ticket-' . $ticket->getUuid(),
+                        'event' => 'ticket_card:update',
+                        'url' => $this->generateUrl('ticket_card_update', [
+                            'room_id' => $room->getUuid(),
+                            'ticket_id' => $ticket->getUuid(),
+                        ]),
+                    ])
+                )
+            );
+
+            $hub->publish(
+                new Update(
+                    $room->getUuid(),
+                    json_encode([
+                        'target' => 'member_list',
+                        'event' => 'member_list:update',
+                        'url' => $this->generateUrl('member_list_update', [
                             'room_id' => $room->getUuid(),
                         ]),
                     ])
                 )
             );
 
-            return $this->redirectToRoute('room_show', [
-                'room_id' => $room->getUuid(),
-            ]);
+            $hub->publish(
+                new Update(
+                    $room->getUuid(),
+                    json_encode([
+                        'target' => 'poker_table',
+                        'event' => 'poker_table:update',
+                        'url' => $this->generateUrl('poker_table_update', [
+                            'room_id' => $room->getUuid(),
+                            'round_id' => null,
+                        ]),
+                    ])
+                )
+            );
+
+            return new Response(status: 200);
         }
     }
 
@@ -183,10 +224,11 @@ class TicketController extends AbstractController
             new Update(
                 $room->getUuid(),
                 json_encode([
-                    'target' => 'ticket_list',
-                    'event' => 'ticket_list:update',
-                    'url' => $this->generateUrl('ticket_list_update', [
+                    'target' => 'ticket-' . $ticket->getUuid(),
+                    'event' => 'ticket_card:update',
+                    'url' => $this->generateUrl('ticket_card_update', [
                         'room_id' => $room->getUuid(),
+                        'ticket_id' => $ticket->getUuid(),
                     ]),
                 ])
             )
@@ -254,10 +296,11 @@ class TicketController extends AbstractController
             new Update(
                 $room->getUuid(),
                 json_encode([
-                    'target' => 'ticket_list',
-                    'event' => 'ticket_list:update',
-                    'url' => $this->generateUrl('ticket_list_update', [
+                    'target' => 'ticket-' . $ticket->getUuid(),
+                    'event' => 'ticket_card:update',
+                    'url' => $this->generateUrl('ticket_card_update', [
                         'room_id' => $room->getUuid(),
+                        'ticket_id' => $ticket->getUuid(),
                     ]),
                 ])
             )
@@ -273,9 +316,9 @@ class TicketController extends AbstractController
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
         #[MapEntity(mapping: ['ticket_id' => 'uuid'])] Ticket $ticket,
         Request $request,
-        TicketService $ticketService,
         HubInterface $hub,
         NotificationService $notificationService,
+        EntityManagerInterface $entityManager,
     ): JsonResponse {
         if ($room->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
@@ -314,22 +357,23 @@ class TicketController extends AbstractController
                     }
                 }
             }
-
-            $hub->publish(
-                new Update(
-                    $room->getUuid(),
-                    json_encode([
-                        'target' => 'ticket_list',
-                        'event' => 'ticket_list:update',
-                        'url' => $this->generateUrl('ticket_list_update', [
-                            'room_id' => $room->getUuid(),
-                        ]),
-                    ])
-                )
-            );
         }
 
-        $ticketService->updateTicket($ticket);
+        $entityManager->flush();
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'ticket-' . $ticket->getUuid(),
+                    'event' => 'ticket_card:update',
+                    'url' => $this->generateUrl('ticket_card_update', [
+                        'room_id' => $room->getUuid(),
+                        'ticket_id' => $ticket->getUuid(),
+                    ]),
+                ])
+            )
+        );
 
         return $this->json([
             'success' => true,
@@ -358,17 +402,16 @@ class TicketController extends AbstractController
             new Update(
                 $room->getUuid(),
                 json_encode([
-                    'target' => 'ticket_list',
-                    'event' => 'ticket_list:update',
-                    'url' => $this->generateUrl('ticket_list_update', [
+                    'target' => 'ticket-' . $ticket->getUuid(),
+                    'event' => 'ticket_card:update',
+                    'url' => $this->generateUrl('ticket_card_remove', [
                         'room_id' => $room->getUuid(),
+                        'ticket_id' => $ticket->getUuid(),
                     ]),
                 ])
             )
         );
 
-        return $this->redirectToRoute('room_show', [
-            'room_id' => $room->getUuid(),
-        ]);
+        return new Response(status: 204);
     }
 }

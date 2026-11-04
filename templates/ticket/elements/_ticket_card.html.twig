@@ -1,4 +1,4 @@
-<div id="ticket-{{ ticket.uuid }}" class="flex flex-col gap-1 bg-primary-black-900  transition-transform duration-150 border {% if ticket.status.value == "voting"%}border-accent! border-l-4{% else %}border-secondary-gray-700{% endif %} p-3 rounded-lg">
+<div id="ticket-{{ ticket.uuid }}" data-mercure-target="stream" data-updated-at="{{ ticket.updatedAt|date('U.u') }}" class="flex flex-col gap-1 bg-primary-black-900  transition-transform duration-150 border {% if ticket.status.value == "voting"%}border-accent! border-l-4{% else %}border-secondary-gray-700{% endif %} p-3 rounded-lg">
     <div class="flex items-start justify-between">
         <span class="uppercase font-mono text-secondary-gray! flex gap-1.5 items-center">
             {% if ticket.source.value == 'jira' %}
@@ -63,7 +63,7 @@
                             {% if ticket.status.value == 'pending' %}
                                 {% if is_granted('ROUND_START', ticket.room) %}
                                     <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
-                                        <button {% if round %}disabled{% endif %} data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                                        <button data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
                                             {{ icon('play', 'w-5! h-5! stroke-secondary-gray') }}
                                             Round Starten
                                         </button>
@@ -85,7 +85,7 @@
                             {% if ticket.status.value == 'revealed' or ticket.status.value == 'finished' %}
                                 {% if is_granted('ROUND_START', ticket.room) %}
                                     <form method="post" action="{{ path('round_start', {room_id:ticket.room.uuid, ticket_id:ticket.uuid}) }}">
-                                        <button {% if round %}disabled{% endif %} data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                                        <button data-action="click->dropdown#close" type="submit" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
                                             {{ icon('rotate', 'w-5! h-5! stroke-secondary-gray') }}
                                             Zurücksetzen
                                         </button>
@@ -102,7 +102,7 @@
                         </li>
 
                         <li>
-                            <button {% if ticket.status.value == "voting"%}disabled{% endif%} type="button" popovertarget="ticket_{{ ticket.uuid }}_edit_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
+                            <button type="button" popovertarget="ticket_{{ ticket.uuid }}_edit_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed!">
                                 {{ icon('pencil', 'w-5! h-5! stroke-secondary-grey-light') }}
                                 Bearbeiten
                             </button>
@@ -113,7 +113,7 @@
                         </li>
 
                         <li>
-                            <button {% if ticket.status.value == "voting"%}disabled{% endif%} popovertarget="ticket_{{ ticket.uuid }}_delete_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed! text-red-500! hover:bg-red-950!">
+                            <button popovertarget="ticket_{{ ticket.uuid }}_delete_modal" class="w-full py-1.5! flex gap-1.5 items-center btn-small rounded-md hover:bg-secondary-grey disabled:opacity-50 disabled:cursor-not-allowed! text-red-500! hover:bg-red-950!">
                                 {{ icon('trash', 'w-5! h-5! stroke-red-500') }}
                                 Löschen
                             </button>
