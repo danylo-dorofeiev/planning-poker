@@ -1,6 +1,6 @@
 {% extends 'pages/app/settings/settings.html.twig' %}
 
-{% block title %}Jira Verbindung{% endblock %}
+{% block title %}Anwendungen{% endblock %}
 
 {% block navigation %}
     {% include 'pages/app/settings/navigation.html.twig' with {activeTab: "services"} %}
@@ -64,13 +64,6 @@
                         <div class="bg-secondary-gray-700 h-10 w-px"></div>
 
                         <div class="flex items-center gap-2">
-                            {% if jiraConnection.accessTokenExpiresAt < date('now', 'UTC') %}
-                                <twig:Button link="{{ path('jira_connection') }}" target="_blank" type="primary" size="small">
-                                    {{ icon('rotate', 'w-4 h-4') }}
-                                    Erneuern
-                                </twig:Button>
-                            {% endif %}
-
                             <twig:Button type="danger" size="small" modal="jira_connection_remove_modal">
                                 {{ icon('unlink', 'w-4 h-4 stroke-red-500') }}
                                 Trennen
@@ -101,7 +94,6 @@
                                     </div>
                                 </div>
                             </twig:Modal>
-
                         </div>
                     </li>
                 {% else %}

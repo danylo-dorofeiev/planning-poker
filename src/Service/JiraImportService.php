@@ -7,9 +7,11 @@ use App\Entity\Room;
 use App\Entity\Ticket;
 use App\Entity\User;
 use App\Enum\TicketSource;
+use App\Exception\JiraConnectionExpiredException;
 use App\Repository\JiraConnectionRepository;
 use App\Twig\AdfExtension;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class JiraImportService
@@ -36,9 +38,20 @@ class JiraImportService
     ): void {
         $connection = $user->getJiraConnection();
 
+        if (!$connection) {
+            throw new \RuntimeException('Jira connection not found.');
+        }
+
+        try {
+            $accessToken = $this
+                ->getValidAccessToken($connection);
+        } catch (JiraConnectionExpiredException $e) {
+
+        }
+
         foreach ($issueKeys as $issueKey) {
             $issue = $this->getIssue(
-                $connection->getAccessToken(),
+                $this->getValidAccessToken($connection),
                 $connection->getCloudId(),
                 $issueKey,
             );
@@ -109,26 +122,6 @@ class JiraImportService
                 ],
             ])
             ->toArray();
-    }
-
-    public function getActiveConnection(User $user): ?JiraConnection
-    {
-        $connection = $this->jiraConnectionRepository->findOneBy([
-            'user' => $user,
-        ]);
-
-        if (!$connection) {
-            return null;
-        }
-
-        if (
-            $connection->getAccessTokenExpiresAt()
-            <= new \DateTimeImmutable('now', new \DateTimeZone('UTC'))
-        ) {
-            return null;
-        }
-
-        return $connection;
     }
 
     public function getProjects(
@@ -283,5 +276,71 @@ class JiraImportService
                 $response->getContent(false),
             ));
         }
+    }
+
+    public function getValidAccessToken(JiraConnection $connection): string
+    {
+        $createdAt = $connection->getCreatedAt();
+
+        if (!$createdAt || $createdAt <= new \DateTimeImmutable('-365 days')) {
+            $this->expireConnection($connection);
+        }
+
+        $expiresAt = $connection->getAccessTokenExpiresAt();
+
+        if (!$expiresAt || $expiresAt <= new \DateTimeImmutable('+5 minutes')) {
+            $refreshToken = $connection->getRefreshToken();
+
+            if (!$refreshToken) {
+                $this->expireConnection($connection);
+            }
+
+            try {
+                $response = $this->httpClient->request('POST', self::TOKEN_URL, [
+                    'json' => [
+                        'grant_type' => 'refresh_token',
+                        'client_id' => $this->clientId,
+                        'client_secret' => $this->clientSecret,
+                        'refresh_token' => $refreshToken,
+                    ],
+                ]);
+
+                $data = $response->toArray();
+
+            } catch (HttpExceptionInterface $e) {
+                $content = $e->getResponse()->getContent(false);
+                $error = json_decode($content, true);
+
+                if (($error['error'] ?? null) === 'invalid_grant') {
+                    $this->expireConnection($connection);
+                }
+
+                throw $e;
+            }
+
+            $connection->setAccessToken($data['access_token']);
+
+            if (!empty($data['refresh_token'])) {
+                $connection->setRefreshToken($data['refresh_token']);
+            }
+
+            $connection->setAccessTokenExpiresAt(
+                new \DateTimeImmutable('+' . $data['expires_in'] . ' seconds')
+            );
+
+            $this->entityManager->flush();
+        }
+
+        return $connection->getAccessToken();
+    }
+
+    private function expireConnection(JiraConnection $connection): never
+    {
+        $this->entityManager->remove($connection);
+        $this->entityManager->flush();
+
+        throw new JiraConnectionExpiredException(
+            'Jira connection has expired.'
+        );
     }
 }

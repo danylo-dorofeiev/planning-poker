@@ -1,6 +1,6 @@
 {% extends 'layout/app.html.twig' %}
 
-{% block title %}Jira Tickets Import{% endblock %}
+{% block title %}Jira Verbindung{% endblock %}
 
 {% block body %}
     <main class="flex">
@@ -33,59 +33,73 @@
 
                     <hr>
 
-                    <div class="p-4 bg-primary-black-900 border border-secondary-gray-700 rounded-lg">
-                        <ol class="flex items-center gap-2">
-                            <li>
-                                <span class="text-accent! bg-accent-700/30 border border-accent rounded-md flex items-center gap-1.5 py-1 px-2">
-                                    {{ icon('link', 'w-5 h-5 stroke-accent') }}
-                                    Verbinden
-                                </span>
-                            </li>
+                    {% if status is defined and status == "connected" %}
+                        <div class="bg-accent-700/30 border border-accent rounded-md p-4 flex flex-col items-center gap-2">
+                            {{ icon('check_circle', 'w-8 h-8 stroke-accent') }}
 
-                            <li>
-                                {{ icon('arrow_narrow_right', 'w-4 h-4 stroke-secondary-gray') }}
-                            </li>
+                            <span class="text-xl! text-accent!">
+                                Die Verbindung ist aktiv.
+                            </span>
+                        </div>
 
-                            <li>
-                                <span class="bg-secondary-gray-700/30 border border-secondary-gray-700 rounded-md flex items-center gap-1.5 py-1 px-2">
-                                    {{ icon('download', 'w-5 h-5 stroke-secondary-gray') }}
-                                    Tickets importieren
-                                </span>
-                            </li>
-
-                            <li>
-                                {{ icon('arrow_narrow_right', 'w-4 h-4 stroke-secondary-gray') }}
-                            </li>
-
-                            <li>
-                                <span class="bg-secondary-gray-700/30 border border-secondary-gray-700 rounded-md flex items-center gap-1.5 py-1 px-2">
-                                    {{ icon('deck', 'w-5 h-5 stroke-secondary-gray') }}
-                                    Abstimmen
-                                </span>
-                            </li>
-
-                            <li>
-                                {{ icon('arrow_narrow_right', 'w-4 h-4 stroke-secondary-gray') }}
-                            </li>
-
-                            <li>
-                                {{ icon('check_circle', 'w-8 h-8 fill-accent stroke-primary-black-900') }}
-                            </li>
-                        </ol>
-                    </div>
-
-                    <twig:Button link="{{ path('jira_connect') }}" type="primary" size="large">
-                        {{ icon('link', 'w-5 h-5') }}
-                        Mit Jira Verbinden
-                    </twig:Button>
-
-                    <div class="flex gap-1.5 items-center justify-center">
-                        {{ icon('info', 'w-3.5 h-3.5 stroke-secondary-gray') }}
-
-                        <span class="text-xs! text-secondary-gray!">
-                            Weitere Informationen zur Verarbeitung personenbezogener Daten in unserer <a href="{{ path('app_privacy') }}" class="text-xs! text-accent! hover:underline">Datenschutzerklärung</a>.
+                        <span class="text-xs! text-center text-secondary-gray!">
+                            Diese Seite kann gschlossen werden.
                         </span>
-                    </div>
+                    {% else %}
+                        <div class="p-4 bg-primary-black-900 border border-secondary-gray-700 rounded-lg">
+                            <ol class="flex items-center gap-2">
+                                <li>
+                                    <span class="text-accent! bg-accent-700/30 border border-accent rounded-md flex items-center gap-1.5 py-1 px-2">
+                                        {{ icon('link', 'w-5 h-5 stroke-accent') }}
+                                        Verbinden
+                                    </span>
+                                </li>
+
+                                <li>
+                                    {{ icon('arrow_narrow_right', 'w-4 h-4 stroke-secondary-gray') }}
+                                </li>
+
+                                <li>
+                                    <span class="bg-secondary-gray-700/30 border border-secondary-gray-700 rounded-md flex items-center gap-1.5 py-1 px-2">
+                                        {{ icon('download', 'w-5 h-5 stroke-secondary-gray') }}
+                                        Tickets importieren
+                                    </span>
+                                </li>
+
+                                <li>
+                                    {{ icon('arrow_narrow_right', 'w-4 h-4 stroke-secondary-gray') }}
+                                </li>
+
+                                <li>
+                                    <span class="bg-secondary-gray-700/30 border border-secondary-gray-700 rounded-md flex items-center gap-1.5 py-1 px-2">
+                                        {{ icon('deck', 'w-5 h-5 stroke-secondary-gray') }}
+                                        Abstimmen
+                                    </span>
+                                </li>
+
+                                <li>
+                                    {{ icon('arrow_narrow_right', 'w-4 h-4 stroke-secondary-gray') }}
+                                </li>
+
+                                <li>
+                                    {{ icon('check_circle', 'w-8 h-8 fill-accent stroke-primary-black-900') }}
+                                </li>
+                            </ol>
+                        </div>
+
+                        <twig:Button link="{{ path('jira_connect') }}" type="primary" size="large">
+                            {{ icon('link', 'w-5 h-5') }}
+                            Mit Jira Verbinden
+                        </twig:Button>
+
+                        <div class="flex gap-1.5 items-center justify-center">
+                            {{ icon('info', 'w-3.5 h-3.5 stroke-secondary-gray') }}
+
+                            <span class="text-xs! text-secondary-gray!">
+                                Weitere Informationen zur Verarbeitung personenbezogener Daten in unserer <a href="{{ path('app_privacy') }}" class="text-xs! text-accent! hover:underline">Datenschutzerklärung</a>.
+                            </span>
+                        </div>
+                    {% endif %}
                 </div>
 
                 {% include 'partials/app/footer.html.twig' %}
