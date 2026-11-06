@@ -1,0 +1,18 @@
+<div id="round_info"
+     data-mercure-target="stream"
+     class="flex flex-col gap-2 text-center"
+>
+    <span class="uppercase font-mono text-secondary-grey-light!">
+        #{{ round.ticket.key }}
+    </span>
+
+    <h4 class="tracking-normal! leading-tight! text-balance">
+        {{ round.ticket.title }}
+    </h4>
+
+    {% if round.ticket.description %}
+        <p class="text-secondary-grey-light!">
+            {{ round.ticket.description }}
+        </p>
+    {% endif %}
+</div>

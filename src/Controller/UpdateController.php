@@ -149,7 +149,6 @@ class UpdateController extends AbstractController
     public function ticket_card_remove(
         #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
         string $ticket_id,
-        RoundRepository $roundRepository,
     ): Response {
         return $this->render('ticket/stream/_ticket_card.html.twig', [
             'action' => "remove",
@@ -165,17 +164,47 @@ class UpdateController extends AbstractController
         RoundRepository $roundRepository,
         VoteRepository $voteRepository,
     ): Response {
-        $activeRound = $roundRepository->findActiveRoundByRoom($room);
+        $round = $roundRepository->findActiveRoundByRoom($room);
 
         $votedUserIds = [];
-        if ($activeRound) {
-            $votedUserIds = $voteRepository->findVotedUserIds($activeRound);
+        if ($round) {
+            $votedUserIds = $voteRepository->findVotedUserIds($round);
         }
 
         return $this->render('room/stream/_poker_table.html.twig', [
             'room' => $room,
-            'round' => $activeRound,
+            'round' => $round,
             'votedUserIds' => $votedUserIds,
+        ]);
+    }
+
+    #[Route('/room/{room_id}/round/{round_id}/round_info/update', name: 'round_info_update')]
+    public function round_info_update(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
+    ): Response {
+        return $this->render('room/stream/_round_info.html.twig', [
+            'round' => $round,
+        ]);
+    }
+
+    #[Route('/room/{room_id}/round/{round_id}/voting_deck/update', name: 'voting_deck_update')]
+    public function voting_deck_update(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
+    ): Response {
+        return $this->render('room/stream/_voting_deck.html.twig', [
+            'round' => $round,
+        ]);
+    }
+
+    #[Route('/room/{room_id}/round/{round_id}/voting_results/update', name: 'voting_results_update')]
+    public function voting_results_update(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
+    ): Response {
+        return $this->render('room/stream/_voting_results.html.twig', [
+            'round' => $round,
         ]);
     }
 

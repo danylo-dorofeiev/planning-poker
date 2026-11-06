@@ -1,0 +1,100 @@
+<twig:Modal modal="ticket_{{ ticket.uuid }}_show" title="Ticket Übersicht" width="600">
+    <div class="flex flex-col gap-3">
+        {% if ticket.rounds is not empty %}
+            <div class="flex flex-col gap-3">
+                <h6>Rounds</h6>
+
+                <div class="flex gap-1.5 flex-wrap text-center">
+                    {% for round in ticket.rounds %}
+                        <a href="{{ path('round_show', {room_id:room.uuid, ticket_id:ticket.uuid, round_id:round.id}) }}" data-turbo-frame="round_overview" class="p-1 border border-secondary-grey-light/40 rounded-lg w-8 h-8 bg-secondary-grey/20 hover:border-accent hover:bg-secondary-grey/30">
+                            {{ round.number }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <turbo-frame id="round_overview"></turbo-frame>
+            </div>
+        {% endif %}
+
+        <div class="flex flex-col gap-1 p-3 border border-secondary-grey-light/40 rounded-lg bg-secondary-grey/20">
+            <span class="uppercase font-mono text-secondary-grey-light! flex gap-1.5 items-center">
+                {% if ticket.source.value == 'jira' %}
+                    {{ icon('jira', 'w-4 h-4 stroke-secondary-gray') }}
+                {% else %}
+                    {{ icon('git_branch', 'w-4! h-4! stroke-secondary-grey-light!') }}
+                {% endif %}
+
+                {{ ticket.key }}
+            </span>
+            <h4>{{ ticket.title }}</h4>
+            <p class="text-secondary-grey-light!">
+                {{ ticket.description }}
+            </p>
+        </div>
+
+        <table class="table-auto w-full border-collapse text-sm">
+            <thead>
+            <tr>
+                <th class="text-left text-secondary-grey-light!">
+                    Status
+                </th>
+                <th class="text-left text-secondary-grey-light!">
+                    Created at
+                </th>
+                <th class="text-left text-secondary-grey-light!">
+                    Updated at
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    {% if ticket.status.value == 'finished' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent text-accent! bg-accent/20">
+                                {{ icon('check_circle', 'w-4! h-4! stroke-accent!') }}
+                                Abgeschlossen
+                            </span>
+                    {% endif %}
+
+                    {% if ticket.status.value == 'revealed' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                                {{ icon('check_circle_dashed', 'w-4! h-4!') }}
+                                Aufgedeckt
+                            </span>
+                    {% endif %}
+
+                    {% if ticket.status.value == 'voting' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-accent bg-accent/20">
+                                {{ icon('circle_dashed', 'w-4! h-4! animate-[spin_3s_linear_infinite]') }}
+                                Läuft
+                            </span>
+                    {% endif %}
+
+                    {% if ticket.status.value == 'pending' %}
+                        <span class="w-fit flex gap-1.5 items-center capitalize border rounded-lg py-0.5 px-2 border-secondary-gray-700 text-secondary-gray! bg-secondary-gray-800">
+                                {{ icon('clock', 'w-4! h-4! stroke-secondary-grey-light') }}
+                                Ausstehend
+                            </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ ticket.createdAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                </td>
+                <td>
+                    {{ ticket.updatedAt|format_datetime(pattern='MMM dd, yyyy – HH:mm', locale='en', timezone='Europe/Berlin') }}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% if ticket.source.value == 'jira' %}
+            <span class="flex gap-1.5 items-center text-secondary-gray! text-xs!">
+                Importiert von
+                <a href="https://www.atlassian.com/software/jira" target="_blank" class="text-accent! hover:underline text-xs! flex gap-1 items-center">
+                    Jira
+                    {{ icon('external_link', 'w-3.5 h-3.5 stroke-accent') }}
+                </a>
+            </span>
+        {% endif %}
+    </div>
+</twig:Modal>

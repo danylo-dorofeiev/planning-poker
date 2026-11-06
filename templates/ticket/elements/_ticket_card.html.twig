@@ -125,7 +125,9 @@
     </div>
 
     <div class="flex flex-col gap-1">
-        <h6 class="tracking-normal! text-balance">{{ ticket.title }}</h6>
+        <h6 class="tracking-normal! text-balance">
+            {{ ticket.title }}
+        </h6>
 
         {% if ticket.description %}
             <p class="text-secondary-grey-light!">
@@ -140,128 +142,136 @@
             {{ ticket.createdAt|format_datetime(pattern='MMM dd, yyyy', locale='en', timezone='Europe/Berlin') }}
         </span>
 
-        <div
-            data-controller="voting-result"
-            data-voting-result-url-value="{{ path('ticket_voting_result', {
-                room_id: room.uuid,
-                ticket_id: ticket.uuid
-            }) }}"
-            data-voting-result-time-based-url-value="{{ path('ticket_time_based', {
-                room_id: room.uuid,
-                ticket_id: ticket.uuid
-            }) }}"
-            data-voting-result-delete-url-value="{{ path('ticket_voting_result_delete', {
-                room_id:room.uuid,
-                ticket_id:ticket.uuid
-            }) }}"
-            data-voting-result-voting-result-value="{{ ticket.votingResult ?? '' }}"
-            class="relative"
-        >
-            {% if ticket.votingResult or ticket.votingResult == "0" %}
-                <twig:Button custom_param="data-voting-result-target=toggleButtonOpen" data_action="click->voting-result#inputBlockToggle" type="primary" size="small">
-                    {% if ticket.isTimeBased %}
-                        {{ ticket.votingResult }} Std.
-                    {% else %}
-                        {{ ticket.votingResult }}
-                    {% endif %}
-                </twig:Button>
-            {% else %}
-                <twig:Button custom_param="data-voting-result-target=toggleButtonOpen" data_action="click->voting-result#inputBlockToggle" type="smooth" size="smaller">
-                    {{ icon('clock', 'w-4 h-4 stroke-secondary-gray') }}
-                </twig:Button>
-            {% endif %}
-
+        {% if is_granted('ROUND_REVEAL', ticket.room) %}
             <div
-                data-voting-result-target="inputBlock"
-                class="opacity-0 translate-x-0 pointer-events-none transition-all duration-200 z-10"
+                data-controller="voting-result"
+                data-voting-result-url-value="{{ path('ticket_voting_result', {
+                    room_id: room.uuid,
+                    ticket_id: ticket.uuid
+                }) }}"
+                data-voting-result-time-based-url-value="{{ path('ticket_time_based', {
+                    room_id: room.uuid,
+                    ticket_id: ticket.uuid
+                }) }}"
+                data-voting-result-delete-url-value="{{ path('ticket_voting_result_delete', {
+                    room_id:room.uuid,
+                    ticket_id:ticket.uuid
+                }) }}"
+                data-voting-result-voting-result-value="{{ ticket.votingResult ?? '' }}"
+                class="relative"
             >
-                <div class="absolute top-1/2 right-full -translate-y-1/2">
-                    <div class="bg-primary-black p-3 border border-secondary-gray-700 rounded-lg flex flex-col gap-3">
+                {% if ticket.votingResult or ticket.votingResult == "0" %}
+                    <twig:Button custom_param="data-voting-result-target=toggleButtonOpen" data_action="click->voting-result#inputBlockToggle" type="primary" size="small">
+                        {% if ticket.isTimeBased %}
+                            {{ ticket.votingResult }} Std.
+                        {% else %}
+                            {{ ticket.votingResult }}
+                        {% endif %}
+                    </twig:Button>
+                {% else %}
+                    <twig:Button custom_param="data-voting-result-target=toggleButtonOpen" data_action="click->voting-result#inputBlockToggle" type="smooth" size="smaller">
+                        {{ icon('clock', 'w-4 h-4 stroke-secondary-gray') }}
+                    </twig:Button>
+                {% endif %}
 
-                        <div class="flex flex-col gap-2">
-                            <div class="flex gap-3 items-center">
-                                <span class="text-sm! text-secondary-gray! ">
-                                    Geschätzter Aufwand
-                                </span>
+                <div
+                    data-voting-result-target="inputBlock"
+                    class="opacity-0 translate-x-0 pointer-events-none transition-all duration-200 z-10"
+                >
+                    <div class="absolute top-1/2 right-full -translate-y-1/2">
+                        <div class="bg-primary-black p-3 border border-secondary-gray-700 rounded-lg flex flex-col gap-3">
 
-                                <div class="ml-auto flex gap-2">
-                                    {% if ticket.votingResult or ticket.votingResult == "0" %}
-                                        <button
-                                            type="button"
-                                            data-action="click->voting-result#deleteVotingResult"
-                                            class="btn-ghost btn-smallest hover:bg-red-950!"
+                            <div class="flex flex-col gap-2">
+                                <div class="flex gap-3 items-center">
+                                    <span class="text-sm! text-secondary-gray! ">
+                                        Geschätzter Aufwand
+                                    </span>
+
+                                    <div class="ml-auto flex gap-2">
+                                        {% if ticket.votingResult or ticket.votingResult == "0" %}
+                                            <button
+                                                type="button"
+                                                data-action="click->voting-result#deleteVotingResult"
+                                                class="btn-ghost btn-smallest hover:bg-red-950!"
+                                            >
+                                                {{ icon('trash', 'w-4 h-4 stroke-red-500') }}
+                                            </button>
+                                        {% endif %}
+
+                                        <twig:Button custom_param="data-voting-result-target=toggleButtonClose" data_action="click->voting-result#inputBlockToggle" type="smooth" size="smallest">
+                                            {{ icon('x', 'w-4 h-4 stroke-secondary-gray') }}
+                                        </twig:Button>
+                                    </div>
+                                </div>
+
+                                <hr>
+                            </div>
+
+                            <div class="flex flex-col gap-3">
+                                <div class="relative flex justify-end gap-2">
+                                    <span class="text-sm! text-secondary-gray!">
+                                        Zeitaufwand
+                                    </span>
+
+                                    <label class="w-fit flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            class="peer sr-only"
+                                            data-voting-result-target="timeBasedSelect"
+                                            data-action="change->voting-result#updateTimeBased"
+                                            data-previous-value="{{ ticket.isTimeBased ? '1' : '0' }}"
+                                            {{ ticket.isTimeBased ? 'checked' : '' }}
+
                                         >
-                                            {{ icon('trash', 'w-4 h-4 stroke-red-500') }}
-                                        </button>
-                                    {% endif %}
 
-                                    <twig:Button custom_param="data-voting-result-target=toggleButtonClose" data_action="click->voting-result#inputBlockToggle" type="smooth" size="smallest">
-                                        {{ icon('x', 'w-4 h-4 stroke-secondary-gray') }}
+                                        <span class="relative w-10 h-5 rounded-full bg-secondary-gray-700 transition-colors
+                                             peer-checked:bg-accent-600
+                                             peer-focus-visible:outline-2 peer-focus-visible:outline-accent-500
+                                             after:absolute after:top-0.5 after:left-0.5
+                                             after:size-4 after:rounded-full after:bg-white
+                                             after:transition-transform peer-checked:after:translate-x-5">
+                                        </span>
+                                    </label>
+
+                                    <span>
+                                        {{ icon('info', 'w-3.5 h-3.5 stroke-secondary-gray') }}
+                                    </span>
+                                </div>
+
+                                <div class="flex gap-2 items-center">
+                                    <label>
+                                        <input
+                                            type="text"
+                                            required
+                                            name="voting-result"
+                                            value="{{ ticket.votingResult ?? '' }}"
+                                            placeholder="Std."
+                                            data-voting-result-target="input"
+                                            data-action="input->voting-result#validateInput
+                                                         keydown.enter->voting-result#save"
+                                        >
+                                    </label>
+
+                                    <twig:Button data_action="click->voting-result#reset" type="smooth" size="smaller">
+                                        {{ icon('rotate', 'w-4 h-4 stroke-secondary-gray') }}
                                     </twig:Button>
                                 </div>
-                            </div>
 
-                            <hr>
-                        </div>
-
-                        <div class="flex flex-col gap-3">
-                            <div class="relative flex justify-end gap-2">
-                                <span class="text-sm! text-secondary-gray!">
-                                    Zeitaufwand
-                                </span>
-
-                                <label class="w-fit flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        class="peer sr-only"
-                                        data-voting-result-target="timeBasedSelect"
-                                        data-action="change->voting-result#updateTimeBased"
-                                        data-previous-value="{{ ticket.isTimeBased ? '1' : '0' }}"
-                                        {{ ticket.isTimeBased ? 'checked' : '' }}
-
-                                    >
-
-                                    <span class="relative w-10 h-5 rounded-full bg-secondary-gray-700 transition-colors
-                                         peer-checked:bg-accent-600
-                                         peer-focus-visible:outline-2 peer-focus-visible:outline-accent-500
-                                         after:absolute after:top-0.5 after:left-0.5
-                                         after:size-4 after:rounded-full after:bg-white
-                                         after:transition-transform peer-checked:after:translate-x-5">
-                                    </span>
-                                </label>
-
-                                <span>
-                                    {{ icon('info', 'w-3.5 h-3.5 stroke-secondary-gray') }}
-                                </span>
-                            </div>
-
-                            <div class="flex gap-2 items-center">
-                                <label>
-                                    <input
-                                        type="text"
-                                        required
-                                        name="voting-result"
-                                        value="{{ ticket.votingResult ?? '' }}"
-                                        placeholder="Std."
-                                        data-voting-result-target="input"
-                                        data-action="input->voting-result#validateInput
-                                                     keydown.enter->voting-result#save"
-                                    >
-                                </label>
-
-                                <twig:Button data_action="click->voting-result#reset" type="smooth" size="smaller">
-                                    {{ icon('rotate', 'w-4 h-4 stroke-secondary-gray') }}
+                                <twig:Button type="primary" size="medium" data_action="click->voting-result#save">
+                                    Speichern
                                 </twig:Button>
                             </div>
-
-                            <twig:Button type="primary" size="medium" data_action="click->voting-result#save">
-                                Speichern
-                            </twig:Button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% else %}
+            {% if ticket.votingResult %}
+                <div class="text-accent! text-sm!">
+                    {{ ticket.votingResult }}
+                </div>
+            {% endif %}
+        {% endif %}
     </div>
 </div>
 

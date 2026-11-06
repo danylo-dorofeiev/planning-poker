@@ -9,13 +9,16 @@ use App\Entity\Ticket;
 use App\Entity\Vote;
 use App\Enum\RoomStatus;
 use App\Enum\RoundStatus;
+use App\Enum\TicketSource;
 use App\Enum\TicketStatus;
 use App\Event\MemberListEvent;
 use App\Event\PokerTableEvent;
 use App\Event\TicketCardListEvent;
+use App\Repository\RoundRepository;
 use App\Repository\TicketRepository;
 use App\Repository\VoteRepository;
 use App\Security\Voter\RoomVoter;
+use App\Service\JiraImportService;
 use App\Service\RoomService;
 use App\Service\RoundService;
 use App\Service\TicketService;
@@ -33,12 +36,31 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[IsGranted('ROLE_USER')]
 final class RoundController extends AbstractController
 {
-    #[Route('/room/{room_id}/ticket/{ticket_id}/round/{round_id}', name: 'round_show', methods: ['GET'])]
+    #[Route('/room/{room_id}/ticket/{ticket_id}/round/{round_id}', name: 'round_show', requirements: ['round_id' => '\d+'], methods: ['GET'])]
     public function show(
         #[MapEntity(mapping: ['round_id' => 'id'])] Round $round,
     ): Response {
         return $this->render('ticket/stream/_round_overview.html.twig', [
             'round' => $round,
+        ]);
+    }
+
+    #[Route('/room/{room_id}/voting/next', name: 'voting_next', methods: ['GET'])]
+    public function voting(
+        #[MapEntity(mapping: ['room_id' => 'uuid'])] Room $room,
+        TicketRepository $ticketRepository,
+    ): Response {
+        $nextTicket = $ticketRepository->findFirstPendingTicket($room);
+
+        if (!$nextTicket) {
+            return $this->redirectToRoute('room_show', [
+                'room_id' => $room->getUuid(),
+            ]);
+        }
+
+        return $this->redirectToRoute('round_start', [
+            'room_id' => $room->getUuid(),
+            'ticket_id' => $nextTicket->getUuid(),
         ]);
     }
 
@@ -139,6 +161,33 @@ final class RoundController extends AbstractController
                     'event' => 'poker_table:update',
                     'url' => $this->generateUrl('poker_table_update', [
                         'room_id' => $room->getUuid(),
+                    ]),
+                ])
+            )
+        );
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'round_info',
+                    'event' => 'round_info:update',
+                    'url' => $this->generateUrl('round_info_update', [
+                        'room_id' => $room->getUuid(),
+                        'round_id' => $round->getId(),
+                    ]),
+                ])
+            )
+        );
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'voting_interface',
+                    'event' => 'voting_interface:update',
+                    'url' => $this->generateUrl('voting_deck_update', [
+                        'room_id' => $room->getUuid(),
                         'round_id' => $round->getId(),
                     ]),
                 ])
@@ -205,7 +254,6 @@ final class RoundController extends AbstractController
                     'event' => 'poker_table:update',
                     'url' => $this->generateUrl('poker_table_update', [
                         'room_id' => $room->getUuid(),
-                        'round_id' => $round->getId(),
                     ]),
                 ])
             )
@@ -222,6 +270,8 @@ final class RoundController extends AbstractController
         TicketService $ticketService,
         RoundService $roundService,
         HubInterface $hub,
+        VoteRepository $voteRepository,
+        JiraImportService $jiraImportService,
     ): Response {
         $this->denyAccessUnlessGranted(RoomVoter::REVEAL, $room);
 
@@ -229,16 +279,44 @@ final class RoundController extends AbstractController
             return new Response(status: 400);
         }
 
-        $round->setStatus(RoundStatus::REVEALED);
+        $votedUserIds = $voteRepository->findVotedUserIds($round);
 
-        if ($ticket->getVotingResult() !== null) {
-            $ticket->setStatus(TicketStatus::FINISHED);
-        } else {
-            $ticket->setStatus(TicketStatus::REVEALED);
+        $round->setStatus(RoundStatus::REVEALED);
+        $roundService->updateRound($round);
+
+        $votes = $round->getVotes();
+
+        $values = $votes->map(
+            fn ($vote) => $vote->getValue()
+        )->toArray();
+
+        $allSame = count($values) > 0
+            && count(array_unique($values)) === 1;
+
+        if ($allSame) {
+            $result = $values[0];
+
+            $round->getTicket()->setVotingResult($result);
+
+            if ($ticket->getSource() === TicketSource::JIRA) {
+                $connection = $this->getUser()->getJiraConnection();
+
+                $jiraImportService->updateOriginalEstimate(
+                    $connection->getAccessToken(),
+                    $connection->getCloudId(),
+                    $ticket->getKey(),
+                    $result,
+                );
+            }
         }
 
+        $ticket->setStatus(
+            $ticket->getVotingResult() !== null
+                ? TicketStatus::FINISHED
+                : TicketStatus::REVEALED
+        );
+
         $ticketService->updateTicket($ticket);
-        $roundService->updateRound($round);
 
         $hub->publish(
             new Update(
@@ -261,7 +339,20 @@ final class RoundController extends AbstractController
                     'event' => 'poker_table:update',
                     'url' => $this->generateUrl('poker_table_update', [
                         'room_id' => $room->getUuid(),
-                        'round_id' => $round->getId(),
+                    ]),
+                ])
+            )
+        );
+
+        $hub->publish(
+            new Update(
+                $room->getUuid(),
+                json_encode([
+                    'target' => 'voting_interface',
+                    'event' => 'voting_interface:update',
+                    'url' => $this->generateUrl('voting_results_update', [
+                        'room_id' => $room->getUuid(),
+                        'round_id' => $round->getNumber(),
                     ]),
                 ])
             )
@@ -284,7 +375,7 @@ final class RoundController extends AbstractController
         return $this->render('room/stream/_poker_table.html.twig', [
             'room' => $room,
             'round' => $round,
-            'votedUserIds' => null,
+            'votedUserIds' => $votedUserIds,
         ]);
     }
 }

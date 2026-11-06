@@ -39,4 +39,17 @@ class TicketRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function findFirstPendingTicket(Room $room): ?Ticket
+    {
+        return $this->createQueryBuilder('ticket')
+            ->andWhere('ticket.room = :room')
+            ->andWhere('ticket.status = :status')
+            ->setParameter('room', $room)
+            ->setParameter('status', TicketStatus::PENDING)
+            ->orderBy('ticket.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

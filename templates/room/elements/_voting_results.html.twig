@@ -1,0 +1,23 @@
+<div id="voting_interface"
+     data-mercure-target="stream"
+     class="flex gap-2">
+    {% for vote in round.votes %}
+        <div class="flex flex-col justify-center items-center gap-2">
+            <div class="group relative bg-secondary-grey w-12 h-12 rounded-full flex justify-center items-center border border-transparent hover:brightness-110 hover:scale-110 transition-transform duration-100 ease-in-out">
+                    <span class="text-base! uppercase select-none">
+                        {{ vote.user.name|slice(0, 2)|upper }}
+                    </span>
+
+                <div class="absolute top-full right-1/2 translate-x-1/2 pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150">
+                        <span class="text-xs! font-light! bg-secondary-grey px-2 py-1.5 rounded-sm text-nowrap brightness-110">
+                            {{ vote.user.name }}
+                        </span>
+                </div>
+            </div>
+
+            <div class="card">
+                {{ vote.value }}
+            </div>
+        </div>
+    {% endfor %}
+</div>

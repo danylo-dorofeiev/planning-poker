@@ -1,0 +1,21 @@
+<div id="voting_interface"
+     data-mercure-target="stream"
+     data-controller="vote"
+     data-vote-vote-url-value="{{ path('round_vote', {
+         room_id:round.ticket.room.uuid,
+         ticket_id:round.ticket.uuid,
+         round_id:round.id
+     }) }}"
+     class="flex items-center justify-center gap-1.5"
+>
+    {% for card in round.cards %}
+        <button type="button"
+                data-value="{{ card }}"
+                data-vote-target="button"
+                data-action="click->vote#submit"
+                class="card {% if round and round.votes|filter(vote => vote.user == app.user and vote.value == card)|length > 0 %}active{% endif %} transition-transform duration-150 hover:-translate-y-1 active:-translate-y-2 hover:border-accent!"
+        >
+            {{ card }}
+        </button>
+    {% endfor %}
+</div>
