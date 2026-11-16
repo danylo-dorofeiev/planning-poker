@@ -28,7 +28,7 @@ export default class extends Controller {
     toggle(event) {
         event.stopPropagation();
 
-        const isClosed = this.menuTarget.classList.contains('opacity-0');
+        const isClosed = !this.menuTarget.classList.contains('opened');
 
         if (isClosed) {
             window.dispatchEvent(
@@ -37,10 +37,8 @@ export default class extends Controller {
                 })
             );
 
-            this.menuTarget.classList.remove(
-                'opacity-0',
-                '-translate-y-2',
-                'pointer-events-none'
+            this.menuTarget.classList.add(
+                'opened'
             );
         } else {
             this.close();
@@ -48,10 +46,8 @@ export default class extends Controller {
     }
 
     close() {
-        this.menuTarget.classList.add(
-            'opacity-0',
-            '-translate-y-2',
-            'pointer-events-none'
+        this.menuTarget.classList.remove(
+            'opened'
         );
     }
 }

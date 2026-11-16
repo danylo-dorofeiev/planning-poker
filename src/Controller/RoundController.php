@@ -352,7 +352,7 @@ final class RoundController extends AbstractController
                     'event' => 'voting_interface:update',
                     'url' => $this->generateUrl('voting_results_update', [
                         'room_id' => $room->getUuid(),
-                        'round_id' => $round->getNumber(),
+                        'round_id' => $round->getId(),
                     ]),
                 ])
             )

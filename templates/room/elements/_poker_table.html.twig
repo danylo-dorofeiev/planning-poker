@@ -16,6 +16,13 @@
                         </form>
                     {% endif %}
                 {% endif %}
+            {% else %}
+                {% if is_granted('ROUND_START', room) %}
+                    <twig:Button link="{{ path('voting_next', {room_id:room.uuid}) }}" type="secondary" css="w-full h-full rounded-full! bg-transparent! hover:bg-secondary-gray-800!">
+                        {{ icon('arrow_right', 'w-4! h-4!') }}
+                        Nächste Runde
+                    </twig:Button>
+                {% endif %}
             {% endif %}
 
             {% for player in room.members %}

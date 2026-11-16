@@ -1,0 +1,11 @@
+.dropdown {
+    @apply opacity-0 -translate-y-2 pointer-events-none
+}
+
+.opened.dropdown {
+    @apply opacity-100 translate-y-0 pointer-events-auto;
+}
+
+.dropdown button {
+    @apply w-full flex gap-1.5 items-center px-2 py-1.5 text-sm rounded-md hover:bg-secondary-gray-800 min-h-8;
+}

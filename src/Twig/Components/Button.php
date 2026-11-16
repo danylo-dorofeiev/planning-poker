@@ -26,6 +26,7 @@ class Button
     public string $data_action="";
     public string $data_turbo_frame="";
 
+    public bool $dropdown_close=false;
     public string $custom_param="";
     public string $css="";
 }

@@ -1,8 +1,8 @@
-<header id="app_header" class="bg-primary-black border-b border-secondary-gray-700 px-4 py-2 z-90">
-    <div class="w-full flex justify-between items-center">
+<header id="app_header" class="bg-primary-black border-b border-secondary-gray-700 p-4 z-90">
+    <div class="w-full flex gap-6 items-center">
         <twig:Logo />
 
-        <div class="flex gap-2 items-center">
+        <div class="flex-1 flex gap-2 items-center justify-end">
             <div class="flex items-center gap-2">
                 {% if room is defined and not null %}
                     {% include 'room/elements/_room_settings.html.twig' with {room:room} %}
@@ -50,7 +50,7 @@
 
                 <div class="relative group">
                     <twig:Button link="{{ path('app') }}" type="smooth" size="smaller">
-                        {{ icon('dashboard', 'w-5 h-5 stroke-secondary-gray-400') }}
+                        {{ icon('dashboard', 'w-4.5 h-4.5 stroke-secondary-gray-400') }}
                     </twig:Button>
 
                     <twig:Tooltip poition="bottom center">
@@ -60,7 +60,7 @@
 
                 <div class="relative group">
                     <twig:Button link="{{ path('deck_list') }}" type="smooth" size="smaller">
-                        {{ icon('deck', 'w-5! h-5! stroke-secondary-gray-400') }}
+                        {{ icon('deck', 'w-4.5! h-4.5! stroke-secondary-gray-400') }}
                     </twig:Button>
 
                     <twig:Tooltip poition="bottom center">
@@ -72,32 +72,22 @@
 
             <twig:Dropdown width="250" position="bottom left">
                 <twig:block name="toggle">
-                    <div class="relative group">
-                        <div class="bg-secondary-grey-light/50 w-9 h-9 rounded-full flex justify-center items-center border border-transparent hover:brightness-110 cursor-pointer">
-                            <span class="text-sm! uppercase select-none">
-                                {{ app.user.name|slice(0, 2)|upper }}
-                             </span>
-                        </div>
+                    <twig:Avatar size="small"/>
 
-                        <twig:Tooltip position="bottom left">
-                            Benutzernavigationsmenü öffnen
-                        </twig:Tooltip>
-                    </div>
+                    <twig:Tooltip position="bottom left">
+                        Benutzernavigationsmenü öffnen
+                    </twig:Tooltip>
                 </twig:block>
 
                 <twig:block name="content">
                     <ol class="flex flex-col">
                         <li>
                             <div class="flex gap-2 items-center p-1">
-                                <div class="bg-secondary-gray-700 w-9 h-9 rounded-full flex justify-center items-center">
-                                <span class="text-sm! uppercase select-none">
-                                    {{ app.user.name|slice(0, 2)|upper }}
-                                </span>
-                                </div>
+                                <twig:Avatar size="small" :settings_link="true"/>
 
-                                <span class="font-medium!">
-                                {{ app.user.name }}
-                            </span>
+                                <span>
+                                    {{ app.user.name }}
+                                </span>
                             </div>
                         </li>
 
@@ -106,36 +96,36 @@
                         </li>
 
                         <li>
-                            <twig:Button link="{{ path('app_profile') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
-                                {{ icon('profile', 'w-5! h-5! stroke-secondary-gray!') }}
+                            <twig:Button link="{{ path('app_profile') }}" turbo="false" type="ghost" size="small" css="justify-start!">
+                                {{ icon('profile', 'w-4.5! h-4.5! stroke-secondary-gray!') }}
                                 Profil
                             </twig:Button>
                         </li>
 
                         <li>
-                            <twig:Button link="{{ path('app') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
-                                {{ icon('dashboard', 'w-5! h-5! stroke-secondary-gray!') }}
+                            <twig:Button link="{{ path('app') }}" turbo="false" type="ghost" size="small" css="justify-start!">
+                                {{ icon('dashboard', 'w-4.5! h-4.5! stroke-secondary-gray!') }}
                                 Räume
                             </twig:Button>
                         </li>
 
                         <li>
-                            <twig:Button link="{{ path('deck_list') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
-                                {{ icon('deck', 'w-5! h-5! stroke-secondary-gray!') }}
+                            <twig:Button link="{{ path('deck_list') }}" turbo="false" type="ghost" size="small" css="justify-start!">
+                                {{ icon('deck', 'w-4.5! h-4.5! stroke-secondary-gray!') }}
                                 Decks
                             </twig:Button>
                         </li>
 
                         <li>
-                            <twig:Button link="{{ path('app_appearance') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
-                                {{ icon('brush', 'w-5 h-5 stroke-secondary-gray!') }}
+                            <twig:Button link="{{ path('app_appearance') }}" turbo="false" type="ghost" size="small" css="justify-start!">
+                                {{ icon('brush', 'w-4.5 h-4.5 stroke-secondary-gray!') }}
                                 Darstellung
                             </twig:Button>
                         </li>
 
                         <li>
-                            <twig:Button link="{{ path('app_settings') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
-                                {{ icon('settings', 'w-5 h-5 stroke-secondary-gray!') }}
+                            <twig:Button link="{{ path('app_settings') }}" turbo="false" type="ghost" size="small" css="justify-start!">
+                                {{ icon('settings', 'w-4.5 h-4.5 stroke-secondary-gray!') }}
                                 Einstellungen
                             </twig:Button>
                         </li>
@@ -145,8 +135,8 @@
                         </li>
 
                         <li>
-                            <twig:Button link="{{ path('app_logout') }}" turbo="false" type="ghost" size="smaller" css="justify-start!">
-                                {{ icon('logout', 'w-5 h-5 stroke-secondary-gray!') }}
+                            <twig:Button link="{{ path('app_logout') }}" turbo="false" type="ghost" size="small" css="justify-start!">
+                                {{ icon('logout', 'w-4.5 h-4.5 stroke-secondary-gray!') }}
                                 Abmelden
                             </twig:Button>
                         </li>

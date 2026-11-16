@@ -4,6 +4,7 @@
        data-turbo="{{ turbo }}"
        {% if data_turbo_frame %}data-turbo-frame="{{ data_turbo_frame }}"{% endif %}
        {% if preload %}data-turbo-preload{% endif %}
+       {% if dropdown_close %}data-action="click->dropdown#close"{% endif %}
        class="btn-{{ type }} btn-{{ size }} {{ css }} leading-3.5"
 
        {% if custom_param %}{{ custom_param }}{% endif %}
@@ -16,6 +17,7 @@
             {% if value %}value="{{ value }}"{% endif %}
             {% if modal %}popovertarget="{{ modal }}"{% endif %}
             {% if data_action %}data-action="{{ data_action }}"{% endif %}
+            {% if dropdown_close %}data-action="click->dropdown#close"{% endif %}
             class="btn-{{ type }} btn-{{ size }} {{ css }}"
 
             {% if custom_param %}{{ custom_param }}{% endif %}

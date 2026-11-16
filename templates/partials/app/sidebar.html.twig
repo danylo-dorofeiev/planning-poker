@@ -2,7 +2,7 @@
     <div class="h-[calc(100vh-65px)] sticky top-0 p-2">
         <nav class="h-full flex flex-col items-center gap-2">
 
-            <div data-controller="sidebar" class="group relative mb-4">
+            <div data-controller="sidebar" class="group relative">
                 <div data-sidebar-target="closeIcon">
                     <twig:Button type="ghost" size="smaller" data_action="click->sidebar#close">
                         {{ icon('sidebar_left_collapse', 'w-5 h-5 stroke-secondary-gray') }}
@@ -24,44 +24,38 @@
                 </div>
             </div>
 
-            <div class="flex flex-col justify-center items-center">
+            <hr>
+
+            <div class="relative group flex flex-col justify-center items-center">
                 {% if activeTab is defined and activeTab == "rooms" %}
                     <twig:Button type="primary" size="smaller">
                         {{ icon('dashboard', 'w-5 h-5') }}
                     </twig:Button>
-
-                    <span class="text-xs! text-accent!">
-                        Räume
-                    </span>
                 {% else %}
                     <twig:Button link="{{ path('app') }}" type="ghost" size="smaller">
                         {{ icon('dashboard', 'w-5 h-5 stroke-secondary-gray') }}
                     </twig:Button>
-
-                    <span class="text-xs! text-secondary-gray!">
-                        Räume
-                    </span>
                 {% endif %}
+
+                <twig:Tooltip position="right">
+                    Dashboard
+                </twig:Tooltip>
             </div>
 
-            <div class="flex flex-col justify-center items-center">
+            <div class="relative group flex flex-col justify-center items-center">
                 {% if activeTab is defined and activeTab == "decks" %}
                     <twig:Button type="primary" size="smaller">
                         {{ icon('deck', 'w-5 h-5') }}
                     </twig:Button>
-
-                    <span class="text-xs! text-accent!">
-                        Decks
-                    </span>
                 {% else %}
                     <twig:Button link="{{ path('deck_list') }}" type="ghost" size="smaller">
                         {{ icon('deck', 'w-5 h-5 stroke-secondary-gray') }}
                     </twig:Button>
-
-                    <span class="text-xs! text-secondary-gray!">
-                        Decks
-                    </span>
                 {% endif %}
+
+                <twig:Tooltip position="right">
+                    Decks
+                </twig:Tooltip>
             </div>
 
             <div class="mt-auto flex flex-col gap-2">
