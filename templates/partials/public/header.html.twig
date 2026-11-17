@@ -1,9 +1,9 @@
 <header class="sticky top-0 bg-primary-black border-b border-secondary-gray-700 p-3.5 z-90">
     <div class="flex justify-between items-center">
         <div class="flex items-center gap-20">
-            <twig:Logo />
+            <twig:Logo :isDemo="false"/>
 
-            <nav class="flex gap-2 mt-0.5 items-center">
+            <nav class="hidden flex gap-2 mt-0.5 items-center">
                 <twig:Button link="{{ path('app_about') }}" type="ghost" size="small" css="text-primary-white! hover:underline">
                     About
                 </twig:Button>
